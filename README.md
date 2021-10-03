@@ -1,7 +1,31 @@
-# Morpho Data Strcutures 🦋
+# Morpho Data Structures 🦋
 
 This repository contains the data strcutures that can be used for the matching engine.
-The goal is to compare themn in terms of security and gas consumption to find the best solution for the protocol and its users.
+The goal is to compare them in terms of security and gas consumption to find the best solution for the protocol and its users.
+
+## Data structures
+
+The data structures we implement and modify are based on public works of amazing developers. We thank them for what they have done 🙏
+
+### Double Linked List
+
+The current implementation of the double linked list is based on this [article](https://hackernoon.com/a-linked-list-implementation-for-ethereum-deep-dive-oy9432pa) written by Alberto Cuesta Cañada.
+You can find the repository [here](https://github.com/HQ20/contracts/tree/master/contracts/lists).
+Note that the code has been modified to meet our needs and to allow us to sort the double linked list.
+
+### Red Black Binary Tree
+
+A [Red Black Binary Tree](https://en.wikipedia.org/wiki/Red%E2%80%93black_tree) is a kind of binary tree that allows insertion / deletion / search in `O(log(n))`.
+Our implementation is a modified version of the [OrderStatisticsTree repository](https://github.com/rob-Hitchens/OrderStatisticsTree) written by [Rob Hitechn](https://github.com/rob-Hitchens) which is also based on [BokkyPooBahsRedBlackTreeLibrary repository](https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary) written by [bokkypoobah](https://github.com/bokkypoobah).
+Our modified version makes keys unique items instead of just (key, value) unique pairs.
+
+You can refer to the following table for the complexity of some data structures.
+
+![complexities](https://devopedia.org/images/article/17/7752.1513922040.jpg)
+
+### Other data structures
+
+Other data structures may be explored in the future.
 
 ## Contributing
 
@@ -69,28 +93,6 @@ We recommend developers using VSCODE to set their local config as below:
 In doing so the code will be formatted on each save.
 
 We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
-
-## Deploy a contract on a network
-
-```
-npx hardhat run scripts/deploy.js --network <network-name>
-```
-
-## Publish and verify a contract on Etherscan
-
-An etherscn API key is required to verify the contract and placed into your `.env` local file.
-The right arguments of the constructor of the smart contract to verify must be write inside `arguments.js`. Then you can run the following command to verify a contract:
-
-```
-npx hardhat verify --network <network-name> --constructor-args scripts/arguments.js <contract-address>
-```
-
-## External resources & documentation
-
-- [Solidity Prettier Plugin](https://github.com/prettier-solidity/prettier-plugin-solidity)
-- [Red Black Binary Tree](https://en.wikipedia.org/wiki/Red%E2%80%93black_tree): binary tree used to sort users for the matching engine
-- [Red Black Binary Tree Solidity Implementation 1](https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary): base solidity implementation of a Red Black Binary Tree.
-- [Red Black Binary Tree Solidity Implementation 2](https://github.com/rob-Hitchens/OrderStatisticsTree): solidity implementation of a Red Black Binary Tree based on the previous version. Our modified version makes keys unique items instead of just (key, value) unique pairs.
 
 ## Questions
 
