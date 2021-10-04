@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity 0.8.9;
+pragma solidity 0.8.7;
 
 library DoubleLinkedList {
     struct Account {
@@ -17,14 +17,30 @@ library DoubleLinkedList {
         uint256 counter;
     }
 
+    /** @dev Returns the `account` linked to `_id`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @return account The account linked to `_id`.
+     */
     function get(List storage _list, address _id) internal view returns (Account memory account) {
         return _list.accounts[_id];
     }
 
+    /** @dev Returns the next id address from the current `_id`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @return account The account linked to `_id`.
+     */
     function getNext(List storage _list, address _id) internal view returns (address) {
         return _list.accounts[_id].next;
     }
 
+    /** @dev Adds an `_id` and its value to the head of the `_list`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @param _value The value of the account.
+     *  @return bool Whether the account has been added or not.
+     */
     function addHead(
         List storage _list,
         address _id,
@@ -41,6 +57,12 @@ library DoubleLinkedList {
         }
     }
 
+    /** @dev Adds an `_id` and its value to the tail of the `_list`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @param _value The value of the account.
+     *  @return bool Whether the account has been added or not.
+     */
     function addTail(
         List storage _list,
         address _id,
@@ -60,6 +82,11 @@ library DoubleLinkedList {
         }
     }
 
+    /** @dev Removes an account of the `_list`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @return bool Whether the account has been removed or not.
+     */
     function remove(List storage _list, address _id) internal returns (bool) {
         if (_contains(_list, _id)) {
             Account memory account = _list.accounts[_id];
@@ -83,6 +110,11 @@ library DoubleLinkedList {
         }
     }
 
+    /** @dev Inserts an account in the `_list` at the right slot based on its `_value`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @param _value The value of the account.
+     */
     function insertSorted(
         List storage _list,
         address _id,
@@ -96,6 +128,12 @@ library DoubleLinkedList {
         require(insertBefore(_list, previous, _id, _value));
     }
 
+    /** @dev Inserts an account in the `_list` before another account.
+     *  @param _list The list to search in.
+     *  @param _nextId The account id from which to insert the account before.
+     *  @param _id The address of the account.
+     *  @param _value The value of the account.
+     */
     function insertBefore(
         List storage _list,
         address _nextId,
@@ -117,30 +155,58 @@ library DoubleLinkedList {
         }
     }
 
+    /** @dev Returns whether or not the account is in the `_list`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @return whether or not the account is in the `_list`.
+     */
     function contains(List storage _list, address _id) internal view returns (bool) {
         return _contains(_list, _id);
     }
 
+    /** @dev Returns the length of the `_list`.
+     *  @param _list The list to get the length.
+     *  @return The length.
+     */
     function length(List storage _list) internal view returns (uint256) {
         return _length(_list);
     }
 
+    /** @dev Returns the address at the head of the `_list`.
+     *  @param _list The list to get the head.
+     *  @return The address.
+     */
     function getHead(List storage _list) internal view returns (address) {
         return _list.head;
     }
 
+    /** @dev Returns the address at the tail of the `_list`.
+     *  @param _list The list to get the tail.
+     *  @return The address.
+     */
     function getTail(List storage _list) internal view returns (address) {
         return _list.tail;
     }
 
+    /** @dev Sets the head of the `_list`.
+     *  @param _list The list to set the head.
+     */
     function _setHead(List storage _list, address _id) private {
         _list.head = _id;
     }
 
+    /** @dev Sets the tail of the `_list`.
+     *  @param _list The list to set the tail.
+     */
     function _setTail(List storage _list, address _id) private {
         _list.tail = _id;
     }
 
+    /** @dev Creates an account based on its `_id` and `_value`.
+     *  @param _list The list to set the tail.
+     *  @param _id The address of the account.
+     *  @param _value The value of the account.
+     */
     function _createAccount(
         List storage _list,
         address _id,
@@ -151,6 +217,11 @@ library DoubleLinkedList {
         _list.accounts[_id] = account;
     }
 
+    /** @dev Links an account to its previous and next accounts.
+     *  @param _list The list to set the tail.
+     *  @param _prevId The address of the previous account.
+     *  @param _nextId The address of the next account.
+     */
     function _link(
         List storage _list,
         address _prevId,
@@ -160,10 +231,19 @@ library DoubleLinkedList {
         _list.accounts[_nextId].prev = _prevId;
     }
 
+    /** @dev Returns whether or not the account is in the `_list`.
+     *  @param _list The list to search in.
+     *  @param _id The address of the account.
+     *  @return whether or not the account is in the `_list`.
+     */
     function _contains(List storage _list, address _id) private view returns (bool) {
         return _list.accounts[_id].isIn;
     }
 
+    /** @dev Returns the length of the `_list`.
+     *  @param _list The list to get the length.
+     *  @return The length.
+     */
     function _length(List storage _list) private view returns (uint256) {
         return _list.counter;
     }
