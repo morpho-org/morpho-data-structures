@@ -2,13 +2,14 @@ require('dotenv').config({ path: './.env.local' });
 require('@nomiclabs/hardhat-etherscan');
 require('@nomiclabs/hardhat-waffle');
 require('hardhat-gas-reporter');
-require('hardhat-deploy');
 
 module.exports = {
   defaultNetwork: 'hardhat',
-  networks: {},
+  networks: {
+    hardhat: {},
+  },
   solidity: {
-    version: '0.8.9',
+    version: '0.8.7',
     settings: {
       optimizer: {
         enabled: true,
@@ -21,6 +22,7 @@ module.exports = {
   },
   gasReporter: {
     currency: 'USD',
+    gasPrice: 100,
   },
   mocha: {
     timeout: 100000,
