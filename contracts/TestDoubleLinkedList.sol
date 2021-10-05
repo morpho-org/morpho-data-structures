@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.7;
 
+import "hardhat/console.sol";
 import "./DoubleLinkedList.sol";
 
 contract TestDoubleLinkedList {
@@ -16,11 +17,25 @@ contract TestDoubleLinkedList {
         list.remove(_id);
     }
 
-    function getHead() external view returns (address) {
-        return list.getHead();
+    function addTail(address _id, uint256 _value) external {
+        list.addTail(_id, _value);
     }
 
-    function length() external view returns (uint256) {
-        return list.length();
+    function getNext(address _id) external view {
+        uint256 gasBefore = gasleft();
+        list.getNext(_id);
+        console.log("getNext", gasBefore - gasleft());
+    }
+
+    function getHead() external view {
+        uint256 gasBefore = gasleft();
+        list.getHead();
+        console.log("getHead", gasBefore - gasleft());
+    }
+
+    function length() external view {
+        uint256 gasBefore = gasleft();
+        list.length();
+        console.log("length", gasBefore - gasleft());
     }
 }
