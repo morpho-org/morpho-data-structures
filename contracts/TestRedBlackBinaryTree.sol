@@ -24,15 +24,11 @@ contract TestRedBlackBinaryTree {
         return tree.last();
     }
 
-    function getNodeCount(uint256 _value) external view returns (uint256) {
-        return tree.getNodeCount(_value);
+    function getNumberOfKeyAtValue(uint256 _value) external view returns (uint256) {
+        return tree.getNumberOfKeyAtValue(_value);
     }
 
     function valueKeyAtIndex(uint256 _value, uint256 _index) external view returns (address) {
         return tree.valueKeyAtIndex(_value, _index);
-    }
-
-    function count() external view returns (uint256) {
-        return tree.count();
     }
 }
