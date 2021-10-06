@@ -1,15 +1,18 @@
-const { utils } = require('ethers');
+const { utils, BigNumber } = require('ethers');
 const { ethers } = require('hardhat');
 
 describe('Test RedBlackBinaryTree Library', () => {
   let testRedBlackBinaryTree;
   let addresses = [];
   let addressesLength;
+  const MAX = 10 * 30;
 
   for (let i = 0; i < 700; i++) {
     addresses.push(utils.solidityKeccak256(['uint256'], [i]).slice(0, 42));
   }
   addressesLength = addresses.length;
+
+  const getRandomNumber = () => Math.floor(Math.random() * MAX + 1);
 
   beforeEach(async () => {
     const RedBlackBinaryTree = await ethers.getContractFactory('RedBlackBinaryTree');
@@ -63,6 +66,20 @@ describe('Test RedBlackBinaryTree Library', () => {
       }
     });
 
+    it('Test insert and remove many random values', async () => {
+      for (let i = 0; i < addressesLength; i++) {
+        const address = addresses[i];
+        const value = BigNumber.from(getRandomNumber());
+
+        await testRedBlackBinaryTree.insert(address, value);
+      }
+
+      for (let i = 0; i < addressesLength; i++) {
+        const address = addresses[addressesLength - i - 1];
+        await testRedBlackBinaryTree.remove(address);
+      }
+    });
+
     it('Test keyExists', async () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
@@ -77,7 +94,7 @@ describe('Test RedBlackBinaryTree Library', () => {
       }
     });
 
-    it('Test getNodeCount', async () => {
+    it('Test getNumberOfKeysAtValue', async () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
@@ -85,7 +102,7 @@ describe('Test RedBlackBinaryTree Library', () => {
         value = value.sub(1);
       }
 
-      await testRedBlackBinaryTree.getNodeCount(utils.parseUnits('10'));
+      await testRedBlackBinaryTree.getNumberOfKeysAtValue(utils.parseUnits('10'));
     });
 
     it('Test last', async () => {

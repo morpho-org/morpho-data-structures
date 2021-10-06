@@ -1,15 +1,18 @@
-const { utils } = require('ethers');
+const { utils, BigNumber } = require('ethers');
 const { ethers } = require('hardhat');
 
 describe('Test DoubleLinkedList Library', () => {
   let testDoubleLinkedList;
   let addresses = [];
   let addressesLength;
+  const MAX = 10 * 30;
 
   for (let i = 0; i < 700; i++) {
     addresses.push(utils.solidityKeccak256(['uint256'], [i]).slice(0, 42));
   }
   addressesLength = addresses.length;
+
+  const getRandomNumber = () => Math.floor(Math.random() * MAX + 1);
 
   beforeEach(async () => {
     const TestDoubleLinkedList = await ethers.getContractFactory('TestDoubleLinkedList');
@@ -47,6 +50,20 @@ describe('Test DoubleLinkedList Library', () => {
         const address = addresses[i];
         await testDoubleLinkedList.insertSorted(address, value);
         value = value.sub(1);
+      }
+
+      for (let i = 0; i < addressesLength; i++) {
+        const address = addresses[addressesLength - i - 1];
+        await testDoubleLinkedList.remove(address);
+      }
+    });
+
+    it('Test insert and remove many random values', async () => {
+      for (let i = 0; i < addressesLength; i++) {
+        const address = addresses[i];
+        const value = BigNumber.from(getRandomNumber());
+
+        await testDoubleLinkedList.insertSorted(address, value);
       }
 
       for (let i = 0; i < addressesLength; i++) {
