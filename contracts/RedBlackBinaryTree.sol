@@ -12,7 +12,6 @@ library RedBlackBinaryTree {
         uint256 parent;
         uint256 left;
         uint256 right;
-        uint256 count;
         bool red;
         address[] keys;
         mapping(address => uint256) keyMap;
@@ -78,11 +77,6 @@ library RedBlackBinaryTree {
         return _self.isIn[_key];
     }
 
-    function getNodeCount(Tree storage _self, uint256 value) public view returns (uint256) {
-        Node storage gn = _self.nodes[value];
-        return gn.keys.length + gn.count;
-    }
-
     function valueKeyAtIndex(
         Tree storage _self,
         uint256 _value,
@@ -92,8 +86,18 @@ library RedBlackBinaryTree {
         return _self.nodes[_value].keys[_index];
     }
 
-    function count(Tree storage _self) public view returns (uint256) {
-        return getNodeCount(_self, _self.root);
+    /** @dev Returns the number of addresses in a given node.
+     *  @param _self The tree to search in.
+     *  @param _value The value of the node to search for.
+     *  @return The number of Addresses in this node.
+     */
+    function getNumberOfKeyAtValue(Tree storage _self, uint256 _value)
+        public
+        view
+        returns (uint256)
+    {
+        require(exists(_self, _value), "RBBT(404):value-not-exist");
+        return _self.nodes[_value].keys.length;
     }
 
     function insert(
@@ -118,7 +122,6 @@ library RedBlackBinaryTree {
                 _self.nodes[probe].keyMap[_key] = _self.nodes[probe].keys.length - 1;
                 return;
             }
-            _self.nodes[cursor].count++;
         }
         Node storage nValue = _self.nodes[_value];
         nValue.parent = cursor;
@@ -182,22 +185,11 @@ library RedBlackBinaryTree {
                 _self.nodes[_self.nodes[cursor].right].parent = cursor;
                 _self.nodes[cursor].red = _self.nodes[value].red;
                 (cursor, value) = (value, cursor);
-                fixCountRecurse(_self, value);
             }
             if (doFixup) {
                 removeFixup(_self, probe);
             }
-            fixCountRecurse(_self, cursorParent);
             delete _self.nodes[cursor];
-        }
-    }
-
-    function fixCountRecurse(Tree storage _self, uint256 _value) private {
-        while (_value != 0) {
-            _self.nodes[_value].count =
-                getNodeCount(_self, _self.nodes[_value].left) +
-                getNodeCount(_self, _self.nodes[_value].right);
-            _value = _self.nodes[_value].parent;
         }
     }
 
@@ -233,12 +225,6 @@ library RedBlackBinaryTree {
         }
         _self.nodes[cursor].left = _value;
         _self.nodes[_value].parent = cursor;
-        _self.nodes[_value].count =
-            getNodeCount(_self, _self.nodes[_value].left) +
-            getNodeCount(_self, _self.nodes[_value].right);
-        _self.nodes[cursor].count =
-            getNodeCount(_self, _self.nodes[cursor].left) +
-            getNodeCount(_self, _self.nodes[cursor].right);
     }
 
     function rotateRight(Tree storage _self, uint256 _value) private {
@@ -259,12 +245,6 @@ library RedBlackBinaryTree {
         }
         _self.nodes[cursor].right = _value;
         _self.nodes[_value].parent = cursor;
-        _self.nodes[_value].count =
-            getNodeCount(_self, _self.nodes[_value].left) +
-            getNodeCount(_self, _self.nodes[_value].right);
-        _self.nodes[cursor].count =
-            getNodeCount(_self, _self.nodes[cursor].left) +
-            getNodeCount(_self, _self.nodes[cursor].right);
     }
 
     function insertFixup(Tree storage _self, uint256 _value) private {
