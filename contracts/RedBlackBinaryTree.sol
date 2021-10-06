@@ -86,12 +86,12 @@ library RedBlackBinaryTree {
         return _self.nodes[_value].keys[_index];
     }
 
-    /** @dev Returns the number of addresses in a given node.
+    /** @dev Returns the number of keys in a given node.
      *  @param _self The tree to search in.
      *  @param _value The value of the node to search for.
-     *  @return The number of Addresses in this node.
+     *  @return The number of keys in this node.
      */
-    function getNumberOfKeyAtValue(Tree storage _self, uint256 _value)
+    function getNumberOfKeysAtValue(Tree storage _self, uint256 _value)
         public
         view
         returns (uint256)
