@@ -237,6 +237,10 @@ library RedBlackBinaryTree {
         }
     }
 
+    /** @dev Returns the minimum of the subtree beginning at a given node.
+     *  @param _self The tree to search in.
+     *  @param _value The value of the node to start at.
+     */
     function treeMinimum(Tree storage _self, uint256 _value) private view returns (uint256) {
         while (_self.nodes[_value].left != 0) {
             _value = _self.nodes[_value].left;
@@ -244,6 +248,10 @@ library RedBlackBinaryTree {
         return _value;
     }
 
+    /** @dev Returns the maximum of the subtree beginning at a given node.
+     *  @param _self The tree to search in.
+     *  @param _value The value of the node to start at.
+     */
     function treeMaximum(Tree storage _self, uint256 _value) private view returns (uint256) {
         while (_self.nodes[_value].right != 0) {
             _value = _self.nodes[_value].right;
@@ -251,6 +259,11 @@ library RedBlackBinaryTree {
         return _value;
     }
 
+    /** @dev Rotate the tree to keep the balance. Let's have three node, A (root), B (A's right child), C (B's left child). 
+             After left rotation: B (Root), A (B's left child), C (B's right child)
+     *  @param _self The tree to apply the rotation to.
+     *  @param _value The value of the node to rotate.
+     */
     function rotateLeft(Tree storage _self, uint256 _value) private {
         uint256 cursor = _self.nodes[_value].right;
         uint256 parent = _self.nodes[_value].parent;
@@ -271,6 +284,11 @@ library RedBlackBinaryTree {
         _self.nodes[_value].parent = cursor;
     }
 
+    /** @dev Rotate the tree to keep the balance. Let's have three node, A (root), B (A's left child), C (B's right child). 
+             After right rotation: B (Root), A (B's right child), C (B's left child)
+     *  @param _self The tree to apply the rotation to.
+     *  @param _value The value of the node to rotate.
+     */
     function rotateRight(Tree storage _self, uint256 _value) private {
         uint256 cursor = _self.nodes[_value].left;
         uint256 parent = _self.nodes[_value].parent;
@@ -291,6 +309,10 @@ library RedBlackBinaryTree {
         _self.nodes[_value].parent = cursor;
     }
 
+    /** @dev Makes sure there is no violation of the tree properties after an insertion.
+     *  @param _self The tree to check and correct if needed.
+     *  @param _value The value that was inserted.
+     */
     function insertFixup(Tree storage _self, uint256 _value) private {
         uint256 cursor;
         while (_value != _self.root && _self.nodes[_self.nodes[_value].parent].red) {
@@ -334,6 +356,11 @@ library RedBlackBinaryTree {
         _self.nodes[_self.root].red = false;
     }
 
+    /** @dev Replace the parent of A by B's parent.
+     *  @param _self The tree to work with.
+     *  @param _a The node that will get the new parents.
+     *  @param _b The node that gives its parent.
+     */
     function replaceParent(
         Tree storage _self,
         uint256 _a,
@@ -352,6 +379,10 @@ library RedBlackBinaryTree {
         }
     }
 
+    /** @dev Makes sure there is no violation of the tree properties after removal.
+     *  @param _self The tree to check and correct if needed.
+     *  @param _value The probe value of the function remove.
+     */
     function removeFixup(Tree storage _self, uint256 _value) private {
         uint256 cursor;
         while (_value != _self.root && !_self.nodes[_value].red) {
