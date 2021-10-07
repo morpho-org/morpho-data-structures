@@ -23,6 +23,9 @@ library RedBlackBinaryTree {
         mapping(address => uint256) keyToValue;
     }
 
+    /** @dev Returns the smallest value in the tree `_self`.
+     *  @param _self The tree to search in.
+     */
     function first(Tree storage _self) public view returns (uint256 value) {
         value = _self.root;
         if (value == 0) return 0;
@@ -31,6 +34,9 @@ library RedBlackBinaryTree {
         }
     }
 
+    /** @dev Returns the highest value in the tree `_self`.
+     *  @param _self The tree to search in.
+     */
     function last(Tree storage _self) public view returns (uint256 value) {
         value = _self.root;
         if (value == 0) return 0;
@@ -39,6 +45,10 @@ library RedBlackBinaryTree {
         }
     }
 
+    /** @dev Returns the next value below `_value`.
+     *  @param _self The tree to search in.
+     *  @param _value The value to search after.
+     */
     function next(Tree storage _self, uint256 _value) public view returns (uint256 cursor) {
         require(_value != 0, "RBBT(401):start-_value=0");
         if (_self.nodes[_value].right != 0) {
@@ -52,6 +62,10 @@ library RedBlackBinaryTree {
         }
     }
 
+    /** @dev Returns the previous value above `_value`.
+     *  @param _self The tree to search in.
+     *  @param _value The value to search before.
+     */
     function prev(Tree storage _self, uint256 _value) public view returns (uint256 cursor) {
         require(_value != 0, "RBBT(402):start-_value=0");
         if (_self.nodes[_value].left != 0) {
@@ -65,6 +79,11 @@ library RedBlackBinaryTree {
         }
     }
 
+    /** @dev Returns whether the `_value` exists in the tree or not.
+     *  @param _self The tree to search in.
+     *  @param _value The value to search.
+     *  @return Whether the `_value` exists in the tree or not.
+     */
     function exists(Tree storage _self, uint256 _value) public view returns (bool) {
         if (_value == 0) return false;
         if (_value == _self.root) return true;
@@ -72,15 +91,26 @@ library RedBlackBinaryTree {
         return false;
     }
 
+    /** @dev Returns whether the `_key` exists in the tree or not.
+     *  @param _self The tree to search in.
+     *  @param _key The key to search.
+     *  @return Whether the `_key` exists in the tree or not.
+     */
     function keyExists(Tree storage _self, address _key) public view returns (bool) {
         return _self.keyToValue[_key] != 0;
     }
 
+    /** @dev Returns the `_key` that has the given `_value` at the specified `_index`.
+     *  @param _self The tree to search in.
+     *  @param _value The value to search.
+     *  @param _index The index in the list of keys.
+     *  @return The key address.
+     */
     function valueKeyAtIndex(
         Tree storage _self,
         uint256 _value,
         uint256 _index
-    ) public view returns (address _key) {
+    ) public view returns (address) {
         require(exists(_self, _value), "RBBT(404):value-not-exist");
         return _self.nodes[_value].keys[_index];
     }
@@ -107,6 +137,11 @@ library RedBlackBinaryTree {
         return _self.nodes[_self.root].keys.length > 0;
     }
 
+    /** @dev Inserts the `_key` with `_value` in the tree.
+     *  @param _self The tree in which to add the (key, value) pair.
+     *  @param _key The key to add.
+     *  @param _value The value to add.
+     */
     function insert(
         Tree storage _self,
         address _key,
@@ -146,6 +181,10 @@ library RedBlackBinaryTree {
         insertFixup(_self, _value);
     }
 
+    /** @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
+     *  @param _self The tree in which to remove the (key, value) pair.
+     *  @param _key The key to remove.
+     */
     function remove(Tree storage _self, address _key) public {
         require(_self.keyToValue[_key] != 0, "RBBT:account-not-exist");
         uint256 value = _self.keyToValue[_key];
