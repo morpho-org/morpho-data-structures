@@ -141,6 +141,7 @@ library RedBlackBinaryTree {
     function remove(Tree storage _self, address _key) public {
         require(_self.keyToValue[_key] != 0, "RBBT:account-not-exist");
         uint256 value = _self.keyToValue[_key];
+        _self.keyToValue[_key] = 0;
         Node storage nValue = _self.nodes[value];
         uint256 rowToDelete = nValue.keyMap[_key];
         nValue.keys[rowToDelete] = nValue.keys[nValue.keys.length - 1];
