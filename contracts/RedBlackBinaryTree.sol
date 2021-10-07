@@ -21,7 +21,6 @@ library RedBlackBinaryTree {
         uint256 root;
         mapping(uint256 => Node) nodes;
         mapping(address => uint256) keyToValue;
-        mapping(address => bool) isIn;
     }
 
     function first(Tree storage _self) public view returns (uint256 value) {
@@ -74,7 +73,7 @@ library RedBlackBinaryTree {
     }
 
     function keyExists(Tree storage _self, address _key) public view returns (bool) {
-        return _self.isIn[_key];
+        return _self.keyToValue[_key] != 0;
     }
 
     function valueKeyAtIndex(
@@ -106,8 +105,7 @@ library RedBlackBinaryTree {
         uint256 _value
     ) public {
         require(_value != 0, "RBBT(405):value-cannot-be-0");
-        require(!_self.isIn[_key], "RBBT:account-already-in");
-        _self.isIn[_key] = true;
+        require(_self.keyToValue[_key] == 0, "RBBT:account-already-in");
         _self.keyToValue[_key] = _value;
         uint256 cursor;
         uint256 probe = _self.root;
@@ -141,13 +139,11 @@ library RedBlackBinaryTree {
     }
 
     function remove(Tree storage _self, address _key) public {
-        require(_self.isIn[_key], "RBBT:account-not-exist");
-        _self.isIn[_key] = false;
+        require(_self.keyToValue[_key] != 0, "RBBT:account-not-exist");
         uint256 value = _self.keyToValue[_key];
         Node storage nValue = _self.nodes[value];
         uint256 rowToDelete = nValue.keyMap[_key];
         nValue.keys[rowToDelete] = nValue.keys[nValue.keys.length - 1];
-        nValue.keyMap[_key] = rowToDelete;
         nValue.keys.pop();
         uint256 probe;
         uint256 cursor;
