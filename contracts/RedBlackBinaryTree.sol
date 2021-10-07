@@ -95,8 +95,16 @@ library RedBlackBinaryTree {
         view
         returns (uint256)
     {
-        require(exists(_self, _value), "RBBT(404):value-not-exist");
+        if (!exists(_self, _value)) return 0;
         return _self.nodes[_value].keys.length;
+    }
+
+    /** @dev Returns whether or not there is any key in the tree.
+     *  @param _self The tree to search in.
+     *  @return Whether or not a key exist in the tree.
+     */
+    function isKeyInTree(Tree storage _self) public view returns (bool) {
+        return _self.nodes[_self.root].keys.length > 0;
     }
 
     function insert(
