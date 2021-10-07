@@ -259,7 +259,7 @@ library RedBlackBinaryTree {
         return _value;
     }
 
-    /** @dev Rotate the tree to keep the balance. Let's have three node, A (root), B (A's right child), C (B's left child). 
+    /** @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's right child), C (B's left child).
              After left rotation: B (Root), A (B's left child), C (B's right child)
      *  @param _self The tree to apply the rotation to.
      *  @param _value The value of the node to rotate.
