@@ -19,6 +19,9 @@ A [Red Black Binary Tree](https://en.wikipedia.org/wiki/Red%E2%80%93black_tree) 
 Our implementation is a modified version of the [OrderStatisticsTree repository](https://github.com/rob-Hitchens/OrderStatisticsTree) written by [Rob Hitechn](https://github.com/rob-Hitchens) which is also based on [BokkyPooBahsRedBlackTreeLibrary repository](https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary) written by [bokkypoobah](https://github.com/bokkypoobah).
 Our modified version makes keys unique items instead of just (key, value) unique pairs.
 
+In order to manipulate a binary tree and visualize how it manages to stay balanced, this [tool](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html) is very useful.
+You can also find [here](http://ion.uwinnipeg.ca/~ychen2/advancedAD/Red-black%20Tree.pdf) the pseudo-code logic of the tree's function.
+
 You can refer to the following table for the complexity of some data structures.
 
 ![complexities](https://devopedia.org/images/article/17/7752.1513922040.jpg)
