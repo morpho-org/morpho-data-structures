@@ -3,7 +3,6 @@ const { ethers } = require('hardhat');
 const fs = require('fs');
 
 describe('Test RedBlackBinaryTree Library', () => {
-  
   beforeEach(async () => {
     const RedBlackBinaryTree = await ethers.getContractFactory('RedBlackBinaryTree');
     const redBlackBinaryTree = await RedBlackBinaryTree.deploy();
@@ -26,18 +25,17 @@ describe('Test RedBlackBinaryTree Library', () => {
   });
 });
 
-
 async function testScenario(testFile, tree) {
   let j = 0;
   let rawdata = fs.readFileSync(testFile);
   let steps = await JSON.parse(rawdata);
-  for (j ; j < steps.length; j++) {
+  for (j; j < steps.length; j++) {
     step = await steps[j];
-    
-    if(step['action'] == 'insert'){
+
+    if (step['action'] == 'insert') {
       tree.insert(step['address'], BigNumber.from(step['amount']));
     }
-    if(step['action'] == 'delete'){
+    if (step['action'] == 'delete') {
       tree.remove(step['address']);
     }
   }
@@ -46,33 +44,36 @@ async function testScenario(testFile, tree) {
 
 async function printTreeStucture(tree) {
   let i = 0;
-  let last;
   let temp;
+
+  let data = '';
 
   first = await tree.returnFirst();
   first = first.toNumber();
   next = await tree.returnNext(first);
   next = next.toNumber();
 
-  console.log('****** Node %d ******', first);
+  data += '****** Node ' + (await first.toString()) + ' ****** \n';
   for (let j = 0; j < (await tree.returnGetNumberOfKeysAtValue(first)); j++) {
-    console.log('At index', j, ' key: ', await tree.returnValueKeyAtIndex(first, j));
+    data += 'At index' + (await j.toString()) + ' key: ' + (await (await tree.returnValueKeyAtIndex(first, j)).toString()) + '\n';
   }
-  console.log('\n');
+  data += '\n';
 
   while (next != 0) {
-
     temp = await tree.returnGetNumberOfKeysAtValue(next);
 
-    console.log('****** Node %d ******', next);
+    data += '****** Node ' + (await next.toString()) + ' ****** \n';
     for (let j = 0; j < temp; j++) {
-      console.log('At index', j, ' key: ', await tree.returnValueKeyAtIndex(next, j));
+      data += 'At index' + (await j.toString()) + ' key: ' + (await (await tree.returnValueKeyAtIndex(next, j)).toString()) + '\n';
     }
-    console.log('\n');
+    data += '\n';
 
     next = await tree.returnNext(next);
     next = await next.toNumber();
   }
+  fs.writeFile('./test/Output_Tree_Structure.txt', data, (err) => {
+    if (err) throw err;
+  });
 
   return;
 }
