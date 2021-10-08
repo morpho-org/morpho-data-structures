@@ -1,19 +1,9 @@
 const { utils, BigNumber } = require('ethers');
 const { ethers } = require('hardhat');
+const fs = require('fs');
 
 describe('Test RedBlackBinaryTree Library', () => {
-  let testRedBlackBinaryTree;
-  let addresses = [];
-  let addressesLength;
-  const MAX = 10 * 30;
-
-  for (let i = 0; i < 700; i++) {
-    addresses.push(utils.solidityKeccak256(['uint256'], [i]).slice(0, 42));
-  }
-  addressesLength = addresses.length;
-
-  const getRandomNumber = () => Math.floor(Math.random() * MAX + 1);
-
+  
   beforeEach(async () => {
     const RedBlackBinaryTree = await ethers.getContractFactory('RedBlackBinaryTree');
     const redBlackBinaryTree = await RedBlackBinaryTree.deploy();
@@ -29,15 +19,30 @@ describe('Test RedBlackBinaryTree Library', () => {
   });
 
   describe('Test', () => {
-    it('Test insert many values', async () => {
-      for (let i = 0; i < addressesLength; i++) {
-        const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, BigNumber.from(getRandomNumber()));
-      }
+    it('apply instructions', async () => {
+      testRedBlackBinaryTree = await testScenario('./test/instruction.json', testRedBlackBinaryTree);
       await printTreeStucture(testRedBlackBinaryTree);
     });
   });
 });
+
+
+async function testScenario(testFile, tree) {
+  let j = 0;
+  let rawdata = fs.readFileSync(testFile);
+  let steps = await JSON.parse(rawdata);
+  for (j ; j < steps.length; j++) {
+    step = await steps[j];
+    
+    if(step['action'] == 'insert'){
+      tree.insert(step['address'], BigNumber.from(step['amount']));
+    }
+    if(step['action'] == 'delete'){
+      tree.remove(step['address']);
+    }
+  }
+  return tree;
+}
 
 async function printTreeStucture(tree) {
   let i = 0;
@@ -48,7 +53,6 @@ async function printTreeStucture(tree) {
   first = first.toNumber();
   next = await tree.returnNext(first);
   next = next.toNumber();
-  // console.log("First %d Last %d Next %d", await first.toNumber(), last, next);
 
   console.log('****** Node %d ******', first);
   for (let j = 0; j < (await tree.returnGetNumberOfKeysAtValue(first)); j++) {
