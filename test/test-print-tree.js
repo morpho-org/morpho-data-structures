@@ -39,46 +39,6 @@ describe('Test RedBlackBinaryTree Library', () => {
   });
 });
 
-async function testScenario(testFile) {
-  let i;
-  let step;
-  let isDelete;
-  let readableAction;
-  let count = 0;
-  let treeCount;
-  let sorted = [];
-  let before;
-  let steps = await loadSteps(testFile);
-
-  if (showProgress) console.log();
-  if (showProgress) console.log('Scenario:', testFile);
-  if (showProgress) console.log('Number of steps: ' + steps.length);
-  if (showProgress) console.log('Steps:');
-
-  for (i = 0; i < steps.length; i++) {
-    if (showProgress) cconsole.log('Step:', i, steps[i]['amount']);
-  }
-  if (showProgress) cconsole.log('Step, action, value, expected count, reported count');
-
-  for (i = 0; i < steps.length; i++) {
-    isDelete = steps[i]['amount'] < 0;
-    if (isDelete) {
-      readableAction = 'delete';
-      count--;
-    } else {
-      readableAction = 'insert';
-      count++;
-    }
-    before = sorted;
-    sorted = await applyStep(sorted, i);
-    treeCount = await ost.valueKeyCount();
-    if (verbose) console.log('step', i, readableAction, 'value:', steps[i]['amount'], count, treeCount.toString(10));
-    if (verbose) await printTreeStucture(sorted);
-    assert.equal(treeCount.toString(10), count, 'The count does not match the expected count.');
-  }
-  return;
-}
-
 async function printTreeStucture(tree) {
   let i = 0;
   let last;
@@ -94,7 +54,7 @@ async function printTreeStucture(tree) {
   for (let j = 0; j < (await tree.returnGetNumberOfKeysAtValue(first)); j++) {
     console.log('At index', j, ' key: ', await tree.returnValueKeyAtIndex(first, j));
   }
-  console.log("\n");
+  console.log('\n');
 
   while (next != 0) {
 
@@ -104,10 +64,10 @@ async function printTreeStucture(tree) {
     for (let j = 0; j < temp; j++) {
       console.log('At index', j, ' key: ', await tree.returnValueKeyAtIndex(next, j));
     }
-    console.log("\n");
+    console.log('\n');
 
     next = await tree.returnNext(next);
-    next = await next.toNumber()
+    next = await next.toNumber();
   }
 
   return;
