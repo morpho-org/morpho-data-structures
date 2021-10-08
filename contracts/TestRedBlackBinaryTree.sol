@@ -40,4 +40,24 @@ contract TestRedBlackBinaryTree {
         tree.valueKeyAtIndex(_value, _index);
         console.log("valueKeyAtIndex", gasBefore - gasleft());
     }
+
+    function returnLast() external view returns(uint256) {
+        return(tree.last());
+    }
+
+    function returnFirst() external view returns(uint256) {
+        return(tree.first());
+    }
+
+    function returnGetNumberOfKeysAtValue(uint256 _value) external view returns(uint256) {
+        return(tree.getNumberOfKeysAtValue(_value));
+    }
+
+    function returnValueKeyAtIndex(uint256 _value, uint256 _index) external view returns(address) {
+        return(tree.valueKeyAtIndex(_value, _index));
+    }
+
+    function returnNext(uint256 _value) external view returns(uint256) {
+        return(tree.next(_value));
+    }
 }
