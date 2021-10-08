@@ -3,6 +3,10 @@ const { ethers } = require('hardhat');
 const fs = require('fs');
 
 describe('Test RedBlackBinaryTree Library', () => {
+<<<<<<< HEAD
+=======
+  
+>>>>>>> 01d811e (feat: read instructions from JSON file)
   beforeEach(async () => {
     const RedBlackBinaryTree = await ethers.getContractFactory('RedBlackBinaryTree');
     const redBlackBinaryTree = await RedBlackBinaryTree.deploy();
@@ -25,10 +29,15 @@ describe('Test RedBlackBinaryTree Library', () => {
   });
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 01d811e (feat: read instructions from JSON file)
 async function testScenario(testFile, tree) {
   let j = 0;
   let rawdata = fs.readFileSync(testFile);
   let steps = await JSON.parse(rawdata);
+<<<<<<< HEAD
   for (j; j < steps.length; j++) {
     step = await steps[j];
 
@@ -36,6 +45,15 @@ async function testScenario(testFile, tree) {
       tree.insert(step['address'], BigNumber.from(step['amount']));
     }
     if (step['action'] == 'delete') {
+=======
+  for (j ; j < steps.length; j++) {
+    step = await steps[j];
+    
+    if(step['action'] == 'insert'){
+      tree.insert(step['address'], BigNumber.from(step['amount']));
+    }
+    if(step['action'] == 'delete'){
+>>>>>>> 01d811e (feat: read instructions from JSON file)
       tree.remove(step['address']);
     }
   }
