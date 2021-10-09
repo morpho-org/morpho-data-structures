@@ -82,7 +82,7 @@ async function printTreeStucture(tree) {
 
     data += '****** Node ' + (await next.toString()) + ' ****** \n';
     for (let j = 0; j < temp; j++) {
-      data += 'At index' + (await j.toString()) + ' key: ' + (await (await tree.returnValueKeyAtIndex(next, j)).toString()) + '\n';
+      data += 'At index ' + (await j.toString()) + ' key: ' + (await (await tree.returnValueKeyAtIndex(next, j)).toString()) + '\n';
     }
     data += '\n';
 
