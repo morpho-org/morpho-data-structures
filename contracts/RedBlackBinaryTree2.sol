@@ -290,7 +290,7 @@ library RedBlackBinaryTree {
         address cursor;
         while (_key != _self.root && _self.nodes[_self.nodes[_key].parent].red) {
             address keyParent = _self.nodes[_key].parent;
-            if (keyParent == _self.nodes[keyParent].leftChild) {
+            if (keyParent == _self.nodes[_self.nodes[keyParent].parent].leftChild) {
                 cursor = _self.nodes[_self.nodes[keyParent].parent].rightChild;
                 if (_self.nodes[cursor].red) {
                     _self.nodes[keyParent].red = false;
