@@ -99,7 +99,6 @@ library RedBlackBinaryTree {
         uint256 _valueB,
         address _addressB
     ) public pure returns (bool) {
-
         if (_valueA == _valueB) {
             if (_addressA > _addressB) {
                 return true;
@@ -151,7 +150,6 @@ library RedBlackBinaryTree {
 
         if (cursor == address(0)) {
             _self.root = _key;
-
         } else if (compare(_self.keyToValue[cursor], cursor, _value, _key)) {
             _self.nodes[cursor].leftChild = _key;
         } else {
@@ -169,7 +167,9 @@ library RedBlackBinaryTree {
         _self.keyToValue[_key] = 0;
         address probe;
         address cursor;
-        if (_self.nodes[_key].leftChild == address(0) || _self.nodes[_key].rightChild == address(0)) {
+        if (
+            _self.nodes[_key].leftChild == address(0) || _self.nodes[_key].rightChild == address(0)
+        ) {
             cursor = _key;
         } else {
             cursor = _self.nodes[_key].rightChild;
@@ -177,7 +177,7 @@ library RedBlackBinaryTree {
                 cursor = _self.nodes[_key].leftChild;
             }
         }
-        if (_self.nodes[_key].leftChild !=  address(0)) {
+        if (_self.nodes[_key].leftChild != address(0)) {
             probe = _self.nodes[_key].leftChild;
         } else {
             probe = _self.nodes[_key].rightChild;

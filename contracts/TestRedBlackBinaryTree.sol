@@ -18,14 +18,25 @@ contract TestRedBlackBinaryTree {
     }
 
     function keyExists(address _id) external view {
-        uint256 gasBefore = gasleft();
         tree.keyExists(_id);
-        console.log("keyExists", gasBefore - gasleft());
     }
 
     function last() external view {
-        uint256 gasBefore = gasleft();
         tree.last();
-        console.log("last", gasBefore - gasleft());
+    }
+
+    function returnLast() external view returns (address) {
+        address key = tree.last();
+        return key;
+    }
+
+    function returnFirst() external view returns (address) {
+        address key = tree.first();
+        return key;
+    }
+
+    function returnNext(address _key) external view returns (address) {
+        address next = tree.next(_key);
+        return next;
     }
 }
