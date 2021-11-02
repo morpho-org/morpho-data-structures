@@ -1,5 +1,6 @@
 const { utils, BigNumber } = require('ethers');
 const { ethers } = require('hardhat');
+const fs = require('fs');
 
 describe('Test RedBlackBinaryTree Library', () => {
   let testRedBlackBinaryTree;
@@ -29,6 +30,15 @@ describe('Test RedBlackBinaryTree Library', () => {
   });
 
   describe('Test Gas Consumption', () => {
+    it.only('test first', async () => {
+      await testRedBlackBinaryTree.insert('0xDaB8C61fae3A170CF2f4411D4689BD62Fa733021', 1);
+      await testRedBlackBinaryTree.insert('0x37611DA9a94cf3b466b8f1bEae206A26A3A6E4fC', 2);
+      await testRedBlackBinaryTree.insert('0xD2b7Cfa9A7662eFD8450b034FdD472Ffd8f36D68', 3);
+      await testRedBlackBinaryTree.insert('0x907b0FD3408915DDf4a1915e6D57d683c81b2E27', 4);
+      await testRedBlackBinaryTree.insert('0xa626Aef7c0dD74c825b786166b00929388c568e9', 5);
+      printTreeStucture(testRedBlackBinaryTree);
+    });
+
     it('Test insert many values', async () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
@@ -94,17 +104,6 @@ describe('Test RedBlackBinaryTree Library', () => {
       }
     });
 
-    it('Test getNumberOfKeysAtValue', async () => {
-      let value = utils.parseUnits('10');
-      for (let i = 0; i < addressesLength; i++) {
-        const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
-        value = value.sub(1);
-      }
-
-      await testRedBlackBinaryTree.getNumberOfKeysAtValue(utils.parseUnits('10'));
-    });
-
     it('Test last', async () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
@@ -115,27 +114,31 @@ describe('Test RedBlackBinaryTree Library', () => {
 
       await testRedBlackBinaryTree.last();
     });
-
-    it('Test keyExists', async () => {
-      let value = utils.parseUnits('10');
-      for (let i = 0; i < addressesLength; i++) {
-        const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
-        value = value.sub(1);
-      }
-
-      await testRedBlackBinaryTree.keyExists(addresses[0]);
-    });
-
-    it('Test valueKeyAtIndex', async () => {
-      let value = utils.parseUnits('10');
-      for (let i = 0; i < addressesLength; i++) {
-        const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
-        value = value.sub(1);
-      }
-
-      await testRedBlackBinaryTree.valueKeyAtIndex(utils.parseUnits('10'), 0);
-    });
   });
 });
+
+async function printTreeStucture(tree) {
+  let i = 0;
+  let temp;
+
+  let data = '';
+
+  first = await tree.returnFirst();
+  next = await tree.returnNext(first);
+
+
+  data += 'key: ' + first + ' value: ' + await tree.returnKeyToValue(first) + '\n';
+  data += '\n';
+
+  while (next != '0x0000000000000000000000000000000000000000') {
+    data += 'key: ' + next + ' value: ' + await tree.returnKeyToValue(next) + '\n';
+    data += '\n';
+    next = await tree.returnNext(next);
+  }
+  console.log(data);
+  fs.writeFile('./test/Output_Tree_Structure.txt', data, (err) => {
+    if (err) throw err;
+  });
+
+  return;
+}
