@@ -235,20 +235,20 @@ library RedBlackBinaryTree {
      */
     function rotateLeft(Tree storage _self, address _key) private {
         address cursor = _self.nodes[_key].rightChild;
-        address parent = _self.nodes[_key].parent;
+        address keyParent = _self.nodes[_key].parent;
         address cursorLeft = _self.nodes[cursor].leftChild;
         _self.nodes[_key].rightChild = cursorLeft;
 
         if (cursorLeft != address(0)) {
             _self.nodes[cursorLeft].parent = _key;
         }
-        _self.nodes[cursor].parent = parent;
-        if (parent == address(0)) {
+        _self.nodes[cursor].parent = keyParent;
+        if (keyParent == address(0)) {
             _self.root = cursor;
-        } else if (_key == _self.nodes[parent].leftChild) {
-            _self.nodes[parent].leftChild = cursor;
+        } else if (_key == _self.nodes[keyParent].leftChild) {
+            _self.nodes[keyParent].leftChild = cursor;
         } else {
-            _self.nodes[parent].rightChild = cursor;
+            _self.nodes[keyParent].rightChild = cursor;
         }
         _self.nodes[cursor].leftChild = _key;
         _self.nodes[_key].parent = cursor;
@@ -261,19 +261,19 @@ library RedBlackBinaryTree {
      */
     function rotateRight(Tree storage _self, address _key) private {
         address cursor = _self.nodes[_key].leftChild;
-        address parent = _self.nodes[_key].parent;
+        address keyParent = _self.nodes[_key].parent;
         address cursorRight = _self.nodes[cursor].rightChild;
         _self.nodes[_key].leftChild = cursorRight;
         if (cursorRight != address(0)) {
             _self.nodes[cursorRight].parent = _key;
         }
-        _self.nodes[cursor].parent = parent;
-        if (parent == address(0)) {
+        _self.nodes[cursor].parent = keyParent;
+        if (keyParent == address(0)) {
             _self.root = cursor;
-        } else if (_key == _self.nodes[parent].rightChild) {
-            _self.nodes[parent].rightChild = cursor;
+        } else if (_key == _self.nodes[keyParent].rightChild) {
+            _self.nodes[keyParent].rightChild = cursor;
         } else {
-            _self.nodes[parent].leftChild = cursor;
+            _self.nodes[keyParent].leftChild = cursor;
         }
         _self.nodes[cursor].rightChild = _key;
         _self.nodes[_key].parent = cursor;
@@ -293,7 +293,7 @@ library RedBlackBinaryTree {
                     _self.nodes[keyParent].red = false;
                     _self.nodes[cursor].red = false;
                     _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    _key = keyParent;
+                    _key = _self.nodes[keyParent].parent;
                 } else {
                     if (_key == _self.nodes[keyParent].rightChild) {
                         _key = keyParent;
