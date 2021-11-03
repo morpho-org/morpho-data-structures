@@ -12,8 +12,7 @@ library RedBlackBinaryTree {
         address parent; // The parent node of the current node.
         address leftChild; // The left child of the current node.
         address rightChild; // The right child of the current node.
-        bool red; // Whether the current notde is red or black.
-        address key; // The key in the node.
+        bool red; // Whether the current node is red or black.
     }
 
     struct Tree {
@@ -22,7 +21,7 @@ library RedBlackBinaryTree {
         mapping(address => uint256) keyToValue;
     }
 
-    /** @dev Returns the smallest value in the tree `_self`.
+    /** @dev Returns the address of the smallest value in the tree `_self`.
      *  @param _self The tree to search in.
      */
     function first(Tree storage _self) public view returns (address key) {
@@ -33,7 +32,7 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the highest value in the tree `_self`.
+    /** @dev Returns the address of the highest value in the tree `_self`.
      *  @param _self The tree to search in.
      */
     function last(Tree storage _self) public view returns (address key) {
@@ -44,7 +43,7 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the next value below `_value`.
+    /** @dev Returns the address of the next user after `_key`.
      *  @param _self The tree to search in.
      *  @param _key The address to search after.
      */
@@ -61,7 +60,7 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the previous value above `_value`.
+    /** @dev Returns the address of the previous user above `_key`.
      *  @param _self The tree to search in.
      *  @param _key The address to search before.
      */
@@ -133,7 +132,7 @@ library RedBlackBinaryTree {
         _self.keyToValue[_key] = _value;
         address cursor;
         address probe = _self.root;
-        while (_self.keyToValue[probe] != 0) {
+        while (probe != address(0)) {
             cursor = probe;
             if (compare(_self.keyToValue[probe], probe, _value, _key)) {
                 probe = _self.nodes[probe].leftChild;
@@ -146,8 +145,6 @@ library RedBlackBinaryTree {
         nValue.leftChild = address(0);
         nValue.rightChild = address(0);
         nValue.red = true;
-        nValue.key = _key;
-
         if (cursor == address(0)) {
             _self.root = _key;
         } else if (compare(_self.keyToValue[cursor], cursor, _value, _key)) {
@@ -296,7 +293,7 @@ library RedBlackBinaryTree {
                     _self.nodes[keyParent].red = false;
                     _self.nodes[cursor].red = false;
                     _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    _key = _self.nodes[keyParent].key;
+                    _key = keyParent;
                 } else {
                     if (_key == _self.nodes[keyParent].rightChild) {
                         _key = keyParent;

@@ -30,7 +30,7 @@ describe('Test RedBlackBinaryTree Library', () => {
   });
 
   describe('Test Gas Consumption', () => {
-    it.only('test first', async () => {
+    it('test first', async () => {
       await testRedBlackBinaryTree.insert('0xDaB8C61fae3A170CF2f4411D4689BD62Fa733021', 1);
       await testRedBlackBinaryTree.insert('0x37611DA9a94cf3b466b8f1bEae206A26A3A6E4fC', 2);
       await testRedBlackBinaryTree.insert('0xD2b7Cfa9A7662eFD8450b034FdD472Ffd8f36D68', 3);
@@ -76,7 +76,7 @@ describe('Test RedBlackBinaryTree Library', () => {
       }
     });
 
-    it('Test insert and remove many random values', async () => {
+    xit('Test insert and remove many random values', async () => {
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
         const value = BigNumber.from(getRandomNumber());
@@ -118,14 +118,10 @@ describe('Test RedBlackBinaryTree Library', () => {
 });
 
 async function printTreeStucture(tree) {
-  let i = 0;
-  let temp;
-
   let data = '';
 
   first = await tree.returnFirst();
   next = await tree.returnNext(first);
-
 
   data += 'key: ' + first + ' value: ' + await tree.returnKeyToValue(first) + '\n';
   data += '\n';
@@ -135,7 +131,7 @@ async function printTreeStucture(tree) {
     data += '\n';
     next = await tree.returnNext(next);
   }
-  console.log(data);
+  
   fs.writeFile('./test/Output_Tree_Structure.txt', data, (err) => {
     if (err) throw err;
   });
