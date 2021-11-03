@@ -16,9 +16,9 @@ library RedBlackBinaryTree {
     }
 
     struct Tree {
-        address root;
-        mapping(address => Node) nodes;
-        mapping(address => uint256) keyToValue;
+        address root; // address of the root node
+        mapping(address => Node) nodes; // Map user's address to node
+        mapping(address => uint256) keyToValue; // Maps key to its value
     }
 
     /** @dev Returns the address of the smallest value in the tree `_self`.
@@ -48,7 +48,7 @@ library RedBlackBinaryTree {
      *  @param _key The address to search after.
      */
     function next(Tree storage _self, address _key) public view returns (address cursor) {
-        require(_key != address(0), "RBBT(1):start-_value=0");
+        require(_key != address(0), "RBBT(1):key-is-nul-address");
         if (_self.nodes[_key].rightChild != address(0)) {
             cursor = subTreeMin(_self, _self.nodes[_key].rightChild);
         } else {
@@ -281,7 +281,7 @@ library RedBlackBinaryTree {
 
     /** @dev Makes sure there is no violation of the tree properties after an insertion.
      *  @param _self The tree to check and correct if needed.
-     *  @param _key The value that was inserted.
+     *  @param _key The address of the user that was inserted.
      */
     function insertFixup(Tree storage _self, address _key) private {
         address cursor;
@@ -351,7 +351,7 @@ library RedBlackBinaryTree {
 
     /** @dev Makes sure there is no violation of the tree properties after removal.
      *  @param _self The tree to check and correct if needed.
-     *  @param _key The address request of the function remove.
+     *  @param _key The address requested in the function remove.
      */
     function removeFixup(Tree storage _self, address _key) private {
         address cursor;
