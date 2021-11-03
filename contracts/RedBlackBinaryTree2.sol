@@ -170,14 +170,14 @@ library RedBlackBinaryTree {
             cursor = _key;
         } else {
             cursor = _self.nodes[_key].rightChild;
-            while (_self.nodes[_key].leftChild != address(0)) {
-                cursor = _self.nodes[_key].leftChild;
+            while (_self.nodes[cursor].leftChild != address(0)) {
+                cursor = _self.nodes[cursor].leftChild;
             }
         }
-        if (_self.nodes[_key].leftChild != address(0)) {
-            probe = _self.nodes[_key].leftChild;
+        if (_self.nodes[cursor].leftChild != address(0)) {
+            probe = _self.nodes[cursor].leftChild;
         } else {
-            probe = _self.nodes[_key].rightChild;
+            probe = _self.nodes[cursor].rightChild;
         }
         address cursorParent = _self.nodes[cursor].parent;
         _self.nodes[probe].parent = cursorParent;
