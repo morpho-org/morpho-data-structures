@@ -39,4 +39,9 @@ contract TestRedBlackBinaryTree {
         address next = tree.next(_key);
         return next;
     }
+
+    function returnKeyToValue(address _key) external view returns (uint256) {
+        uint256 value = tree.keyToValue[_key];
+        return value;
+    }
 }
