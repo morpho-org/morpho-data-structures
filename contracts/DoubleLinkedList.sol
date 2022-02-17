@@ -1,250 +1,113 @@
-// SPDX-License-Identifier: UNLICENSED
+// SPDX-License-Identifier: GNU AGPLv3
 pragma solidity 0.8.7;
 
 library DoubleLinkedList {
     struct Account {
-        address id;
-        address next;
         address prev;
+        address next;
         uint256 value;
-        bool isIn;
     }
 
     struct List {
         mapping(address => Account) accounts;
         address head;
         address tail;
-        uint256 counter;
     }
 
-    /** @dev Returns the `account` linked to `_id`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @return account The account linked to `_id`.
-     */
-    function get(List storage _list, address _id) internal view returns (Account memory account) {
-        return _list.accounts[_id];
+    /// @notice Returns the `account` linked to `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return The value of the account.
+    function getValueOf(List storage _list, address _id) internal view returns (uint256) {
+        return _list.accounts[_id].value;
     }
 
-    /** @dev Returns the next id address from the current `_id`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @return account The account linked to `_id`.
-     */
-    function getNext(List storage _list, address _id) internal view returns (address) {
-        return _list.accounts[_id].next;
-    }
-
-    /** @dev Adds an `_id` and its value to the head of the `_list`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @param _value The value of the account.
-     *  @return bool Whether the account has been added or not.
-     */
-    function addHead(
-        List storage _list,
-        address _id,
-        uint256 _value
-    ) internal returns (bool) {
-        if (!_contains(_list, _id)) {
-            _createAccount(_list, _id, _value);
-            _link(_list, _id, _list.head);
-            _setHead(_list, _id);
-            if (_list.tail == address(0)) _setTail(_list, _id);
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /** @dev Adds an `_id` and its value to the tail of the `_list`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @param _value The value of the account.
-     *  @return bool Whether the account has been added or not.
-     */
-    function addTail(
-        List storage _list,
-        address _id,
-        uint256 _value
-    ) internal returns (bool) {
-        if (!_contains(_list, _id)) {
-            if (_list.head == address(0)) {
-                addHead(_list, _id, _value);
-            } else {
-                _createAccount(_list, _id, _value);
-                _link(_list, _list.tail, _id);
-                _setTail(_list, _id);
-            }
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /** @dev Removes an account of the `_list`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @return bool Whether the account has been removed or not.
-     */
-    function remove(List storage _list, address _id) internal returns (bool) {
-        if (_contains(_list, _id)) {
-            Account memory account = _list.accounts[_id];
-            if (_list.head == _id && _list.tail == _id) {
-                _setHead(_list, address(0));
-                _setTail(_list, address(0));
-            } else if (_list.head == _id) {
-                _setHead(_list, account.next);
-                _list.accounts[account.next].prev = address(0);
-            } else if (_list.tail == _id) {
-                _setTail(_list, account.prev);
-                _list.accounts[account.prev].next = address(0);
-            } else {
-                _link(_list, account.prev, account.next);
-            }
-            _list.counter -= 1;
-            delete _list.accounts[account.id];
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    /** @dev Inserts an account in the `_list` at the right slot based on its `_value`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @param _value The value of the account.
-     */
-    function insertSorted(
-        List storage _list,
-        address _id,
-        uint256 _value
-    ) internal {
-        require(!_contains(_list, _id));
-        address previous = _list.head;
-        while (previous != _list.tail && _list.accounts[previous].value >= _value) {
-            previous = _list.accounts[previous].next;
-        }
-        require(insertBefore(_list, previous, _id, _value));
-    }
-
-    /** @dev Inserts an account in the `_list` before another account.
-     *  @param _list The list to search in.
-     *  @param _nextId The account id from which to insert the account before.
-     *  @param _id The address of the account.
-     *  @param _value The value of the account.
-     */
-    function insertBefore(
-        List storage _list,
-        address _nextId,
-        address _id,
-        uint256 _value
-    ) internal returns (bool) {
-        require(!_contains(_list, _id));
-        if (_nextId == _list.head) {
-            return addHead(_list, _id, _value);
-        } else if (_list.accounts[_nextId].prev == _list.tail) {
-            return addTail(_list, _id, _value);
-        } else {
-            Account memory prevAccount = _list.accounts[_list.accounts[_nextId].prev];
-            Account memory nextAccount = _list.accounts[prevAccount.next];
-            _createAccount(_list, _id, _value);
-            _link(_list, _id, nextAccount.id);
-            _link(_list, prevAccount.id, _id);
-            return true;
-        }
-    }
-
-    /** @dev Returns whether or not the account is in the `_list`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @return whether or not the account is in the `_list`.
-     */
-    function contains(List storage _list, address _id) internal view returns (bool) {
-        return _contains(_list, _id);
-    }
-
-    /** @dev Returns the length of the `_list`.
-     *  @param _list The list to get the length.
-     *  @return The length.
-     */
-    function length(List storage _list) internal view returns (uint256) {
-        return _length(_list);
-    }
-
-    /** @dev Returns the address at the head of the `_list`.
-     *  @param _list The list to get the head.
-     *  @return The address.
-     */
+    /// @notice Returns the address at the head of the `_list`.
+    /// @param _list The list to get the head.
+    /// @return The address of the head.
     function getHead(List storage _list) internal view returns (address) {
         return _list.head;
     }
 
-    /** @dev Returns the address at the tail of the `_list`.
-     *  @param _list The list to get the tail.
-     *  @return The address.
-     */
+    /// @notice Returns the address at the tail of the `_list`.
+    /// @param _list The list to get the tail.
+    /// @return The address of the tail.
     function getTail(List storage _list) internal view returns (address) {
         return _list.tail;
     }
 
-    /** @dev Sets the head of the `_list`.
-     *  @param _list The list to set the head.
-     */
-    function _setHead(List storage _list, address _id) private {
-        _list.head = _id;
+    /// @notice Returns the next id address from the current `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the next account.
+    function getNext(List storage _list, address _id) internal view returns (address) {
+        return _list.accounts[_id].next;
     }
 
-    /** @dev Sets the tail of the `_list`.
-     *  @param _list The list to set the tail.
-     */
-    function _setTail(List storage _list, address _id) private {
-        _list.tail = _id;
+    /// @notice Returns the previous id address from the current `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the previous account.
+    function getPrev(List storage _list, address _id) internal view returns (address) {
+        return _list.accounts[_id].prev;
     }
 
-    /** @dev Creates an account based on its `_id` and `_value`.
-     *  @param _list The list to set the tail.
-     *  @param _id The address of the account.
-     *  @param _value The value of the account.
-     */
-    function _createAccount(
+    /// @notice Removes an account of the `_list`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return Whether the account has been removed or not.
+    function remove(List storage _list, address _id) internal returns (bool) {
+        if (_list.accounts[_id].value != 0) {
+            Account memory account = _list.accounts[_id];
+
+            if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
+            else _list.head = account.next;
+            if (account.next != address(0)) _list.accounts[account.next].prev = account.prev;
+            else _list.tail = account.prev;
+
+            delete _list.accounts[_id];
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /// @notice Inserts an account in the `_list` at the right slot based on its `_value`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @param _value The value of the account.
+    /// @param _maxIterations The max number of iterations.
+    function insertSorted(
         List storage _list,
         address _id,
-        uint256 _value
-    ) private {
-        _list.counter += 1;
-        Account memory account = Account(_id, address(0), address(0), _value, true);
-        _list.accounts[_id] = account;
-    }
+        uint256 _value,
+        uint256 _maxIterations
+    ) internal {
+        require(_list.accounts[_id].value == 0, "DLL: account already created");
 
-    /** @dev Links an account to its previous and next accounts.
-     *  @param _list The list to set the tail.
-     *  @param _prevId The address of the previous account.
-     *  @param _nextId The address of the next account.
-     */
-    function _link(
-        List storage _list,
-        address _prevId,
-        address _nextId
-    ) private {
-        _list.accounts[_prevId].next = _nextId;
-        _list.accounts[_nextId].prev = _prevId;
-    }
+        uint256 numberOfIterations;
+        address current = _list.head;
+        while (
+            numberOfIterations <= _maxIterations &&
+            current != _list.tail &&
+            _list.accounts[current].value > _value
+        ) {
+            current = _list.accounts[current].next;
+            numberOfIterations++;
+        }
 
-    /** @dev Returns whether or not the account is in the `_list`.
-     *  @param _list The list to search in.
-     *  @param _id The address of the account.
-     *  @return whether or not the account is in the `_list`.
-     */
-    function _contains(List storage _list, address _id) private view returns (bool) {
-        return _list.accounts[_id].isIn;
-    }
+        address nextId;
+        address prevId;
+        if (numberOfIterations < _maxIterations && current != _list.tail) {
+            prevId = _list.accounts[current].prev;
+            nextId = current;
+        } else prevId = _list.tail;
 
-    /** @dev Returns the length of the `_list`.
-     *  @param _list The list to get the length.
-     *  @return The length.
-     */
-    function _length(List storage _list) private view returns (uint256) {
-        return _list.counter;
+        _list.accounts[_id] = Account(prevId, nextId, _value);
+
+        if (prevId != address(0)) _list.accounts[prevId].next = _id;
+        else _list.head = _id;
+        if (nextId != address(0)) _list.accounts[nextId].prev = _id;
+        else _list.tail = _id;
     }
 }
