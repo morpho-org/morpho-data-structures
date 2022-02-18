@@ -7,7 +7,7 @@ pragma solidity 0.8.7;
 // Significant portions from BokkyPooBahsRedBlackTreeLibrary,
 // https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
 
-library RedBlackBinaryTree {
+library RedBlackBinaryTreeOptimized {
     struct Node {
         address parent; // The parent node of the current node.
         address leftChild; // The left child of the current node.

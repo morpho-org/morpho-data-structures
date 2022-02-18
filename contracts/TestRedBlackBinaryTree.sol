@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.7;
 
-import "./RedBlackBinaryTree2.sol";
+import "./RedBlackBinaryTree.sol";
 
 contract TestRedBlackBinaryTree {
     using RedBlackBinaryTree for RedBlackBinaryTree.Tree;
@@ -24,23 +24,27 @@ contract TestRedBlackBinaryTree {
         tree.last();
     }
 
-    function returnLast() external view returns (address) {
-        address key = tree.last();
-        return key;
+    function returnLast() external view returns (uint256) {
+        return tree.last();
     }
 
-    function returnFirst() external view returns (address) {
-        address key = tree.first();
-        return key;
+    function first() external view returns (uint256) {
+        return tree.first();
     }
 
-    function returnNext(address _key) external view returns (address) {
-        address next = tree.next(_key);
-        return next;
+    function next(uint256 _value) external view returns (uint256) {
+        return tree.next(_value);
     }
 
     function returnKeyToValue(address _key) external view returns (uint256) {
-        uint256 value = tree.keyToValue[_key];
-        return value;
+        return tree.keyToValue[_key];
+    }
+
+    function valueKeyAtIndex(uint256 _value, uint256 _index) external view returns (address) {
+        return tree.valueKeyAtIndex(_value, _index);
+    }
+
+    function getNumberOfKeysAtValue(uint256 _value) external view returns (uint256) {
+        return tree.getNumberOfKeysAtValue(_value);
     }
 }
