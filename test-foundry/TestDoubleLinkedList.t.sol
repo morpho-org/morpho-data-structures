@@ -3,19 +3,18 @@ pragma solidity 0.8.7;
 
 import "lib/ds-test/src/test.sol";
 
-import "./utils/TestDoubleLinkedList.sol";
+import "@contracts/DoubleLinkedList.sol";
 
-contract TestDoubleLinkedListSuite is DSTest {
+contract TestDoubleLinkedList is DSTest {
+    using DoubleLinkedList for DoubleLinkedList.List;
+
     uint256 public NDS = 50;
+    address[] public accounts;
     address public ADDR_ZERO = address(0);
 
-    TestDoubleLinkedList public list;
-
-    address[] public accounts;
+    DoubleLinkedList.List public list;
 
     function setUp() public {
-        list = new TestDoubleLinkedList();
-
         accounts = new address[](NDS);
         accounts[0] = address(this);
         for (uint256 i = 1; i < NDS; i++) {
