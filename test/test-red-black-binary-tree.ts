@@ -1,11 +1,11 @@
-const { utils, BigNumber } = require('ethers');
-const { ethers } = require('hardhat');
-const fs = require('fs');
+import { utils, BigNumber, Contract } from 'ethers';
+import { ethers } from 'hardhat';
+import fs from 'fs';
 
-describe('Test RedBlackBinaryTree Library', () => {
-  let testRedBlackBinaryTree;
-  let addresses = [];
-  let addressesLength;
+describe('Test RedBlackBinaryTreeOptimized Library', () => {
+  let testRedBlackBinaryTreeOptimized: Contract;
+  let addresses: string[] = [];
+  let addressesLength: number;
   const MAX = 10 * 30;
 
   for (let i = 0; i < 700; i++) {
@@ -16,34 +16,34 @@ describe('Test RedBlackBinaryTree Library', () => {
   const getRandomNumber = () => Math.floor(Math.random() * MAX + 1);
 
   beforeEach(async () => {
-    const RedBlackBinaryTree = await ethers.getContractFactory('RedBlackBinaryTree');
-    const redBlackBinaryTree = await RedBlackBinaryTree.deploy();
-    await redBlackBinaryTree.deployed();
+    const RedBlackBinaryTreeOptimized = await ethers.getContractFactory('RedBlackBinaryTreeOptimized');
+    const redBlackBinaryTreeOptimized = await RedBlackBinaryTreeOptimized.deploy();
+    await redBlackBinaryTreeOptimized.deployed();
 
-    const TestRedBlackBinaryTree = await ethers.getContractFactory('TestRedBlackBinaryTree', {
+    const TestRedBlackBinaryTreeOptimized = await ethers.getContractFactory('TestRedBlackBinaryTreeOptimized', {
       libraries: {
-        RedBlackBinaryTree: redBlackBinaryTree.address,
+        RedBlackBinaryTreeOptimized: redBlackBinaryTreeOptimized.address,
       },
     });
-    testRedBlackBinaryTree = await TestRedBlackBinaryTree.deploy();
-    await testRedBlackBinaryTree.deployed();
+    testRedBlackBinaryTreeOptimized = await TestRedBlackBinaryTreeOptimized.deploy();
+    await testRedBlackBinaryTreeOptimized.deployed();
   });
 
   describe('Test Gas Consumption', () => {
     it('test first', async () => {
-      await testRedBlackBinaryTree.insert('0xDaB8C61fae3A170CF2f4411D4689BD62Fa733021', 1);
-      await testRedBlackBinaryTree.insert('0x37611DA9a94cf3b466b8f1bEae206A26A3A6E4fC', 2);
-      await testRedBlackBinaryTree.insert('0xD2b7Cfa9A7662eFD8450b034FdD472Ffd8f36D68', 3);
-      await testRedBlackBinaryTree.insert('0x907b0FD3408915DDf4a1915e6D57d683c81b2E27', 4);
-      await testRedBlackBinaryTree.insert('0xa626Aef7c0dD74c825b786166b00929388c568e9', 5);
-      printTreeStucture(testRedBlackBinaryTree);
+      await testRedBlackBinaryTreeOptimized.insert('0xDaB8C61fae3A170CF2f4411D4689BD62Fa733021', 1);
+      await testRedBlackBinaryTreeOptimized.insert('0x37611DA9a94cf3b466b8f1bEae206A26A3A6E4fC', 2);
+      await testRedBlackBinaryTreeOptimized.insert('0xD2b7Cfa9A7662eFD8450b034FdD472Ffd8f36D68', 3);
+      await testRedBlackBinaryTreeOptimized.insert('0x907b0FD3408915DDf4a1915e6D57d683c81b2E27', 4);
+      await testRedBlackBinaryTreeOptimized.insert('0xa626Aef7c0dD74c825b786166b00929388c568e9', 5);
+      printTreeStucture(testRedBlackBinaryTreeOptimized);
     });
 
     it('Test insert many values', async () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
+        await testRedBlackBinaryTreeOptimized.insert(address, value);
         value = value.sub(1);
       }
     });
@@ -52,13 +52,13 @@ describe('Test RedBlackBinaryTree Library', () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
+        await testRedBlackBinaryTreeOptimized.insert(address, value);
         value = value.sub(1);
       }
 
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.remove(address);
+        await testRedBlackBinaryTreeOptimized.remove(address);
       }
     });
 
@@ -66,13 +66,13 @@ describe('Test RedBlackBinaryTree Library', () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
+        await testRedBlackBinaryTreeOptimized.insert(address, value);
         value = value.sub(1);
       }
 
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[addressesLength - i - 1];
-        await testRedBlackBinaryTree.remove(address);
+        await testRedBlackBinaryTreeOptimized.remove(address);
       }
     });
 
@@ -81,12 +81,12 @@ describe('Test RedBlackBinaryTree Library', () => {
         const address = addresses[i];
         const value = BigNumber.from(getRandomNumber());
 
-        await testRedBlackBinaryTree.insert(address, value);
+        await testRedBlackBinaryTreeOptimized.insert(address, value);
       }
 
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[addressesLength - i - 1];
-        await testRedBlackBinaryTree.remove(address);
+        await testRedBlackBinaryTreeOptimized.remove(address);
       }
     });
 
@@ -94,13 +94,13 @@ describe('Test RedBlackBinaryTree Library', () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
+        await testRedBlackBinaryTreeOptimized.insert(address, value);
         value = value.sub(1);
       }
 
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.keyExists(address);
+        await testRedBlackBinaryTreeOptimized.keyExists(address);
       }
     });
 
@@ -108,30 +108,30 @@ describe('Test RedBlackBinaryTree Library', () => {
       let value = utils.parseUnits('10');
       for (let i = 0; i < addressesLength; i++) {
         const address = addresses[i];
-        await testRedBlackBinaryTree.insert(address, value);
+        await testRedBlackBinaryTreeOptimized.insert(address, value);
         value = value.sub(1);
       }
 
-      await testRedBlackBinaryTree.last();
+      await testRedBlackBinaryTreeOptimized.last();
     });
   });
 });
 
-async function printTreeStucture(tree) {
+async function printTreeStucture(tree: Contract) {
   let data = '';
 
-  first = await tree.returnFirst();
-  next = await tree.returnNext(first);
+  const first = await tree.first();
+  let next = await tree.next(first);
 
-  data += 'key: ' + first + ' value: ' + await tree.returnKeyToValue(first) + '\n';
+  data += 'key: ' + first + ' value: ' + (await tree.returnKeyToValue(first)) + '\n';
   data += '\n';
 
   while (next != '0x0000000000000000000000000000000000000000') {
-    data += 'key: ' + next + ' value: ' + await tree.returnKeyToValue(next) + '\n';
+    data += 'key: ' + next + ' value: ' + (await tree.returnKeyToValue(next)) + '\n';
     data += '\n';
-    next = await tree.returnNext(next);
+    next = await tree.next(next);
   }
-  
+
   fs.writeFile('./test/Output_Tree_Structure.txt', data, (err) => {
     if (err) throw err;
   });

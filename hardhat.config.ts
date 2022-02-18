@@ -1,7 +1,8 @@
-require('dotenv').config({ path: './.env.local' });
-require('@nomiclabs/hardhat-etherscan');
-require('@nomiclabs/hardhat-waffle');
-require('hardhat-gas-reporter');
+import * as dotenv from 'dotenv';
+dotenv.config({ path: './.env.local' });
+import '@nomiclabs/hardhat-etherscan';
+import '@nomiclabs/hardhat-waffle';
+import 'hardhat-gas-reporter';
 
 module.exports = {
   defaultNetwork: 'hardhat',
