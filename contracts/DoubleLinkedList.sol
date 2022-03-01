@@ -2,6 +2,8 @@
 pragma solidity 0.8.7;
 
 library DoubleLinkedList {
+    /// Structs ///
+
     struct Account {
         address prev;
         address next;
@@ -13,6 +15,14 @@ library DoubleLinkedList {
         address head;
         address tail;
     }
+
+    /// Errors ///
+
+    /// @notice Thrown when the account cannot be inserted.
+    error AccountCannotBeInserted();
+
+    /// @notice Thrown when the account does not exist.
+    error AccountDoesNotExist();
 
     /// @notice Returns the `account` linked to `_id`.
     /// @param _list The list to search in.
@@ -52,24 +62,42 @@ library DoubleLinkedList {
         return _list.accounts[_id].prev;
     }
 
+    /// @dev Inserts an account in the `_list` before another account.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @param _nextId The account id from which to insert the account before.
+    /// @param _value The value of the account.
+    function insertBefore(
+        List storage _list,
+        address _id,
+        address _nextId,
+        uint256 _value
+    ) internal {
+        if ((_id == address(0)) || _list.accounts[_id].value != 0) revert AccountCannotBeInserted();
+
+        address prevId = _list.accounts[_nextId].prev;
+        _list.accounts[_id] = Account(prevId, _nextId, _value);
+
+        if (prevId != address(0)) _list.accounts[prevId].next = _id;
+        else _list.head = _id;
+        if (_nextId != address(0)) _list.accounts[_nextId].prev = _id;
+        else _list.tail = _id;
+    }
+
     /// @notice Removes an account of the `_list`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
-    /// @return Whether the account has been removed or not.
-    function remove(List storage _list, address _id) internal returns (bool) {
-        if (_list.accounts[_id].value != 0) {
-            Account memory account = _list.accounts[_id];
+    function remove(List storage _list, address _id) internal {
+        if (_list.accounts[_id].value == 0) revert AccountDoesNotExist();
 
-            if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
-            else _list.head = account.next;
-            if (account.next != address(0)) _list.accounts[account.next].prev = account.prev;
-            else _list.tail = account.prev;
+        Account memory account = _list.accounts[_id];
 
-            delete _list.accounts[_id];
-            return true;
-        } else {
-            return false;
-        }
+        if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
+        else _list.head = account.next;
+        if (account.next != address(0)) _list.accounts[account.next].prev = account.prev;
+        else _list.tail = account.prev;
+
+        delete _list.accounts[_id];
     }
 
     /// @notice Inserts an account in the `_list` at the right slot based on its `_value`.
@@ -83,7 +111,7 @@ library DoubleLinkedList {
         uint256 _value,
         uint256 _maxIterations
     ) internal {
-        require(_list.accounts[_id].value == 0, "DLL: account already created");
+        if ((_id == address(0)) || _list.accounts[_id].value != 0) revert AccountCannotBeInserted();
 
         uint256 numberOfIterations;
         address current = _list.head;
