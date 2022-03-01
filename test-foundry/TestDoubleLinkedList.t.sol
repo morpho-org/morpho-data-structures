@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: GNU AGPLv3
-pragma solidity 0.8.7;
+pragma solidity >=0.8.0;
 
-import "lib/ds-test/src/test.sol";
-
+import "@lib/ds-test/src/test.sol";
 import "@contracts/DoubleLinkedList.sol";
 
 contract TestDoubleLinkedList is DSTest {

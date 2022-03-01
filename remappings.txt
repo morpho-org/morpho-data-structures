@@ -1,3 +1,4 @@
 @openzeppelin/=node_modules/@openzeppelin/
 hardhat/=node_modules/hardhat/
 @contracts/=contracts/
+@lib/ds-test/=lib/ds-test/
