@@ -1,4 +1,3 @@
-
 .PHONY: test
 test: node_modules
 	@echo Run all tests
@@ -10,7 +9,7 @@ contract-% c-%: node_modules
 
 single-% s-%: node_modules
 	@echo Run single test: $*
-	@forge test -vvvvv -c test-foundry --match-test $*
+	@forge test -vvv -c test-foundry --match-test $*
 
 node_modules:
 	@yarn

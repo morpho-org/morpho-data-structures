@@ -7,9 +7,9 @@ import "@contracts/DoubleLinkedList.sol";
 contract TestDoubleLinkedList is DSTest {
     using DoubleLinkedList for DoubleLinkedList.List;
 
-    uint256 public NDS = 50;
     address[] public accounts;
-    address public ADDR_ZERO = address(0);
+    uint256 public constant NDS = 50;
+    address public constant ADDR_ZERO = address(0);
 
     DoubleLinkedList.List public list;
 
@@ -177,11 +177,11 @@ contract TestDoubleLinkedList is DSTest {
 
     // Should remove all sorted accounts
     function test_remove_all_sorted_account() public {
-        for (uint256 i = 0; i < accounts.length; i++) {
+        for (uint256 i; i < accounts.length; i++) {
             list.insertSorted(accounts[i], NDS - i, NDS);
         }
 
-        for (uint256 i = 0; i < accounts.length; i++) {
+        for (uint256 i; i < accounts.length; i++) {
             list.remove(accounts[i]);
         }
 
@@ -195,7 +195,7 @@ contract TestDoubleLinkedList is DSTest {
         uint256 newNDS = 10;
 
         // Add first 10 accounts with decreasing value
-        for (uint256 i = 0; i < 10; i++) {
+        for (uint256 i; i < 10; i++) {
             list.insertSorted(accounts[i], value - i, newNDS);
         }
 
@@ -203,13 +203,13 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), accounts[9]);
 
         address nextAccount = accounts[0];
-        for (uint256 i = 0; i < 9; i++) {
+        for (uint256 i; i < 9; i++) {
             nextAccount = list.getNext(nextAccount);
             assertEq(nextAccount, accounts[i + 1]);
         }
 
         address prevAccount = accounts[9];
-        for (uint256 i = 0; i < 9; i++) {
+        for (uint256 i; i < 9; i++) {
             prevAccount = list.getPrev(prevAccount);
             assertEq(prevAccount, accounts[10 - i - 2]);
         }
@@ -223,13 +223,13 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), accounts[accounts.length - 1]);
 
         nextAccount = accounts[0];
-        for (uint256 i = 0; i < 9; i++) {
+        for (uint256 i; i < 9; i++) {
             nextAccount = list.getNext(nextAccount);
             assertEq(nextAccount, accounts[i + 1]);
         }
 
         prevAccount = accounts[9];
-        for (uint256 i = 0; i < 9; i++) {
+        for (uint256 i; i < 9; i++) {
             prevAccount = list.getPrev(prevAccount);
             assertEq(prevAccount, accounts[10 - i - 2]);
         }
