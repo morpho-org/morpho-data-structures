@@ -104,6 +104,24 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), ADDR_ZERO);
     }
 
+    // Shoudl insert account before another account
+    function test_insert_before() public {
+        list.insertBefore(accounts[0], address(0), 1);
+
+        assertEq(list.getHead(), accounts[0]);
+        assertEq(list.getTail(), accounts[0]);
+
+        list.insertBefore(accounts[1], accounts[0], 1);
+
+        assertEq(list.getHead(), accounts[1]);
+        assertEq(list.getTail(), accounts[0]);
+
+        list.insertBefore(accounts[2], accounts[0], 1);
+
+        assertEq(list.getHead(), accounts[1]);
+        assertEq(list.getTail(), accounts[0]);
+    }
+
     // Should insert 3 accounts and remove them
     function test_insert_three_accounts_and_remove_them() public {
         list.insertSorted(accounts[0], 3, NDS);
