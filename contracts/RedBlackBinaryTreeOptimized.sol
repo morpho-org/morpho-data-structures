@@ -16,7 +16,7 @@ library RedBlackBinaryTreeOptimized {
     }
 
     struct Tree {
-        address root; // address of the root node
+        address root; // Address of the root node
         mapping(address => Node) nodes; // Map user's address to node
         mapping(address => uint256) keyToValue; // Maps key to its value
     }

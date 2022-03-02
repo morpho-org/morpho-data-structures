@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.7;
 
-import "./RedBlackBinaryTree.sol";
+import "../RedBlackBinaryTree.sol";
 
 contract TestRedBlackBinaryTree {
     using RedBlackBinaryTree for RedBlackBinaryTree.Tree;
