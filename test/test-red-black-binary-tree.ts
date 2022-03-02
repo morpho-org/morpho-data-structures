@@ -4,14 +4,13 @@ import fs from 'fs';
 
 describe('Test RedBlackBinaryTreeOptimized Library', () => {
   let testRedBlackBinaryTreeOptimized: Contract;
-  let addresses: string[] = [];
-  let addressesLength: number;
+  const addresses: string[] = [];
   const MAX = 10 * 30;
 
   for (let i = 0; i < 700; i++) {
     addresses.push(utils.solidityKeccak256(['uint256'], [i]).slice(0, 42));
   }
-  addressesLength = addresses.length;
+  const addressesLength = addresses.length;
 
   const getRandomNumber = () => Math.floor(Math.random() * MAX + 1);
 
@@ -132,7 +131,7 @@ async function printTreeStucture(tree: Contract) {
     next = await tree.next(next);
   }
 
-  fs.writeFile('./test/Output_Tree_Structure.txt', data, (err) => {
+  fs.writeFile('./test/output-tree-structure.txt', data, (err) => {
     if (err) throw err;
   });
 
