@@ -1,15 +1,18 @@
 // SPDX-License-Identifier: GNU AGPLv3
 pragma solidity >=0.8.0;
 
-import "@lib/ds-test/src/test.sol";
+import "@ds-test/src/test.sol";
+import "@forge-std/src/VM.sol";
 import "@contracts/DoubleLinkedList.sol";
 
 contract TestDoubleLinkedList is DSTest {
     using DoubleLinkedList for DoubleLinkedList.List;
 
+    Vm public hevm = Vm(HEVM_ADDRESS);
+
+    uint256 public NDS = 50;
     address[] public accounts;
-    uint256 public constant NDS = 50;
-    address public constant ADDR_ZERO = address(0);
+    address public ADDR_ZERO = address(0);
 
     DoubleLinkedList.List public list;
 
@@ -21,8 +24,7 @@ contract TestDoubleLinkedList is DSTest {
         }
     }
 
-    // Should insert one single account
-    function test_insert_one_single_account() public {
+    function testInsertOneSingleAccount() public {
         list.insertSorted(accounts[0], 1, NDS);
 
         assertEq(list.getHead(), accounts[0]);
@@ -32,8 +34,30 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getNext(accounts[0]), ADDR_ZERO);
     }
 
-    // Should remove one single account
-    function test_remove_one_single_account() public {
+    function testShouldNotInsertAccountWithZeroValue() public {
+        hevm.expectRevert(abi.encodeWithSignature("ValueIsZero()"));
+        list.insertSorted(accounts[0], 0, NDS);
+    }
+
+    function testShouldNotRemoveAccountThatDoesNotExist() public {
+        hevm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
+        list.remove(accounts[0]);
+    }
+
+    function testShouldInsertSeveralTimesTheSameAccount() public {
+        list.insertSorted(accounts[0], 1, NDS);
+        hevm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
+        list.insertSorted(accounts[0], 2, NDS);
+    }
+
+    function testShouldHaveTheRightOrder() public {
+        list.insertSorted(accounts[0], 20, NDS);
+        list.insertSorted(accounts[1], 40, NDS);
+        assertEq(list.getHead(), accounts[1]);
+        assertEq(list.getTail(), accounts[0]);
+    }
+
+    function testShouldRemoveOneSingleAccount() public {
         list.insertSorted(accounts[0], 1, NDS);
         list.remove(accounts[0]);
 
@@ -44,8 +68,7 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getNext(accounts[0]), ADDR_ZERO);
     }
 
-    // Should insert 2 accounts
-    function test_insert_two_accounts() public {
+    function testShouldInsertTwoAccounts() public {
         list.insertSorted(accounts[0], 2, NDS);
         list.insertSorted(accounts[1], 1, NDS);
 
@@ -59,8 +82,7 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getNext(accounts[1]), ADDR_ZERO);
     }
 
-    // Should insert 3 accounts
-    function test_insert_three_accounts() public {
+    function testShouldInsertThreeAccounts() public {
         list.insertSorted(accounts[0], 3, NDS);
         list.insertSorted(accounts[1], 2, NDS);
         list.insertSorted(accounts[2], 1, NDS);
@@ -78,8 +100,7 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getNext(accounts[2]), ADDR_ZERO);
     }
 
-    // Should remove 1 account over 2
-    function test_remove_one_account_over_two() public {
+    function testShouldRemoveOneAccountOverTwo() public {
         list.insertSorted(accounts[0], 2, NDS);
         list.insertSorted(accounts[1], 1, NDS);
         list.remove(accounts[0]);
@@ -92,8 +113,7 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getNext(accounts[1]), ADDR_ZERO);
     }
 
-    // Should remove both accounts
-    function test_remove_both_accounts() public {
+    function testShouldRemoveBothAccounts() public {
         list.insertSorted(accounts[0], 2, NDS);
         list.insertSorted(accounts[1], 1, NDS);
         list.remove(accounts[0]);
@@ -103,26 +123,7 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), ADDR_ZERO);
     }
 
-    // Shoudl insert account before another account
-    function test_insert_before() public {
-        list.insertBefore(accounts[0], address(0), 1);
-
-        assertEq(list.getHead(), accounts[0]);
-        assertEq(list.getTail(), accounts[0]);
-
-        list.insertBefore(accounts[1], accounts[0], 1);
-
-        assertEq(list.getHead(), accounts[1]);
-        assertEq(list.getTail(), accounts[0]);
-
-        list.insertBefore(accounts[2], accounts[0], 1);
-
-        assertEq(list.getHead(), accounts[1]);
-        assertEq(list.getTail(), accounts[0]);
-    }
-
-    // Should insert 3 accounts and remove them
-    function test_insert_three_accounts_and_remove_them() public {
+    function testShouldInsertThreeAccountsAndRemoveThem() public {
         list.insertSorted(accounts[0], 3, NDS);
         list.insertSorted(accounts[1], 2, NDS);
         list.insertSorted(accounts[2], 1, NDS);
@@ -130,7 +131,7 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getHead(), accounts[0]);
         assertEq(list.getTail(), accounts[2]);
 
-        // Remove account 0
+        // Remove account 0.
         list.remove(accounts[0]);
         assertEq(list.getHead(), accounts[1]);
         assertEq(list.getTail(), accounts[2]);
@@ -140,21 +141,20 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getPrev(accounts[2]), accounts[1]);
         assertEq(list.getNext(accounts[2]), ADDR_ZERO);
 
-        // Remove account 1
+        // Remove account 1.
         list.remove(accounts[1]);
         assertEq(list.getHead(), accounts[2]);
         assertEq(list.getTail(), accounts[2]);
         assertEq(list.getPrev(accounts[2]), ADDR_ZERO);
         assertEq(list.getNext(accounts[2]), ADDR_ZERO);
 
-        // Remove account 2
+        // Remove account 2.
         list.remove(accounts[2]);
         assertEq(list.getHead(), ADDR_ZERO);
         assertEq(list.getTail(), ADDR_ZERO);
     }
 
-    // Should insert accounts all sorted
-    function test_insert_accounts_all_sorted() public {
+    function testShouldInsertAccountsAllSorted() public {
         for (uint256 i = 0; i < accounts.length; i++) {
             list.insertSorted(accounts[i], NDS - i, NDS);
         }
@@ -175,13 +175,12 @@ contract TestDoubleLinkedList is DSTest {
         }
     }
 
-    // Should remove all sorted accounts
-    function test_remove_all_sorted_account() public {
-        for (uint256 i; i < accounts.length; i++) {
+    function testShouldRemoveAllSortedAccount() public {
+        for (uint256 i = 0; i < accounts.length; i++) {
             list.insertSorted(accounts[i], NDS - i, NDS);
         }
 
-        for (uint256 i; i < accounts.length; i++) {
+        for (uint256 i = 0; i < accounts.length; i++) {
             list.remove(accounts[i]);
         }
 
@@ -189,13 +188,12 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), ADDR_ZERO);
     }
 
-    // Should insert account sorted at the beginning until NDS
-    function test_insert_account_sorted_at_the_beginning_until_NDS() public {
+    function testShouldInsertAccountSortedAtTheBeginningUntilNDS() public {
         uint256 value = 50;
         uint256 newNDS = 10;
 
-        // Add first 10 accounts with decreasing value
-        for (uint256 i; i < 10; i++) {
+        // Add first 10 accounts with decreasing value.
+        for (uint256 i = 0; i < 10; i++) {
             list.insertSorted(accounts[i], value - i, newNDS);
         }
 
@@ -203,18 +201,18 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), accounts[9]);
 
         address nextAccount = accounts[0];
-        for (uint256 i; i < 9; i++) {
+        for (uint256 i = 0; i < 9; i++) {
             nextAccount = list.getNext(nextAccount);
             assertEq(nextAccount, accounts[i + 1]);
         }
 
         address prevAccount = accounts[9];
-        for (uint256 i; i < 9; i++) {
+        for (uint256 i = 0; i < 9; i++) {
             prevAccount = list.getPrev(prevAccount);
             assertEq(prevAccount, accounts[10 - i - 2]);
         }
 
-        // Add last 10 accounts at the same value
+        // Add last 10 accounts at the same value.
         for (uint256 i = NDS - 10; i < NDS; i++) {
             list.insertSorted(accounts[i], 10, newNDS);
         }
@@ -223,13 +221,13 @@ contract TestDoubleLinkedList is DSTest {
         assertEq(list.getTail(), accounts[accounts.length - 1]);
 
         nextAccount = accounts[0];
-        for (uint256 i; i < 9; i++) {
+        for (uint256 i = 0; i < 9; i++) {
             nextAccount = list.getNext(nextAccount);
             assertEq(nextAccount, accounts[i + 1]);
         }
 
         prevAccount = accounts[9];
-        for (uint256 i; i < 9; i++) {
+        for (uint256 i = 0; i < 9; i++) {
             prevAccount = list.getPrev(prevAccount);
             assertEq(prevAccount, accounts[10 - i - 2]);
         }

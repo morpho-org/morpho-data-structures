@@ -2,7 +2,7 @@
 pragma solidity >=0.8.0;
 
 library DoubleLinkedList {
-    /// Structs ///
+    /// STRUCTS ///
 
     struct Account {
         address prev;
@@ -16,13 +16,18 @@ library DoubleLinkedList {
         address tail;
     }
 
-    /// Errors ///
+    /// ERRORS ///
 
-    /// @notice Thrown when the account cannot be inserted.
-    error AccountCannotBeInserted();
+    /// @notice Thrown when the account is already inserted in the double linked list.
+    error AccountAlreadyInserted();
 
-    /// @notice Thrown when the account does not exist.
+    /// @notice Thrown when the account to remove does not exist.
     error AccountDoesNotExist();
+
+    /// @notice Thrown when the value is zero at insertion.
+    error ValueIsZero();
+
+    /// INTERNAL ///
 
     /// @notice Returns the `account` linked to `_id`.
     /// @param _list The list to search in.
@@ -62,34 +67,11 @@ library DoubleLinkedList {
         return _list.accounts[_id].prev;
     }
 
-    /// @dev Inserts an account in the `_list` before another account.
-    /// @param _list The list to search in.
-    /// @param _id The address of the account.
-    /// @param _nextId The account id from which to insert the account before.
-    /// @param _value The value of the account.
-    function insertBefore(
-        List storage _list,
-        address _id,
-        address _nextId,
-        uint256 _value
-    ) internal {
-        if ((_id == address(0)) || _list.accounts[_id].value != 0) revert AccountCannotBeInserted();
-
-        address prevId = _list.accounts[_nextId].prev;
-        _list.accounts[_id] = Account(prevId, _nextId, _value);
-
-        if (prevId != address(0)) _list.accounts[prevId].next = _id;
-        else _list.head = _id;
-        if (_nextId != address(0)) _list.accounts[_nextId].prev = _id;
-        else _list.tail = _id;
-    }
-
     /// @notice Removes an account of the `_list`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal {
         if (_list.accounts[_id].value == 0) revert AccountDoesNotExist();
-
         Account memory account = _list.accounts[_id];
 
         if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
@@ -111,31 +93,52 @@ library DoubleLinkedList {
         uint256 _value,
         uint256 _maxIterations
     ) internal {
-        if ((_id == address(0)) || _list.accounts[_id].value != 0) revert AccountCannotBeInserted();
+        if (_value == 0) revert ValueIsZero();
+        if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
 
         uint256 numberOfIterations;
-        address current = _list.head;
+        address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
+
         while (
-            numberOfIterations <= _maxIterations &&
-            current != _list.tail &&
-            _list.accounts[current].value > _value
+            numberOfIterations < _maxIterations &&
+            next != _list.tail &&
+            _list.accounts[next].value >= _value
         ) {
-            current = _list.accounts[current].next;
-            numberOfIterations++;
+            next = _list.accounts[next].next;
+            unchecked {
+                ++numberOfIterations;
+            }
         }
 
-        address nextId;
-        address prevId;
-        if (numberOfIterations < _maxIterations && current != _list.tail) {
-            prevId = _list.accounts[current].prev;
-            nextId = current;
-        } else prevId = _list.tail;
-
-        _list.accounts[_id] = Account(prevId, nextId, _value);
-
-        if (prevId != address(0)) _list.accounts[prevId].next = _id;
-        else _list.head = _id;
-        if (nextId != address(0)) _list.accounts[nextId].prev = _id;
-        else _list.tail = _id;
+        // Account is not the new tail.
+        if (next != address(0) && _list.accounts[next].value < _value) {
+            // Account is the new head.
+            if (next == _list.head) {
+                _list.accounts[_id] = Account(address(0), next, _value);
+                _list.head = _id;
+                _list.accounts[next].prev = _id;
+            }
+            // Account is not the new head.
+            else {
+                _list.accounts[_id] = Account(_list.accounts[next].prev, next, _value);
+                _list.accounts[_list.accounts[next].prev].next = _id;
+                _list.accounts[next].prev = _id;
+            }
+        }
+        // Account is the new tail.
+        else {
+            // Account is the new head.
+            if (_list.head == address(0)) {
+                _list.accounts[_id] = Account(address(0), address(0), _value);
+                _list.head = _id;
+                _list.tail = _id;
+            }
+            // Account is not the new head.
+            else {
+                _list.accounts[_id] = Account(_list.tail, address(0), _value);
+                _list.accounts[_list.tail].next = _id;
+                _list.tail = _id;
+            }
+        }
     }
 }
