@@ -1,4 +1,5 @@
 @openzeppelin/=node_modules/@openzeppelin/
-hardhat/=node_modules/hardhat/
 @contracts/=contracts/
-@lib/ds-test/=lib/ds-test/
+@ds-test/src/=lib/ds-test/src/
+@forge-std/src/=lib/forge-std/src/
+hardhat/=node_modules/hardhat/
