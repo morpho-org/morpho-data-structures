@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: GNU AGPLv3
-pragma solidity >=0.8.0;
+pragma solidity 0.8.13;
 
-import "@ds-test/src/test.sol";
-import "@forge-std/src/VM.sol";
+import "forge-std/Test.sol";
 import "@contracts/DoubleLinkedList.sol";
 
-contract TestDoubleLinkedList is DSTest {
+contract TestDoubleLinkedList is Test {
     using DoubleLinkedList for DoubleLinkedList.List;
 
     Vm public hevm = Vm(HEVM_ADDRESS);
@@ -37,6 +36,11 @@ contract TestDoubleLinkedList is DSTest {
     function testShouldNotInsertAccountWithZeroValue() public {
         hevm.expectRevert(abi.encodeWithSignature("ValueIsZero()"));
         list.insertSorted(accounts[0], 0, NDS);
+    }
+
+    function testShouldNotInsertZeroAddress() public {
+        hevm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
+        list.insertSorted(address(0), 10, NDS);
     }
 
     function testShouldNotRemoveAccountThatDoesNotExist() public {
