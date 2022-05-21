@@ -58,7 +58,7 @@ Before merging a PR:
 
 ## Testing
 
-You can run the tests for the `DoubleLinkedList` with foundry. You can find the instructions to the [here](https://book.getfoundry.sh/getting-started/installation.html)
+You can run the tests for the `DoubleLinkedList` with foundry. You can find the instructions for installing foundry [here](https://book.getfoundry.sh/getting-started/installation.html)
 
 You also need to have up to date git submodules:
 
