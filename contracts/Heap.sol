@@ -93,7 +93,7 @@ library BasicHeap {
         _heap.indexes[accountOldIndex1.id] = _index2;
     }
 
-    /// @notice Moves an account up the heap until its value is smaller than its parent's.
+    /// @notice Moves an account up the heap until its value is smaller than the one of its parent.
     /// @dev This functions restores the invariant about the order of the values stored when the account at `_index` is the only one with value greater than what it should be.
     /// @param _heap The heap to modify.
     /// @param _index The index of the account to move.
@@ -155,7 +155,7 @@ library BasicHeap {
         shiftUp(_heap, accountsLength);
     }
 
-    /// @notice Increase the amount of an account in the `_heap`.
+    /// @notice Decreases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a value greater than `_newValue`.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to decrease the amount.
@@ -170,7 +170,7 @@ library BasicHeap {
         shiftDown(_heap, index);
     }
 
-    /// @notice Increase the amount of an account in the `_heap`.
+    /// @notice Increases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a smaller value than `_newValue`.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to increase the amount.
