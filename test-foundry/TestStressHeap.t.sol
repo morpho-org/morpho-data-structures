@@ -9,6 +9,7 @@ import "@contracts/Heap.sol";
 contract HeapStorage {
     BasicHeap.Heap internal heap;
     uint256 public TESTED_SIZE = 10000;
+    uint256 public incrementAmount = 5;
 
     function setUp() public {
         for (uint256 i = 0; i < TESTED_SIZE; i++) {
@@ -30,10 +31,12 @@ contract HeapStorage {
 contract TestStressHeap is DSTest {
     HeapStorage public hs = new HeapStorage();
     uint256 public ts;
+    uint256 public im;
 
     function setUp() public {
         hs.setUp();
         ts = hs.TESTED_SIZE();
+        im = hs.incrementAmount();
     }
 
     function testInsertOneTop() public {
@@ -58,22 +61,22 @@ contract TestStressHeap is DSTest {
     }
 
     function testRemoveOneBottom() public {
-        uint256 end = ts - 10;
+        uint256 end = ts - 2 * im;
         hs.update(address(uint160(end + 1)), ts - end, 0);
     }
 
     function testIncreaseOneTop() public {
-        hs.update(address(uint160(1)), ts, ts + 5);
+        hs.update(address(uint160(1)), ts, ts + im);
     }
 
     function testIncreaseOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, ts - middle + 5);
+        hs.update(address(uint160(middle + 1)), ts - middle, ts - middle + im);
     }
 
     function testIncreaseOneBottom() public {
-        uint256 end = ts - 10;
-        hs.update(address(uint160(end + 1)), ts - end, ts - end + 5);
+        uint256 end = ts - 2 * im;
+        hs.update(address(uint160(end + 1)), ts - end, ts - end + im);
     }
 
     function testDecreaseOneTop() public {
@@ -86,7 +89,7 @@ contract TestStressHeap is DSTest {
     }
 
     function testDecreaseOneBottom() public {
-        uint256 end = ts - 10;
-        hs.update(address(uint160(end + 1)), ts - end, ts - end - 5);
+        uint256 end = ts - 2 * im;
+        hs.update(address(uint160(end + 1)), ts - end, ts - end - im);
     }
 }
