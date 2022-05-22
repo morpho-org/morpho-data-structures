@@ -74,6 +74,21 @@ library BasicHeap {
 
     /// PRIVATE ///
 
+    /// @notice Sets `_index` in the `_heap` to be `_account`.
+    /// @dev The heap may lose its invariant about the order of the values stored.
+    /// @dev Only call this function with an index in the bounds of the array.
+    /// @param _heap The heap to modify.
+    /// @param _index The index of the account in the heap to be set.
+    /// @param _account The account to set the `_index` to.
+    function set(
+        Heap storage _heap,
+        uint256 _index,
+        Account memory _account
+    ) private {
+        _heap.accounts[_index - 1] = _account;
+        _heap.indexes[_account.id] = _index;
+    }
+
     /// @notice Swaps two accounts in the `_heap`.
     /// @dev The heap may lose its invariant about the order of the values stored.
     /// @dev Only call this function with indexes in the bounds of the array.
@@ -87,10 +102,8 @@ library BasicHeap {
     ) private {
         Account memory accountOldIndex1 = _heap.accounts[_index1 - 1];
         Account memory accountOldIndex2 = _heap.accounts[_index2 - 1];
-        _heap.accounts[_index1 - 1] = accountOldIndex2;
-        _heap.accounts[_index2 - 1] = accountOldIndex1;
-        _heap.indexes[accountOldIndex2.id] = _index1;
-        _heap.indexes[accountOldIndex1.id] = _index2;
+        set(_heap, _index1, accountOldIndex2);
+        set(_heap, _index2, accountOldIndex1);
     }
 
     /// @notice Moves an account up the heap until its value is smaller than the one of its parent.
@@ -98,12 +111,13 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _index The index of the account to move.
     function shiftUp(Heap storage _heap, uint256 _index) private {
-        uint256 mother = _index / 2;
-        while (mother > 0 && _heap.accounts[_index - 1].value > _heap.accounts[mother - 1].value) {
-            swap(_heap, _index, mother);
-            _index = mother;
-            mother = mother / 2;
+        Account memory initAccount = _heap.accounts[_index - 1];
+        uint256 initValue = initAccount.value;
+        while (_index != 1 && initValue > _heap.accounts[_index / 2 - 1].value) {
+            set(_heap, _index, _heap.accounts[_index / 2 - 1]);
+            _index /= 2;
         }
+        set(_heap, _index, initAccount);
     }
 
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
@@ -111,31 +125,26 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _index The index of the account to move.
     function shiftDown(Heap storage _heap, uint256 _index) private {
-        uint256 accountsLength = _heap.accounts.length;
-        uint256 leftIndex;
-        uint256 rightIndex;
-        uint256 maxIndex;
-        uint256 maxValue;
+        uint256 size = _heap.accounts.length;
+        Account memory initAccount = _heap.accounts[_index - 1];
+        uint256 childIndex = _index * 2;
+        Account memory childAccount;
 
-        while (true) {
-            leftIndex = 2 * _index;
-            rightIndex = 2 * _index + 1;
-            maxIndex = _index;
-            maxValue = _heap.accounts[_index - 1].value;
+        while (childIndex <= size) {
+            if (
+                childIndex + 1 <= size &&
+                _heap.accounts[childIndex].value > _heap.accounts[childIndex - 1].value
+            ) childIndex++;
 
-            if (leftIndex <= accountsLength && _heap.accounts[leftIndex - 1].value > maxValue) {
-                maxIndex = leftIndex;
-                maxValue = _heap.accounts[leftIndex - 1].value;
-            }
+            childAccount = _heap.accounts[childIndex - 1];
 
-            if (rightIndex <= accountsLength && _heap.accounts[rightIndex - 1].value > maxValue)
-                maxIndex = rightIndex;
-
-            if (maxIndex != _index) {
-                swap(_heap, _index, maxIndex);
-                _index = maxIndex;
+            if (childAccount.value > initAccount.value) {
+                set(_heap, _index, childAccount);
+                _index = childIndex;
+                childIndex *= 2;
             } else break;
         }
+        set(_heap, _index, initAccount);
     }
 
     /// @notice Inserts an account in the `_heap`.
