@@ -123,8 +123,10 @@ library BasicHeap {
             maxIndex = _index;
             maxValue = _heap.accounts[_index - 1].value;
 
-            if (leftIndex <= accountsLength && _heap.accounts[leftIndex - 1].value > maxValue)
+            if (leftIndex <= accountsLength && _heap.accounts[leftIndex - 1].value > maxValue) {
                 maxIndex = leftIndex;
+                maxValue = _heap.accounts[leftIndex - 1].value;
+            }
 
             if (rightIndex <= accountsLength && _heap.accounts[rightIndex - 1].value > maxValue)
                 maxIndex = rightIndex;
