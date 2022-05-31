@@ -18,63 +18,6 @@ library HeapOrdering {
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
 
-    /// GETTERS ///
-
-    /// @notice Returns the number of users in the `_heap`.
-    /// @param _heap The heap parameter.
-    /// @return The length of the heap.
-    function length(HeapArray storage _heap) internal view returns (uint256) {
-        return _heap.accounts.length;
-    }
-
-    /// @notice Returns the value of the account linked to `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The value of the account.
-    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
-        uint256 rank = _heap.ranks[_id];
-        if (rank == 0) return 0;
-        else return _heap.accounts[rank - 1].value;
-    }
-
-    /// @notice Returns the address at the head of the `_heap`.
-    /// @param _heap The heap to get the head.
-    /// @return The address of the head.
-    function getHead(HeapArray storage _heap) internal view returns (address) {
-        if (_heap.accounts.length > 0) return _heap.accounts[0].id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address at the tail of the `_heap`.
-    /// @param _heap The heap to get the tail.
-    /// @return The address of the tail.
-    function getTail(HeapArray storage _heap) internal view returns (address) {
-        if (_heap.accounts.length > 0) return _heap.accounts[_heap.accounts.length - 1].id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address coming before `_id` in accounts.
-    /// @dev The account associated to the returned address does not necessarily have a lower value than the one of the account associated to `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The address of the previous account.
-    function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id];
-        if (rank > 1) return _heap.accounts[rank - 2].id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address coming after `_id` in accounts.
-    /// @dev The account associated to the returned address does not necessarily have a greater value than the one of the account associated to `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The address of the next account.
-    function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id];
-        if (rank < _heap.accounts.length) return _heap.accounts[rank].id;
-        else return address(0);
-    }
-
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_heap`.
@@ -106,13 +49,27 @@ library HeapOrdering {
     /// PRIVATE ///
 
     /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
-    /// @dev We use division by 2 because the biggest elements of the heap are in the first half (rounded down) of the heap.
+    /// @dev We use division by 2 to remove the leafs of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
     function computeSize(uint256 _size, uint256 _maxSortedUsers) private pure returns (uint256) {
         while (_size >= _maxSortedUsers) _size /= 2;
         return _size;
+    }
+
+    /// @notice Returns the account of rank `_rank`.
+    /// @dev The first rank is 1 and the last one is length of the array.
+    /// @dev Only call this function with positive numbers.
+    /// @param _heap The heap to search in.
+    /// @param _rank The rank of the account.
+    /// @return The account of rank `_rank`.
+    function getAccountByRank(HeapArray storage _heap, uint256 _rank)
+        private
+        view
+        returns (Account memory)
+    {
+        return _heap.accounts[_rank - 1];
     }
 
     /// @notice Sets `_rank` in the `_heap` to be `_account`.
@@ -141,8 +98,8 @@ library HeapOrdering {
         uint256 _rank1,
         uint256 _rank2
     ) private {
-        Account memory accountOldRank1 = _heap.accounts[_rank1 - 1];
-        Account memory accountOldRank2 = _heap.accounts[_rank2 - 1];
+        Account memory accountOldRank1 = getAccountByRank(_heap, _rank1);
+        Account memory accountOldRank2 = getAccountByRank(_heap, _rank2);
         set(_heap, _rank1, accountOldRank2);
         set(_heap, _rank2, accountOldRank1);
     }
@@ -152,13 +109,13 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _rank The rank of the account to move.
     function shiftUp(HeapArray storage _heap, uint256 _rank) private {
-        Account memory initAccount = _heap.accounts[_rank - 1];
-        uint256 initValue = initAccount.value;
-        while (_rank > 1 && initValue > _heap.accounts[_rank / 2 - 1].value) {
-            set(_heap, _rank, _heap.accounts[_rank / 2 - 1]);
+        Account memory initialAccount = getAccountByRank(_heap, _rank);
+        uint256 initialValue = initialAccount.value;
+        while (_rank > 1 && initialValue > getAccountByRank(_heap, _rank / 2).value) {
+            set(_heap, _rank, getAccountByRank(_heap, _rank / 2));
             _rank /= 2;
         }
-        set(_heap, _rank, initAccount);
+        set(_heap, _rank, initialAccount);
     }
 
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
@@ -167,7 +124,8 @@ library HeapOrdering {
     /// @param _rank The rank of the account to move.
     function shiftDown(HeapArray storage _heap, uint256 _rank) private {
         uint256 size = _heap.size;
-        Account memory initAccount = _heap.accounts[_rank - 1];
+        Account memory initialAccount = getAccountByRank(_heap, _rank);
+        uint256 initialValue = initialAccount.value;
         uint256 childRank = _rank * 2;
         Account memory childAccount;
 
@@ -175,18 +133,19 @@ library HeapOrdering {
             if (
                 // Compute the rank of the child with biggest value.
                 childRank + 1 <= size &&
-                _heap.accounts[childRank].value > _heap.accounts[childRank - 1].value
+                getAccountByRank(_heap, childRank + 1).value >
+                getAccountByRank(_heap, childRank).value
             ) childRank++;
 
-            childAccount = _heap.accounts[childRank - 1];
+            childAccount = getAccountByRank(_heap, childRank);
 
-            if (childAccount.value > initAccount.value) {
+            if (childAccount.value > initialValue) {
                 set(_heap, _rank, childAccount);
                 _rank = childRank;
                 childRank *= 2;
             } else break;
         }
-        set(_heap, _rank, initAccount);
+        set(_heap, _rank, initialAccount);
     }
 
     /// @notice Inserts an account in the `_heap`.
@@ -278,8 +237,65 @@ library HeapOrdering {
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller of greater than the removed value.
         if (rank <= _heap.size) {
-            if (_removedValue > _heap.accounts[rank - 1].value) shiftDown(_heap, rank);
+            if (_removedValue > getAccountByRank(_heap, rank).value) shiftDown(_heap, rank);
             else shiftUp(_heap, rank);
         }
+    }
+
+    /// GETTERS ///
+
+    /// @notice Returns the number of users in the `_heap`.
+    /// @param _heap The heap parameter.
+    /// @return The length of the heap.
+    function length(HeapArray storage _heap) internal view returns (uint256) {
+        return _heap.accounts.length;
+    }
+
+    /// @notice Returns the value of the account linked to `_id`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The value of the account.
+    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
+        uint256 rank = _heap.ranks[_id];
+        if (rank == 0) return 0;
+        else return getAccountByRank(_heap, rank).value;
+    }
+
+    /// @notice Returns the address at the head of the `_heap`.
+    /// @param _heap The heap to get the head.
+    /// @return The address of the head.
+    function getHead(HeapArray storage _heap) internal view returns (address) {
+        if (_heap.accounts.length > 0) return getAccountByRank(_heap, 1).id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address at the tail of the `_heap`.
+    /// @param _heap The heap to get the tail.
+    /// @return The address of the tail.
+    function getTail(HeapArray storage _heap) internal view returns (address) {
+        if (_heap.accounts.length > 0) return getAccountByRank(_heap, _heap.accounts.length).id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address coming before `_id` in accounts.
+    /// @dev The account associated to the returned address does not necessarily have a lower value than the one of the account associated to `_id`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the previous account.
+    function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id];
+        if (rank > 1) return getAccountByRank(_heap, rank - 1).id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address coming after `_id` in accounts.
+    /// @dev The account associated to the returned address does not necessarily have a greater value than the one of the account associated to `_id`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the next account.
+    function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id];
+        if (rank < _heap.accounts.length) return getAccountByRank(_heap, rank + 1).id;
+        else return address(0);
     }
 }
