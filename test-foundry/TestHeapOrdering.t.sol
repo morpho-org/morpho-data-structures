@@ -417,48 +417,48 @@ contract TestHeap is DSTest {
         assertEq(heap.accounts[10].value, 1);
     }
 
-    function testDecreaseIndexChanges() public {
+    function testDecreaseRankChanges() public {
         MAX_SORTED_USERS = 4;
         for (uint256 i = 0; i < 16; i++) update(accounts[i], 0, 20 - i);
 
-        uint256 index5Before = heap.indexes[accounts[5]];
-        uint256 index0Before = heap.indexes[accounts[0]];
+        uint256 rank5Before = heap.ranks[accounts[5]];
+        uint256 rank0Before = heap.ranks[accounts[0]];
 
         update(accounts[5], 16, 1);
 
-        uint256 index5After = heap.indexes[accounts[5]];
+        uint256 rank5After = heap.ranks[accounts[5]];
 
-        assertEq(index5Before, index5After);
+        assertEq(rank5Before, rank5After);
 
         update(accounts[0], 20, 2);
 
-        uint256 index0After = heap.indexes[accounts[0]];
+        uint256 rank0After = heap.ranks[accounts[0]];
 
-        assertGt(index0After, index0Before);
+        assertGt(rank0After, rank0Before);
     }
 
-    function testIncreaseIndexChange() public {
+    function testIncreaseRankChange() public {
         for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
 
         MAX_SORTED_USERS = 10;
 
         update(accounts[17], 20 - 17, 5);
 
-        uint256 index17After = heap.indexes[accounts[17]];
+        uint256 rank17After = heap.ranks[accounts[17]];
 
-        assertEq(index17After, 6);
+        assertEq(rank17After, 6);
     }
 
-    function testIncreaseIndexChangeShiftUp() public {
+    function testIncreaseRankChangeShiftUp() public {
         for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
 
         MAX_SORTED_USERS = 10;
 
         update(accounts[17], 20 - 17, 40);
 
-        uint256 index17After = heap.indexes[accounts[17]];
+        uint256 rank17After = heap.ranks[accounts[17]];
 
-        assertEq(index17After, 1);
+        assertEq(rank17After, 1);
     }
 
     function testRemoveLast() public {
