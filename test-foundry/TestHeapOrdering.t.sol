@@ -7,14 +7,14 @@ import "forge-std/console.sol";
 
 import "@contracts/HeapOrdering.sol";
 
-contract TestHeap is DSTest {
+contract TestHeapOrdering is DSTest {
     using HeapOrdering for HeapOrdering.HeapArray;
 
     Vm public hevm = Vm(HEVM_ADDRESS);
 
     address[] public accounts;
     uint256 public NB_ACCOUNTS = 50;
-    uint256 public MAX_SORTED_USERS = 50;
+    uint128 public MAX_SORTED_USERS = 50;
     address public ADDR_ZERO = address(0);
 
     HeapOrdering.HeapArray internal heap;
@@ -417,14 +417,14 @@ contract TestHeap is DSTest {
         assertEq(heap.accounts[10].value, 1);
     }
 
-    function testDecreaseRankChanges() public {
+    function testDecreaseRankChange() public {
         MAX_SORTED_USERS = 4;
         for (uint256 i = 0; i < 16; i++) update(accounts[i], 0, 20 - i);
 
         uint256 rank5Before = heap.ranks[accounts[5]];
         uint256 rank0Before = heap.ranks[accounts[0]];
 
-        update(accounts[5], 16, 1);
+        update(accounts[5], 20 - 5, 1);
 
         uint256 rank5After = heap.ranks[accounts[5]];
 
