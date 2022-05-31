@@ -202,7 +202,8 @@ library HeapOrdering {
         uint256 rank = _heap.ranks[_id];
         setAccountValue(_heap, rank, _newValue);
 
-        if (rank <= _heap.size) shiftDown(_heap, rank);
+        // We only need to restore the invariant if the account is a node in the heap
+        if (rank <= _heap.size >> 1) shiftDown(_heap, rank);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
@@ -221,13 +222,13 @@ library HeapOrdering {
         Account memory account = getAccount(_heap, rank);
         account.value = _newValue;
         setAccountValue(_heap, rank, _newValue);
-        uint256 size = _heap.size;
+        uint256 nextSize = _heap.size + 1;
 
-        if (rank <= size) shiftUp(_heap, rank);
-        else if (size < _heap.accounts.length) {
-            swap(_heap, size + 1, rank);
-            shiftUp(_heap, size + 1);
-            _heap.size = computeSize(size + 1, _maxSortedUsers);
+        if (rank < nextSize) shiftUp(_heap, rank);
+        else if (nextSize <= _heap.accounts.length) {
+            swap(_heap, nextSize, rank);
+            shiftUp(_heap, nextSize);
+            _heap.size = computeSize(nextSize, _maxSortedUsers);
         }
     }
 
