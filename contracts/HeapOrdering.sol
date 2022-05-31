@@ -49,12 +49,12 @@ library HeapOrdering {
     /// PRIVATE ///
 
     /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
-    /// @dev We use division by 2 to remove the leafs of the heap.
+    /// @dev We use division by 2 to remove the leaves of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
     function computeSize(uint256 _size, uint256 _maxSortedUsers) private pure returns (uint256) {
-        while (_size >= _maxSortedUsers) _size /= 2;
+        while (_size >= _maxSortedUsers) _size >>= 1;
         return _size;
     }
 
@@ -146,7 +146,8 @@ library HeapOrdering {
         while (childRank <= size) {
             if (
                 // Compute the rank of the child with largest value.
-                childRank + 1 <= size &&
+                // childRank (resp. childRank+1) is the rank of the left (resp. right) child.
+                childRank < size &&
                 getAccount(_heap, childRank + 1).value > getAccount(_heap, childRank).value
             ) childRank++;
 
@@ -155,7 +156,7 @@ library HeapOrdering {
             if (childAccount.value > initialValue) {
                 setAccount(_heap, _rank, childAccount);
                 _rank = childRank;
-                childRank *= 2;
+                childRank <<= 1;
             } else break;
         }
         setAccount(_heap, _rank, initialAccount);
