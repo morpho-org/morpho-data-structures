@@ -424,7 +424,7 @@ contract TestHeap is DSTest {
         uint256 rank5Before = heap.ranks[accounts[5]];
         uint256 rank0Before = heap.ranks[accounts[0]];
 
-        update(accounts[5], 16, 1);
+        update(accounts[5], 15, 1);
 
         uint256 rank5After = heap.ranks[accounts[5]];
 
