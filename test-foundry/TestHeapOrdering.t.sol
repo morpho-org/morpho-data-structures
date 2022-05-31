@@ -286,7 +286,7 @@ contract TestHeap is DSTest {
         for (uint256 i = 0; i < NB_ACCOUNTS; i++) {
             update(accounts[i], 0, i + 1);
         }
-
+        // Test that the size has been increased to MAX_SORTED_USERS/2 and increased again.
         assertEq(heap.size, 20);
     }
 
