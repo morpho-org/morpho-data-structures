@@ -67,9 +67,17 @@ library HeapOrdering {
     function getAccountByRank(HeapArray storage _heap, uint256 _rank)
         private
         view
-        returns (Account memory)
+        returns (Account storage)
     {
         return _heap.accounts[_rank - 1];
+    }
+
+    function setAccountByRank(
+        HeapArray storage _heap,
+        uint256 _rank,
+        Account memory _account
+    ) private {
+        _heap.accounts[_rank - 1] = _account;
     }
 
     /// @notice Sets `_rank` in the `_heap` to be `_account`.
@@ -83,7 +91,7 @@ library HeapOrdering {
         uint256 _rank,
         Account memory _account
     ) private {
-        _heap.accounts[_rank - 1] = _account;
+        setAccountByRank(_heap, _rank, _account);
         _heap.ranks[_account.id] = _rank;
     }
 
@@ -98,8 +106,8 @@ library HeapOrdering {
         uint256 _rank1,
         uint256 _rank2
     ) private {
-        Account memory accountOldRank1 = getAccountByRank(_heap, _rank1);
-        Account memory accountOldRank2 = getAccountByRank(_heap, _rank2);
+        Account storage accountOldRank1 = getAccountByRank(_heap, _rank1);
+        Account storage accountOldRank2 = getAccountByRank(_heap, _rank2);
         set(_heap, _rank1, accountOldRank2);
         set(_heap, _rank2, accountOldRank1);
     }
@@ -187,7 +195,7 @@ library HeapOrdering {
         uint256 _newValue
     ) private {
         uint256 rank = _heap.ranks[_id];
-        _heap.accounts[rank - 1].value = _newValue;
+        getAccountByRank(_heap, rank).value = _newValue;
 
         if (rank <= _heap.size) shiftDown(_heap, rank);
     }
