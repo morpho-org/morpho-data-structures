@@ -7,7 +7,7 @@ import "forge-std/console.sol";
 
 import "@contracts/HeapOrdering.sol";
 
-contract TestHeap is DSTest {
+contract TestHeapOrdering is DSTest {
     using HeapOrdering for HeapOrdering.HeapArray;
 
     Vm public hevm = Vm(HEVM_ADDRESS);

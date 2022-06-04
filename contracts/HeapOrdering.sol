@@ -127,7 +127,7 @@ library HeapOrdering {
         uint256 initialValue = initialAccount.value;
         while (_rank > 1 && initialValue > getAccount(_heap, _rank >> 1).value) {
             setAccount(_heap, _rank, getAccount(_heap, _rank >> 1));
-            _rank /= 2;
+            _rank >>= 1;
         }
         setAccount(_heap, _rank, initialAccount);
     }
@@ -142,11 +142,11 @@ library HeapOrdering {
         uint256 initialValue = initialAccount.value;
         Account memory childAccount;
         uint256 childRank = _rank << 1;
+        // At this point, childRank (resp. childRank+1) is the rank of the left (resp. right) child.
 
         while (childRank <= size) {
+            // Compute the rank of the child with largest value.
             if (
-                // Compute the rank of the child with largest value.
-                // childRank (resp. childRank+1) is the rank of the left (resp. right) child.
                 childRank < size &&
                 getAccount(_heap, childRank + 1).value > getAccount(_heap, childRank).value
             ) childRank++;
@@ -163,7 +163,7 @@ library HeapOrdering {
     }
 
     /// @notice Inserts an account in the `_heap`.
-    /// @dev Only call this function when `_id` is in the `_heap`.
+    /// @dev Only call this function when `_id` is not in the `_heap`.
     /// @dev Reverts with AddressIsZero if `_value` is 0.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to insert.

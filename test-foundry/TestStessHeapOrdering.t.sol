@@ -28,7 +28,7 @@ contract HeapStorage {
     }
 }
 
-contract TestStressHeap is DSTest {
+contract TestStressHeapOrdering is DSTest {
     HeapStorage public hs = new HeapStorage();
     uint256 public ts;
     uint256 public im;
