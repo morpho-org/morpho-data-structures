@@ -226,7 +226,7 @@ library HeapOrdering {
         uint256 nextSize = _heap.size + 1;
 
         if (rank < nextSize) shiftUp(_heap, rank);
-        else if (nextSize <= _heap.accounts.length) {
+        else {
             swap(_heap, nextSize, rank);
             shiftUp(_heap, nextSize);
             _heap.size = computeSize(nextSize, _maxSortedUsers);
