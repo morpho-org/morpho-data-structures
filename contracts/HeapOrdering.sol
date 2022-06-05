@@ -37,16 +37,13 @@ library HeapOrdering {
         uint256 size = computeSize(_heap.size, _maxSortedUsers);
 
         if (_formerValue != _newValue) {
-            if (_newValue == 0) _heap.size = remove(_heap, _id, _formerValue, size);
-            else if (_formerValue == 0)
-                _heap.size = insert(_heap, _id, _newValue, _maxSortedUsers, size);
+            if (_newValue == 0) size = remove(_heap, _id, _formerValue, size);
+            else if (_formerValue == 0) size = insert(_heap, _id, _newValue, _maxSortedUsers, size);
             else if (_formerValue < _newValue)
-                _heap.size = increase(_heap, _id, _newValue, _maxSortedUsers, size);
-            else {
-                decrease(_heap, _id, _newValue, size);
-                _heap.size = size;
-            }
+                size = increase(_heap, _id, _newValue, _maxSortedUsers, size);
+            else decrease(_heap, _id, _newValue, size);
         }
+        _heap.size = size;
     }
 
     /// PRIVATE ///
