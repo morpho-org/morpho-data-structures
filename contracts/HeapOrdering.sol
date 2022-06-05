@@ -42,7 +42,10 @@ library HeapOrdering {
                 _heap.size = insert(_heap, _id, _newValue, _maxSortedUsers, size);
             else if (_formerValue < _newValue)
                 _heap.size = increase(_heap, _id, _newValue, _maxSortedUsers, size);
-            else decrease(_heap, _id, _newValue, size);
+            else {
+                decrease(_heap, _id, _newValue, size);
+                _heap.size = size;
+            }
         }
     }
 
@@ -231,13 +234,14 @@ library HeapOrdering {
         setAccountValue(_heap, rank, _newValue);
         uint256 nextSize = _size + 1;
 
-        if (rank < nextSize) shiftUp(_heap, rank);
-        else {
+        if (rank < nextSize) {
+            shiftUp(_heap, rank);
+            return _size;
+        } else {
             swap(_heap, nextSize, rank);
             shiftUp(_heap, nextSize);
             return computeSize(nextSize, _maxSortedUsers);
         }
-        return _size;
     }
 
     /// @notice Removes an account in the `_heap`.
