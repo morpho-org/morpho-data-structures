@@ -18,12 +18,20 @@ contract HeapStorage {
         }
     }
 
-    function update(
-        address _id,
-        uint256 _formerValue,
-        uint256 _newValue
-    ) public {
-        BasicHeap.update(heap, _id, _formerValue, _newValue);
+    function insert(address _id, uint256 _value) public {
+        BasicHeap.insert(heap, _id, _value);
+    }
+
+    function decrease(address _id, uint256 _newValue) public {
+        BasicHeap.decrease(heap, _id, _newValue);
+    }
+
+    function increase(address _id, uint256 _newValue) public {
+        BasicHeap.increase(heap, _id, _newValue);
+    }
+
+    function remove(address _id) public {
+        BasicHeap.remove(heap, _id);
     }
 }
 
@@ -39,56 +47,56 @@ contract TestStressHeap is DSTest {
     }
 
     function testInsertOneTop() public {
-        hs.update(address(this), 0, ts + 1);
+        hs.insert(address(this), ts + 1);
     }
 
     function testInsertOneMiddle() public {
-        hs.update(address(this), 0, ts / 2);
+        hs.insert(address(this), ts / 2);
     }
 
     function testInsertOneBottom() public {
-        hs.update(address(this), 0, 1);
+        hs.insert(address(this), 1);
     }
 
     function testRemoveOneTop() public {
-        hs.update(address(uint160(1)), ts, 0);
+        hs.remove(address(uint160(1)));
     }
 
     function testRemoveOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, 0);
+        hs.remove(address(uint160(middle + 1)));
     }
 
     function testRemoveOneBottom() public {
         uint256 end = ts - 2 * im;
-        hs.update(address(uint160(end + 1)), ts - end, 0);
+        hs.remove(address(uint160(end + 1)));
     }
 
     function testIncreaseOneTop() public {
-        hs.update(address(uint160(1)), ts, ts + im);
+        hs.increase(address(uint160(1)), ts + im);
     }
 
     function testIncreaseOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, ts - middle + im);
+        hs.increase(address(uint160(middle + 1)), ts - middle + im);
     }
 
     function testIncreaseOneBottom() public {
         uint256 end = ts - 2 * im;
-        hs.update(address(uint160(end + 1)), ts - end, ts - end + im);
+        hs.increase(address(uint160(end + 1)), ts - end + im);
     }
 
     function testDecreaseOneTop() public {
-        hs.update(address(uint160(1)), ts, 1);
+        hs.decrease(address(uint160(1)), 1);
     }
 
     function testDecreaseOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, 1);
+        hs.decrease(address(uint160(middle + 1)), 1);
     }
 
     function testDecreaseOneBottom() public {
         uint256 end = ts - 2 * im;
-        hs.update(address(uint160(end + 1)), ts - end, ts - end - im);
+        hs.decrease(address(uint160(end + 1)), ts - end - im);
     }
 }
