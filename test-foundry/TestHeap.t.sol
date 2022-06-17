@@ -28,7 +28,7 @@ contract TestHeap is DSTest {
     function testInsertOneSingleAccount() public {
         heap.update(accounts[0], 0, 1);
 
-        assertEq(heap.length(), 1);
+        assertEq(heap.getSize(), 1);
         assertEq(heap.getValueOf(accounts[0]), 1);
         assertEq(heap.getHead(), accounts[0]);
         assertEq(heap.getTail(), accounts[0]);
@@ -38,7 +38,7 @@ contract TestHeap is DSTest {
 
     function testShouldNotInsertAccountWithZeroValue() public {
         heap.update(accounts[0], 0, 0);
-        assertEq(heap.length(), 0);
+        assertEq(heap.getSize(), 0);
     }
 
     function testShouldNotInsertZeroAddress() public {
@@ -198,19 +198,19 @@ contract TestHeap is DSTest {
             heap.update(accounts[i], 0, value - i);
         }
 
-        assertEq(heap.getHead(), accounts[0]);
-        assertEq(heap.getTail(), accounts[9]);
+        assertEq(heap.getHead(), accounts[0], "head not expected, 1");
+        assertEq(heap.getTail(), accounts[9], "tail not expected, 1");
 
         address nextAccount = accounts[0];
         for (uint256 i = 0; i < 9; i++) {
             nextAccount = heap.getNext(nextAccount);
-            assertEq(nextAccount, accounts[i + 1]);
+            assertEq(nextAccount, accounts[i + 1], "next not expected, 1");
         }
 
         address prevAccount = accounts[9];
         for (uint256 i = 0; i < 9; i++) {
             prevAccount = heap.getPrev(prevAccount);
-            assertEq(prevAccount, accounts[10 - i - 2]);
+            assertEq(prevAccount, accounts[10 - i - 2], "prev not expected, 1");
         }
 
         // Add last 10 accounts at the same value.
@@ -218,19 +218,19 @@ contract TestHeap is DSTest {
             heap.update(accounts[i], 0, 10);
         }
 
-        assertEq(heap.getHead(), accounts[0]);
-        assertEq(heap.getTail(), accounts[accounts.length - 1]);
+        assertEq(heap.getHead(), accounts[0], "head not expected, 2");
+        assertEq(heap.getTail(), accounts[accounts.length - 1], "tail not expected, 2");
 
         nextAccount = accounts[0];
         for (uint256 i = 0; i < 9; i++) {
             nextAccount = heap.getNext(nextAccount);
-            assertEq(nextAccount, accounts[i + 1]);
+            assertEq(nextAccount, accounts[i + 1], "next not expected, 2");
         }
 
         prevAccount = accounts[9];
         for (uint256 i = 0; i < 9; i++) {
             prevAccount = heap.getPrev(prevAccount);
-            assertEq(prevAccount, accounts[10 - i - 2]);
+            assertEq(prevAccount, accounts[10 - i - 2], "prev not expected, 2");
         }
     }
 
