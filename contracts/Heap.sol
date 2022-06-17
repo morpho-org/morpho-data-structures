@@ -14,28 +14,98 @@ library BasicHeap {
 
     /// ERRORS ///
 
+    /// @notice Thrown when trying to modify an account with a wrong value.
+    error WrongValue();
+
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
 
+    /// @notice Thrown when the account is already inserted in the heap.
+    error AccountAlreadyInserted();
+
+    /// @notice Thrown when the account to modify does not exist.
+    error AccountDoesNotExist();
+
     /// INTERNAL ///
 
-    /// @notice Updates an account in the `_heap`.
-    /// @dev Only call with `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0.
+    /// @notice Inserts an account in the `_heap`.
     /// @param _heap The heap to modify.
-    /// @param _id The address of the account to update.
-    /// @param _formerValue The former value of the account to update.
-    /// @param _newValue The new value of the account to update.
-    function update(
+    /// @param _id The address of the account to insert.
+    /// @param _value The value of the account to insert.
+    function insert(
         Heap storage _heap,
         address _id,
-        uint256 _formerValue,
+        uint256 _value
+    ) internal {
+        if (_value == 0) revert WrongValue();
+        if (_id == address(0)) revert AddressIsZero();
+        if (_heap.ranks[_id] != 0) revert AccountAlreadyInserted();
+
+        // Put the account at the end of the heap.
+        _heap.accounts.push(Account(_id, _value));
+        uint256 size = getSize(_heap);
+        _heap.ranks[_id] = size;
+
+        // Restore the invariant.
+        shiftUp(_heap, size);
+    }
+
+    /// @notice Decreases the amount of an account in the `_heap`.
+    /// @param _heap The heap to modify.
+    /// @param _id The address of the account to decrease the amount.
+    /// @param _newValue The new value of the account.
+    function decrease(
+        Heap storage _heap,
+        address _id,
         uint256 _newValue
     ) internal {
-        if (_formerValue != _newValue) {
-            if (_newValue == 0) remove(_heap, _id);
-            else if (_formerValue == 0) insert(_heap, _id, _newValue);
-            else if (_formerValue < _newValue) increase(_heap, _id, _newValue);
-            else decrease(_heap, _id, _newValue);
+        uint256 rank = _heap.ranks[_id];
+        if (rank == 0) revert AccountDoesNotExist();
+        uint256 oldValue = getAccount(_heap, rank).value;
+        if (_newValue >= oldValue || _newValue == 0) revert WrongValue();
+
+        setAccountValue(_heap, rank, _newValue);
+        shiftDown(_heap, rank);
+    }
+
+    /// @notice Increases the amount of an account in the `_heap`.
+    /// @dev Only call this function when `_id` is in the `_heap` with a smaller value than `_newValue`.
+    /// @param _heap The heap to modify.
+    /// @param _id The address of the account to increase the amount.
+    /// @param _newValue The new value of the account.
+    function increase(
+        Heap storage _heap,
+        address _id,
+        uint256 _newValue
+    ) internal {
+        uint256 rank = _heap.ranks[_id];
+        if (rank == 0) revert AccountDoesNotExist();
+        uint256 oldValue = getAccount(_heap, rank).value;
+        if (_newValue <= oldValue) revert WrongValue();
+
+        setAccountValue(_heap, rank, _newValue);
+        shiftUp(_heap, rank);
+    }
+
+    /// @notice Removes an account in the `_heap`.
+    /// @dev Only call when `_id` is in the `_heap`.
+    /// @param _heap The heap to modify.
+    /// @param _id The address of the account to remove.
+    function remove(Heap storage _heap, address _id) internal {
+        uint256 rank = _heap.ranks[_id];
+        if (rank == 0) revert AccountDoesNotExist();
+        uint256 removedValue = getAccount(_heap, rank).value;
+        uint256 size = getSize(_heap);
+
+        if (rank == size) {
+            _heap.accounts.pop();
+            delete _heap.ranks[_id];
+        } else {
+            swap(_heap, rank, size);
+            _heap.accounts.pop();
+            delete _heap.ranks[_id];
+            if (getAccount(_heap, rank).value > removedValue) shiftUp(_heap, rank);
+            else shiftDown(_heap, rank);
         }
     }
 
@@ -141,80 +211,6 @@ library BasicHeap {
         setAccount(_heap, _rank, initialAccount);
     }
 
-    /// @notice Inserts an account in the `_heap`.
-    /// @dev Only call this function when `_id` is not in the `_heap`.
-    /// @dev Reverts with AddressIsZero if `_value` is 0.
-    /// @param _heap The heap to modify.
-    /// @param _id The address of the account to insert.
-    /// @param _value The value of the account to insert.
-    function insert(
-        Heap storage _heap,
-        address _id,
-        uint256 _value
-    ) private {
-        // _heap cannot contain the 0 address
-        if (_id == address(0)) revert AddressIsZero();
-
-        // Put the account at the end of the heap.
-        _heap.accounts.push(Account(_id, _value));
-        uint256 size = getSize(_heap);
-        _heap.ranks[_id] = size;
-
-        // Restore the invariant.
-        shiftUp(_heap, size);
-    }
-
-    /// @notice Decreases the amount of an account in the `_heap`.
-    /// @dev Only call this function when `_id` is in the `_heap` with a value greater than `_newValue`.
-    /// @param _heap The heap to modify.
-    /// @param _id The address of the account to decrease the amount.
-    /// @param _newValue The new value of the account.
-    function decrease(
-        Heap storage _heap,
-        address _id,
-        uint256 _newValue
-    ) private {
-        uint256 rank = _heap.ranks[_id];
-        setAccountValue(_heap, rank, _newValue);
-        shiftDown(_heap, rank);
-    }
-
-    /// @notice Increases the amount of an account in the `_heap`.
-    /// @dev Only call this function when `_id` is in the `_heap` with a smaller value than `_newValue`.
-    /// @param _heap The heap to modify.
-    /// @param _id The address of the account to increase the amount.
-    /// @param _newValue The new value of the account.
-    function increase(
-        Heap storage _heap,
-        address _id,
-        uint256 _newValue
-    ) private {
-        uint256 rank = _heap.ranks[_id];
-        setAccountValue(_heap, rank, _newValue);
-        shiftUp(_heap, rank);
-    }
-
-    /// @notice Removes an account in the `_heap`.
-    /// @dev Only call when `_id` is in the `_heap`.
-    /// @param _heap The heap to modify.
-    /// @param _id The address of the account to remove.
-    function remove(Heap storage _heap, address _id) private {
-        uint256 rank = _heap.ranks[_id];
-        uint256 removedValue = getAccount(_heap, rank).value;
-        uint256 size = getSize(_heap);
-
-        if (rank == size) {
-            _heap.accounts.pop();
-            delete _heap.ranks[_id];
-        } else {
-            swap(_heap, rank, size);
-            _heap.accounts.pop();
-            delete _heap.ranks[_id];
-            if (getAccount(_heap, rank).value > removedValue) shiftUp(_heap, rank);
-            else shiftDown(_heap, rank);
-        }
-    }
-
     /// VIEW ///
 
     /// @notice Returns the size of the `_heap`.
@@ -224,7 +220,7 @@ library BasicHeap {
         return _heap.accounts.length;
     }
 
-    /// @notice Returns the value of the account linked to `_id`.
+    /// @notice Returns the value of the account linked to `_id`, returns 0 if the account is not in the `_heap`.
     /// @param _heap The heap to search in.
     /// @param _id The address of the account.
     /// @return The value of the account.
@@ -234,40 +230,41 @@ library BasicHeap {
         else return getAccount(_heap, rank).value;
     }
 
-    /// @notice Returns the address at the head of the `_heap`.
-    /// @param _heap The heap to get the head.
-    /// @return The address of the head.
-    function getHead(Heap storage _heap) internal view returns (address) {
+    /// @notice Returns the address at the root of the `_heap`, returns the zero address if the `_heap` is empty.
+    /// @param _heap The heap to get the root.
+    /// @return The address of the root node.
+    function getRoot(Heap storage _heap) internal view returns (address) {
         if (getSize(_heap) > 0) return getAccount(_heap, 1).id;
         else return address(0);
     }
 
-    /// @notice Returns the address at the tail of the `_heap`.
-    /// @param _heap The heap to get the tail.
-    /// @return The address of the tail.
-    function getTail(Heap storage _heap) internal view returns (address) {
-        uint256 size = getSize(_heap);
-        if (size > 0) return getAccount(_heap, size).id;
+    /// @notice Returns the address of the parent node of the given address in the `_heap`, returns the zero address if it's the root or if the address is not in the heap.
+    /// @param _heap The heap in which to search for the parent.
+    /// @param _id The address to get the parent.
+    /// @return The address of the parent.
+    function getParent(Heap storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id] / 2;
+        if (rank != 0) return getAccount(_heap, rank).id;
         else return address(0);
     }
 
-    /// @notice Returns the previous address from the current `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The address of the previous account.
-    function getPrev(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id];
-        if (rank > 1) return getAccount(_heap, rank - 1).id;
+    /// @notice Returns the address of the left child of the given address, returns the zero address if it's not in the heap or if it has no left child.
+    /// @param _heap The heap in which to search for the left child.
+    /// @param _id The address to get the left child.
+    /// @return The address of the left child.
+    function getLeftChild(Heap storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id] * 2;
+        if (rank != 0 && rank <= getSize(_heap)) return getAccount(_heap, rank).id;
         else return address(0);
     }
 
-    /// @notice Returns the next address from the current `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The address of the next account.
-    function getNext(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id];
-        if (rank < getSize(_heap)) return getAccount(_heap, rank + 1).id;
+    /// @notice Returns the address of the right child of the given address, returns the zero address if it's not in the heap or if it has no right child.
+    /// @param _heap The heap in which to search for the right child.
+    /// @param _id The address to get the right child.
+    /// @return The address of the right child.
+    function getRightChild(Heap storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id] * 2 + 1;
+        if (rank != 1 && rank <= getSize(_heap)) return getAccount(_heap, rank).id;
         else return address(0);
     }
 }
