@@ -14,7 +14,7 @@ contract HeapStorage {
         for (uint256 i = 0; i < TESTED_SIZE; i++) {
             address id = address(uint160(i + 1));
             heap.accounts.push(BasicHeap.Account(id, TESTED_SIZE - i));
-            heap.indexes[id] = heap.accounts.length;
+            heap.ranks[id] = heap.accounts.length;
         }
     }
 
