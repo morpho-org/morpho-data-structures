@@ -220,8 +220,6 @@ library HeapOrdering {
         uint256 _maxSortedUsers
     ) private {
         uint256 rank = _heap.ranks[_id];
-        Account memory account = getAccount(_heap, rank);
-        account.value = _newValue;
         setAccountValue(_heap, rank, _newValue);
         uint256 nextSize = _heap.size + 1;
 
