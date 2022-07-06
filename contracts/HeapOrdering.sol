@@ -130,8 +130,11 @@ library HeapOrdering {
     function shiftUp(HeapArray storage _heap, uint256 _rank) private {
         Account memory accountToShift = getAccount(_heap, _rank);
         uint256 valueToShift = accountToShift.value;
-        while (_rank > ROOT && valueToShift > getAccount(_heap, _rank >> 1).value) {
-            setAccount(_heap, _rank, getAccount(_heap, _rank >> 1));
+        Account memory parentAccount;
+        while (
+            _rank > ROOT && valueToShift > (parentAccount = getAccount(_heap, _rank >> 1)).value
+        ) {
+            setAccount(_heap, _rank, parentAccount);
             _rank >>= 1;
         }
         setAccount(_heap, _rank, accountToShift);
