@@ -288,7 +288,7 @@ library HeapOrdering {
         else return address(0);
     }
 
-    /// @notice Returns the address at the tail of the `_heap`.
+    /// @notice Returns the address at the tail of unsorted portion of the `_heap`.
     /// @param _heap The heap to get the tail.
     /// @return The address of the tail.
     function getTail(HeapArray storage _heap) internal view returns (address) {
