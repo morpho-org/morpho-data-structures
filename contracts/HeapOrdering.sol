@@ -149,17 +149,21 @@ library HeapOrdering {
         Account memory accountToShift = getAccount(_heap, _rank);
         uint256 valueToShift = accountToShift.value;
         Account memory childToSwap;
+        Account memory rightChild;
         uint256 childRank = _rank << 1;
         // At this point, childRank (resp. childRank+1) is the rank of the left (resp. right) child.
 
         while (childRank <= size) {
-            // Compute the rank of the child with largest value.
-            if (
-                childRank < size &&
-                getAccount(_heap, childRank + 1).value > getAccount(_heap, childRank).value
-            ) childRank++;
-
             childToSwap = getAccount(_heap, childRank);
+
+            // Find the child with largest value.
+            if (childRank < size) {
+                rightChild = getAccount(_heap, childRank + 1);
+                if (rightChild.value > childToSwap.value) {
+                    childRank++;
+                    childToSwap = rightChild;
+                }
+            }
 
             if (childToSwap.value > valueToShift) {
                 setAccount(_heap, _rank, childToSwap);
