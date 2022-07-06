@@ -42,11 +42,11 @@ contract Helper is Random {
 
     function updateHeap(
         address _id,
-        uint256 _newValue,
+        uint96 _newValue,
         uint256 _max_sorted_users
     ) public {
         HeapOrdering.HeapArray storage heap = getCurrentHeap();
-        uint256 _formerValue;
+        uint96 _formerValue;
         uint256 rank = heap.ranks[_id];
         if (rank == 0) {
             _formerValue = 0;
@@ -96,10 +96,10 @@ contract TestHeapRandomHeapOrdering is DSTest {
         uint256 max_sorted_users = helper.randomUint256(N_USERS);
         for (uint256 iter; iter < N_ITERS; iter++) {
             address user = helper.randomAddress(N_USERS);
-            uint256 newValue;
+            uint96 newValue;
             if (helper.randomUint256(100) <= 75) {
                 // 25 % chance of deletion
-                newValue = helper.randomUint256(RANGE_VALUES);
+                newValue = uint96(helper.randomUint256(RANGE_VALUES));
             }
             if (helper.randomUint256(N_ITERS) <= 3) {
                 // change max users approximately 3 times per test

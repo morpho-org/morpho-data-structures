@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 library HeapOrdering {
     struct Account {
         address id; // The address of the account.
-        uint256 value; // The value of the account.
+        uint96 value; // The value of the account.
     }
 
     struct HeapArray {
@@ -34,8 +34,8 @@ library HeapOrdering {
     function update(
         HeapArray storage _heap,
         address _id,
-        uint256 _formerValue,
-        uint256 _newValue,
+        uint96 _formerValue,
+        uint96 _newValue,
         uint256 _maxSortedUsers
     ) internal {
         uint256 size = _heap.size;
@@ -85,7 +85,7 @@ library HeapOrdering {
     function setAccountValue(
         HeapArray storage _heap,
         uint256 _rank,
-        uint256 _newValue
+        uint96 _newValue
     ) private {
         _heap.accounts[_rank - 1].value = _newValue;
     }
@@ -180,7 +180,7 @@ library HeapOrdering {
     function insert(
         HeapArray storage _heap,
         address _id,
-        uint256 _value,
+        uint96 _value,
         uint256 _maxSortedUsers
     ) private {
         // `_heap` cannot contain the 0 address.
@@ -206,7 +206,7 @@ library HeapOrdering {
     function decrease(
         HeapArray storage _heap,
         address _id,
-        uint256 _newValue
+        uint96 _newValue
     ) private {
         uint256 rank = _heap.ranks[_id];
         setAccountValue(_heap, rank, _newValue);
@@ -224,7 +224,7 @@ library HeapOrdering {
     function increase(
         HeapArray storage _heap,
         address _id,
-        uint256 _newValue,
+        uint96 _newValue,
         uint256 _maxSortedUsers
     ) private {
         uint256 rank = _heap.ranks[_id];
@@ -247,7 +247,7 @@ library HeapOrdering {
     function remove(
         HeapArray storage _heap,
         address _id,
-        uint256 _removedValue
+        uint96 _removedValue
     ) private {
         uint256 rank = _heap.ranks[_id];
         uint256 accountsLength = _heap.accounts.length;
@@ -278,7 +278,7 @@ library HeapOrdering {
     /// @param _heap The heap to search in.
     /// @param _id The address of the account.
     /// @return The value of the account.
-    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
+    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint96) {
         uint256 rank = _heap.ranks[_id];
         if (rank == 0) return 0;
         else return getAccount(_heap, rank).value;
