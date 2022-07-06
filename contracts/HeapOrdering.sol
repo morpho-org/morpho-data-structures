@@ -116,6 +116,7 @@ library HeapOrdering {
         uint256 _rank1,
         uint256 _rank2
     ) private {
+        if (_rank1 == _rank2) return;
         Account memory accountOldRank1 = getAccount(_heap, _rank1);
         Account memory accountOldRank2 = getAccount(_heap, _rank2);
         setAccount(_heap, _rank1, accountOldRank2);
