@@ -252,10 +252,11 @@ library HeapOrdering {
         _heap.accounts.pop();
         delete _heap.ranks[_id];
 
-        // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
+        // If the swapped account is in the heap, restore the invariant: its current value can be smaller or larger than the removed value.
         if (rank <= _heap.size) {
-            if (_removedValue > getAccount(_heap, rank).value) shiftDown(_heap, rank);
-            else shiftUp(_heap, rank);
+            uint256 currentValue = getAccount(_heap, rank).value;
+            if (_removedValue > currentValue) shiftDown(_heap, rank);
+            else if (_removedValue < currentValue) shiftUp(_heap, rank);
         }
     }
 
