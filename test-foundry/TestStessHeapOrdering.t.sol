@@ -14,7 +14,7 @@ contract HeapStorage {
     function setUp() public {
         for (uint256 i = 0; i < TESTED_SIZE; i++) {
             address id = address(uint160(i + 1));
-            heap.accounts.push(HeapOrdering.Account(id, TESTED_SIZE - i));
+            heap.accounts.push(HeapOrdering.Account(id, uint96(TESTED_SIZE - i)));
             heap.ranks[id] = heap.accounts.length;
             heap.size = uint96(MAX_SORTED_USERS);
         }
@@ -22,8 +22,8 @@ contract HeapStorage {
 
     function update(
         address _id,
-        uint256 _formerValue,
-        uint256 _newValue
+        uint96 _formerValue,
+        uint96 _newValue
     ) public {
         HeapOrdering.update(heap, _id, _formerValue, _newValue, MAX_SORTED_USERS);
     }
@@ -31,13 +31,13 @@ contract HeapStorage {
 
 contract TestStressHeapOrdering is DSTest {
     HeapStorage public hs = new HeapStorage();
-    uint256 public ts;
-    uint256 public im;
+    uint96 public ts;
+    uint96 public im;
 
     function setUp() public {
         hs.setUp();
-        ts = hs.TESTED_SIZE();
-        im = hs.incrementAmount();
+        ts = uint96(hs.TESTED_SIZE());
+        im = uint96(hs.incrementAmount());
     }
 
     function testInsertOneTop() public {
@@ -57,12 +57,12 @@ contract TestStressHeapOrdering is DSTest {
     }
 
     function testRemoveOneMiddle() public {
-        uint256 middle = ts / 2;
+        uint96 middle = ts / 2;
         hs.update(address(uint160(middle + 1)), ts - middle, 0);
     }
 
     function testRemoveOneBottom() public {
-        uint256 end = ts - 2 * im;
+        uint96 end = ts - 2 * im;
         hs.update(address(uint160(end + 1)), ts - end, 0);
     }
 
@@ -71,12 +71,12 @@ contract TestStressHeapOrdering is DSTest {
     }
 
     function testIncreaseOneMiddle() public {
-        uint256 middle = ts / 2;
+        uint96 middle = ts / 2;
         hs.update(address(uint160(middle + 1)), ts - middle, ts - middle + im);
     }
 
     function testIncreaseOneBottom() public {
-        uint256 end = ts - 2 * im;
+        uint96 end = ts - 2 * im;
         hs.update(address(uint160(end + 1)), ts - end, ts - end + im);
     }
 
@@ -85,12 +85,12 @@ contract TestStressHeapOrdering is DSTest {
     }
 
     function testDecreaseOneMiddle() public {
-        uint256 middle = ts / 2;
+        uint96 middle = ts / 2;
         hs.update(address(uint160(middle + 1)), ts - middle, 1);
     }
 
     function testDecreaseOneBottom() public {
-        uint256 end = ts - 2 * im;
+        uint96 end = ts - 2 * im;
         hs.update(address(uint160(end + 1)), ts - end, ts - end - im);
     }
 }
