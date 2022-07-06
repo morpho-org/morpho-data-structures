@@ -13,6 +13,10 @@ library HeapOrdering {
         mapping(address => uint256) ranks; // A mapping from an address to a rank in accounts. Beware: ranks are shifted by one compared to indexes, so the first rank is 1 and not 0.
     }
 
+    /// CONSTANTS ///
+
+    uint256 public constant ROOT = 1;
+
     /// ERRORS ///
 
     /// @notice Thrown when the address is zero at insertion.
@@ -125,7 +129,7 @@ library HeapOrdering {
     function shiftUp(HeapArray storage _heap, uint256 _rank) private {
         Account memory accountToShift = getAccount(_heap, _rank);
         uint256 valueToShift = accountToShift.value;
-        while (_rank > 1 && valueToShift > getAccount(_heap, _rank >> 1).value) {
+        while (_rank > ROOT && valueToShift > getAccount(_heap, _rank >> 1).value) {
             setAccount(_heap, _rank, getAccount(_heap, _rank >> 1));
             _rank >>= 1;
         }
@@ -299,7 +303,7 @@ library HeapOrdering {
     /// @return The address of the previous account.
     function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 rank = _heap.ranks[_id];
-        if (rank > 1) return getAccount(_heap, rank - 1).id;
+        if (rank > ROOT) return getAccount(_heap, rank - 1).id;
         else return address(0);
     }
 
