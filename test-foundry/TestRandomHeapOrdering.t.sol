@@ -82,7 +82,7 @@ contract Helper is Random {
     }
 }
 
-contract TestHeapMEP is DSTest {
+contract TestHeapRandomHeapOrdering is DSTest {
     Helper public helper = new Helper();
 
     function setUp() public {
