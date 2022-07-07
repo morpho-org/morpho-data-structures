@@ -3,11 +3,31 @@
 This repository contains the data structures that can be used for the Morpho's matching engine 🦋.
 The goal is to compare them in terms of security and gas consumption to find the best solution for the protocol and its users.
 
-## Data structures
+## Installation
+
+Install foundry, you can find the instructions [here](https://book.getfoundry.sh/getting-started/installation.html).
+
+Then, run `make`.
+
+## Testing
+
+Run `make test`.
+
+For the `RedBlackBinaryTree`, you can run the tests with hardhat.
+
+```
+yarn test
+```
+
+# Data structures
 
 The data structures we implement and modified are based on public works of amazing developers. We thank them for what they have done 🙏
 
-### Double Linked List
+You can refer to the following table for the complexity of some data structures.
+
+![complexities](https://devopedia.org/images/article/17/7752.1513922040.jpg)
+
+## Double Linked List
 
 The current implementation of the double linked list is based on this [article](https://hackernoon.com/a-linked-list-implementation-for-ethereum-deep-dive-oy9432pa) written by Alberto Cuesta Cañada. You can find the repository [here](https://github.com/HQ20/contracts/tree/master/contracts/lists). Note that the code has been modified to meet our own needs and to allow us to sort the first accounts of the double linked list. Our implementation is not a generalised one.
 What you can with it:
@@ -15,7 +35,7 @@ What you can with it:
 - Insert an address sorted by a value passed along this address.
 - Insert (and its value) before an account.
 
-### Red Black Binary Tree
+## Red Black Binary Tree
 
 A [Red Black Binary Tree](https://en.wikipedia.org/wiki/Red%E2%80%93black_tree) is a kind of binary tree that allows insertion / deletion / search in `O(log(n))`.
 Our implementation is a modified version of the [OrderStatisticsTree repository](https://github.com/rob-Hitchens/OrderStatisticsTree) written by [Rob Hitechn](https://github.com/rob-Hitchens) which is also based on [BokkyPooBahsRedBlackTreeLibrary repository](https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary) written by [bokkypoobah](https://github.com/bokkypoobah).
@@ -23,19 +43,19 @@ Our modified version makes keys unique items instead of just (key, value) unique
 
 In order to manipulate a binary tree and visualize how it manages to stay balanced, this [tool](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html) is very useful. You can also find [here](http://ion.uwinnipeg.ca/~ychen2/advancedAD/Red-black%20Tree.pdf) the pseudo-code logic of the tree's function.
 
-You can refer to the following table for the complexity of some data structures.
+## HeapOrdering
 
-![complexities](https://devopedia.org/images/article/17/7752.1513922040.jpg)
+This implementation is based on a heap data structure, and refines it by adding an unsorted portion after it. This gives us an approximation of a heap, and thus operations are performed in constant time. The main entry point is the `update` function, calling internally either `insert`, `increase`, `decrease` or `remove`.
 
-### Other data structures
+## Other data structures
 
 Other data structures may be explored in the future and we are open to any suggestions or optimisation of current implementations ⚡️
 
-## Contributing
+# Contributing
 
 In this section, you will find some guidelines to read before contributing to the project.
 
-### Creating issues and PRs
+## Creating issues and PRs
 
 Guidelines for creating issues and PRs:
 
@@ -47,7 +67,7 @@ Guidelines for creating issues and PRs:
 - Reviewers must be added to the PR.
 - For commits, we use the bitmoji VS Code extension 🙃
 
-### Before merging a PR
+## Before merging a PR
 
 Before merging a PR:
 
@@ -55,31 +75,6 @@ Before merging a PR:
 - Comments and requested changes must have been resolved.
 - PR must have been approved by every reviewers.
 - CI must pass.
-
-## Testing
-
-You can run the tests for the `DoubleLinkedList` with foundry. You can find the instructions for installing foundry [here](https://book.getfoundry.sh/getting-started/installation.html)
-
-You also need to have up to date git submodules:
-
-```
-git submodule init
-git submodule update
-```
-
-The just run the `make test` CLI.
-
-For the `RedBlackBinaryTree`, you can run the tests with hardhat. First, install the dependencies with:
-
-```
-yarn
-```
-
-Then to run test:
-
-```
-yarn test
-```
 
 ## Code Formatting
 
@@ -98,6 +93,6 @@ In doing so the code will be formatted on each save.
 
 We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
 
-## Questions
+# Questions
 
 For any question you can send an email to [merlin@mopho.best](mailto:merlin@morpho.best) 😊
