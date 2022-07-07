@@ -123,13 +123,13 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _rank The rank of the account to move.
     function shiftUp(HeapArray storage _heap, uint256 _rank) private {
-        Account memory initialAccount = getAccount(_heap, _rank);
-        uint256 initialValue = initialAccount.value;
-        while (_rank > 1 && initialValue > getAccount(_heap, _rank >> 1).value) {
+        Account memory accountToShift = getAccount(_heap, _rank);
+        uint256 valueToShift = accountToShift.value;
+        while (_rank > 1 && valueToShift > getAccount(_heap, _rank >> 1).value) {
             setAccount(_heap, _rank, getAccount(_heap, _rank >> 1));
             _rank >>= 1;
         }
-        setAccount(_heap, _rank, initialAccount);
+        setAccount(_heap, _rank, accountToShift);
     }
 
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
@@ -138,9 +138,9 @@ library HeapOrdering {
     /// @param _rank The rank of the account to move.
     function shiftDown(HeapArray storage _heap, uint256 _rank) private {
         uint256 size = _heap.size;
-        Account memory initialAccount = getAccount(_heap, _rank);
-        uint256 initialValue = initialAccount.value;
-        Account memory childAccount;
+        Account memory accountToShift = getAccount(_heap, _rank);
+        uint256 valueToShift = accountToShift.value;
+        Account memory childToSwap;
         uint256 childRank = _rank << 1;
         // At this point, childRank (resp. childRank+1) is the rank of the left (resp. right) child.
 
@@ -151,15 +151,15 @@ library HeapOrdering {
                 getAccount(_heap, childRank + 1).value > getAccount(_heap, childRank).value
             ) childRank++;
 
-            childAccount = getAccount(_heap, childRank);
+            childToSwap = getAccount(_heap, childRank);
 
-            if (childAccount.value > initialValue) {
-                setAccount(_heap, _rank, childAccount);
+            if (childToSwap.value > valueToShift) {
+                setAccount(_heap, _rank, childToSwap);
                 _rank = childRank;
                 childRank <<= 1;
             } else break;
         }
-        setAccount(_heap, _rank, initialAccount);
+        setAccount(_heap, _rank, accountToShift);
     }
 
     /// @notice Inserts an account in the `_heap`.
