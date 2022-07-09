@@ -289,7 +289,7 @@ library HeapOrdering {
     /// @param _heap The heap to search in.
     /// @param _id The address of the account.
     /// @return The value of the account.
-    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint96) {
+    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
         uint256 rank = _heap.ranks[_id];
         if (rank == 0) return 0;
         else return getAccount(_heap, rank).value;

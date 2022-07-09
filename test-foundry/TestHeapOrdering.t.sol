@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import "ds-test/test.sol";
 import "forge-std/Vm.sol";
-import "forge-std/console.sol";
 
 import "@contracts/HeapOrdering.sol";
 
@@ -14,7 +13,6 @@ contract TestHeapOrdering is DSTest {
 
     address[] public accounts;
     uint256 public NB_ACCOUNTS = 50;
-    uint96 public MAX_VALUE = uint96(NB_ACCOUNTS);
     uint256 public MAX_SORTED_USERS = 50;
     address public ADDR_ZERO = address(0);
 
@@ -22,8 +20,8 @@ contract TestHeapOrdering is DSTest {
 
     function update(
         address _id,
-        uint96 _formerValue,
-        uint96 _newValue
+        uint256 _formerValue,
+        uint256 _newValue
     ) public {
         heap.update(_id, _formerValue, _newValue, MAX_SORTED_USERS);
     }
@@ -188,8 +186,8 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testShouldInsertAccountsAllSorted() public {
-        for (uint96 i = 0; i < accounts.length; i++) {
-            update(accounts[i], 0, MAX_VALUE - i);
+        for (uint256 i = 0; i < accounts.length; i++) {
+            update(accounts[i], 0, NB_ACCOUNTS - i);
         }
 
         assertEq(heap.size, NB_ACCOUNTS / 2);
@@ -211,12 +209,12 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testShouldRemoveAllSortedAccount() public {
-        for (uint96 i = 0; i < accounts.length; i++) {
-            update(accounts[i], 0, MAX_VALUE - i);
+        for (uint256 i = 0; i < accounts.length; i++) {
+            update(accounts[i], 0, NB_ACCOUNTS - i);
         }
 
-        for (uint96 i = 0; i < accounts.length; i++) {
-            update(accounts[i], MAX_VALUE - i, 0);
+        for (uint256 i = 0; i < accounts.length; i++) {
+            update(accounts[i], NB_ACCOUNTS - i, 0);
         }
 
         assertEq(heap.getHead(), ADDR_ZERO);
@@ -224,10 +222,10 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testShouldInsertAccountSortedAtTheBeginningUntilNDS() public {
-        uint96 value = 50;
+        uint256 value = 50;
 
         // Add first 10 accounts with decreasing value.
-        for (uint96 i = 0; i < 10; i++) {
+        for (uint256 i = 0; i < 10; i++) {
             update(accounts[i], 0, value - i);
         }
 
@@ -284,7 +282,7 @@ contract TestHeapOrdering is DSTest {
     function testComputeSizeBig() public {
         MAX_SORTED_USERS = 30;
 
-        for (uint96 i = 0; i < NB_ACCOUNTS; i++) {
+        for (uint256 i = 0; i < NB_ACCOUNTS; i++) {
             update(accounts[i], 0, i + 1);
         }
         // Test that the size has been increased to MAX_SORTED_USERS/2 and increased again.
@@ -402,16 +400,16 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testInsertLast() public {
-        for (uint96 i; i < 10; i++) update(accounts[i], 0, MAX_VALUE - i);
+        for (uint256 i; i < 10; i++) update(accounts[i], 0, NB_ACCOUNTS - i);
 
-        for (uint96 i = 10; i < 15; i++) update(accounts[i], 0, i - 9);
+        for (uint256 i = 10; i < 15; i++) update(accounts[i], 0, i - 9);
 
-        for (uint96 i = 10; i < 15; i++) assertLe(heap.accounts[i].value, 10);
+        for (uint256 i = 10; i < 15; i++) assertLe(heap.accounts[i].value, 10);
     }
 
     function testInsertWrap() public {
         MAX_SORTED_USERS = 20;
-        for (uint96 i = 0; i < 20; i++) update(accounts[i], 0, MAX_VALUE - i);
+        for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, NB_ACCOUNTS - i);
 
         update(accounts[20], 0, 1);
 
@@ -420,7 +418,7 @@ contract TestHeapOrdering is DSTest {
 
     function testDecreaseRankChanges() public {
         MAX_SORTED_USERS = 4;
-        for (uint96 i = 0; i < 16; i++) update(accounts[i], 0, 20 - i);
+        for (uint256 i = 0; i < 16; i++) update(accounts[i], 0, 20 - i);
 
         uint256 rank5Before = heap.ranks[accounts[5]];
         uint256 rank0Before = heap.ranks[accounts[0]];
@@ -439,7 +437,7 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testIncreaseRankChange() public {
-        for (uint96 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
+        for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
 
         MAX_SORTED_USERS = 10;
 
@@ -451,7 +449,7 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testIncreaseRankChangeShiftUp() public {
-        for (uint96 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
+        for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
 
         MAX_SORTED_USERS = 10;
 
@@ -478,11 +476,11 @@ contract TestHeapOrdering is DSTest {
     }
 
     function testRemoveShiftDown() public {
-        for (uint96 i = 0; i < 20; i++) update(accounts[i], 0, MAX_VALUE - i);
+        for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, NB_ACCOUNTS - i);
 
-        update(accounts[5], MAX_VALUE - 5, 0);
+        update(accounts[5], NB_ACCOUNTS - 5, 0);
 
-        assertEq(heap.accounts[5].value, MAX_VALUE - 2 * (5 + 1) + 1);
+        assertEq(heap.accounts[5].value, NB_ACCOUNTS - 2 * (5 + 1) + 1);
     }
 
     function testRemoveShiftUp() public {
@@ -537,5 +535,15 @@ contract TestHeapOrdering is DSTest {
         assertEq(heap.ranks[accounts[0]], 1);
         assertEq(heap.ranks[accounts[1]], 2);
         assertEq(heap.ranks[accounts[2]], 3);
+    }
+
+    function testOverflowNewValue() public {
+        hevm.expectRevert("SafeCast: value doesn't fit in 96 bits");
+        update(accounts[0], 0, uint256(type(uint128).max));
+    }
+
+    function testOverflowFormerValue() public {
+        hevm.expectRevert("SafeCast: value doesn't fit in 96 bits");
+        update(accounts[0], uint256(type(uint128).max), 0);
     }
 }
