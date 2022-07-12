@@ -152,7 +152,9 @@ library HeapOrdering {
             if (childRank < size) {
                 rightChild = getAccount(_heap, childRank + 1);
                 if (rightChild.value > childToSwap.value) {
-                    childRank++;
+                    unchecked {
+                        ++childRank; // This cannot overflow because childRank < size.
+                    }
                     childToSwap = rightChild;
                 }
             }
