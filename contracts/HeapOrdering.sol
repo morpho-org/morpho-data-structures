@@ -15,7 +15,7 @@ library HeapOrdering {
 
     /// CONSTANTS ///
 
-    uint256 public constant ROOT = 1;
+    uint256 private constant ROOT = 1;
 
     /// ERRORS ///
 
