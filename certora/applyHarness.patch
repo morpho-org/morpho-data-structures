@@ -1,6 +1,52 @@
+diff -ruN DLL.sol DLL.sol
+--- DLL.sol	1970-01-01 01:00:00.000000000 +0100
++++ DLL.sol	2022-08-01 22:39:03.653588212 +0200
+@@ -0,0 +1,42 @@
++// SPDX-License-Identifier: GNU AGPLv3
++pragma solidity ^0.8.0;
++
++import "./DoubleLinkedList.sol";
++
++contract DLL {
++    using DoubleLinkedList for DoubleLinkedList.List;
++
++    DoubleLinkedList.List public dll;
++
++    function getValueOf(address _id) public view returns (uint256) {
++        return dll.getValueOf(_id);
++    }
++
++    function getHead() public view returns (address) {
++        return dll.head;
++    }
++
++    function getTail() public view returns (address) {
++        return dll.getTail();
++    }
++
++    function getNext(address _id) public view returns (address) {
++        return dll.getNext(_id);
++    }
++
++    function getPrev(address _id) public view returns (address) {
++        return dll.getPrev(_id);
++    }
++
++    function remove(address _id) public {
++        dll.remove(_id);
++    }
++
++    function insertSorted(
++        address _id,
++        uint256 _value,
++        uint256 _maxIterations
++    ) public {
++        dll.insertSorted(_id, _value, _maxIterations);
++    }
++}
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-08-01 19:04:21.076234361 +0200
++++ .gitignore	2022-08-01 22:38:56.450219500 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore

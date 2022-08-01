@@ -1,5 +1,3 @@
-default: help
-
 PATCH         = applyHarness.patch
 CONTRACTS_DIR = ../contracts
 MUNGED_DIR    = munged
@@ -10,16 +8,12 @@ help:
 	@echo "  make $(MUNGED_DIR): create $(MUNGED_DIR) directory by applying the patch file to $(CONTRACTS_DIR)"
 	@echo "  make record: record a new patch file capturing the differences between $(CONTRACTS_DIR) and $(MUNGED_DIR)"
 
-munged:  $(wildcard $(CONTRACTS_DIR)/*.sol) $(PATCH)
-	rm -rf $@
-	cp -r $(CONTRACTS_DIR) $@
-	patch -p0 -d $@ < $(PATCH)
+munged: $(wildcard $(CONTRACTS_DIR)/*.sol) $(PATCH)
+	@test -d ${MUNGED_DIR} && rm -rI ${MUNGED_DIR} || echo "creating ${MUNGED_DIR} from scratch..."
+	@cp -r $(CONTRACTS_DIR) ${MUNGED_DIR}
+	@patch -p0 -d ${MUNGED_DIR} < $(PATCH)
 
 record:
 	diff -ruN $(CONTRACTS_DIR) $(MUNGED_DIR) | sed 's+\.\./contracts/++g' | sed 's+munged/++g' > $(PATCH)
 
-clean:
-	git clean -fdX
-	touch $(PATCH)
-
-.PHONY: default help munged record clean
+.PHONY: help munged record
