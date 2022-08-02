@@ -6,14 +6,15 @@ methods {
     getPrev(address) returns (address) envfree
     remove(address) envfree
     insert(address, uint256) envfree
+    isForwardLinked(address, address) returns (bool) envfree
 }
 
 // FAILS: circular definition
-// definition isForwardLinked(address head, address tail) returns bool =
-//     head == tail || getNext(head) != 0 && isForwardLinked(getNext(head), tail);
+definition isForwardLinked(address head, address tail) returns bool =
+    head == tail || getNext(head) != 0 && isForwardLinked(getNext(head), tail);
 
-// invariant DLLisForwardLinked()
-//     isLinked(getHead(), getTail())
+invariant DLLisForwardLinked()
+    isForwardLinked(getHead(), getTail())
 
 // FAILS: also a circular definition
 // definition decrSortedFromUpper(address head, uint256 upperBound) returns bool =
