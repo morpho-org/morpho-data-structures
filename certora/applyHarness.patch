@@ -1,7 +1,7 @@
 diff -ruN DLL.sol DLL.sol
 --- DLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ DLL.sol	2022-08-02 20:38:34.428337178 +0200
-@@ -0,0 +1,45 @@
++++ DLL.sol	2022-08-03 10:00:39.309199176 +0200
+@@ -0,0 +1,38 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
 +
@@ -39,17 +39,10 @@ diff -ruN DLL.sol DLL.sol
 +    function insertSorted(address _id, uint256 _value) public {
 +        dll.insertSorted(_id, _value);
 +    }
-+
-+    function isForwardLinked(address _start, address _end) public view returns (bool) {
-+        if (_start == _end) return true;
-+
-+        address next = getNext(_start);
-+        return next != address(0) && isForwardLinked(next, _end);
-+    }
 +}
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 --- DoubleLinkedList.sol	2022-07-09 10:02:06.467881506 +0200
-+++ DoubleLinkedList.sol	2022-08-02 20:38:09.758406877 +0200
++++ DoubleLinkedList.sol	2022-08-03 10:00:39.309199176 +0200
 @@ -89,29 +89,19 @@
      /// @param _list The list to search in.
      /// @param _id The address of the account.
@@ -84,7 +77,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
          // Account is not the new tail.
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-08-02 20:38:09.758406877 +0200
++++ .gitignore	2022-08-03 10:00:39.309199176 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore
