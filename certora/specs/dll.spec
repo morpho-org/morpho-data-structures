@@ -15,17 +15,33 @@ methods {
 definition inDLL(address _id) returns bool =
     getValueOf(_id) != 0;
 
-invariant inDLLCharacterization(address _id)
-    inDLL(_id) <=> getPrev(_id) != 0 || getNext(_id) != 0
-
 invariant zeroIsNotLinked()
     ! inDLL(0)
 
+invariant twoWayLinked(address prev, address next)
+    getNext(prev) == next <=> getPrev(next) == prev
+
+invariant inDLLCharacterization(address _id)
+    inDLL(_id) <=> (getPrev(_id) != 0 || getNext(_id) != 0)
+    { preserved { requireInvariant twoWayLinked(getPrev(_id), _id); } }
+
 invariant zeroPrev(address _id)
-    getPrev(_id) == 0 <=> _id == getHead()
+    (inDLL(_id) && getPrev(_id) == 0) <=> _id == getHead()
+    { preserved { 
+        requireInvariant inDLLCharacterization(_id);
+      }
+      preserved remove(address rem) {
+        requireInvariant inDLLCharacterization(_id);
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        // requireInvariant zeroPrev(rem);
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant zeroIsNotLinked();
+        requireInvariant inDLLCharacterization(0);
+      }
+    }
 
 invariant zeroNext(address _id)
-    getNext(_id) == 0 <=> _id == getTail()
+    (inDLL(_id) && getNext(_id) == 0) <=> _id == getTail()
 
 rule DLLisForwardLinkedPreservedRemove() {
     env e; address _id;
@@ -44,9 +60,9 @@ rule DLLisForwardLinkedPreservedRemove() {
     assert isForwardLinkedBetween(headAfter, tailAfter, lengthAfter);
 }
 
-// invariant DLLisForwardLinked()
-//     isForwardLinkedBetween(getHead(), getTail(), getLength())
-//     { preserved { require DLLisForwardLinkedPreservedRemove(); } }
+invariant DLLisForwardLinked()
+    isForwardLinkedBetween(getHead(), getTail(), getLength())
+    // { preserved { require DLLisForwardLinkedPreservedRemove(); } }
 
 
 invariant DLLisDecrSorted()
