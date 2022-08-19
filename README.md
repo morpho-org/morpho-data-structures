@@ -39,7 +39,7 @@ Our modified version makes keys unique items instead of just (key, value) unique
 
 In order to manipulate a binary tree and visualize how it manages to stay balanced, this [tool](https://www.cs.usfca.edu/~galles/visualization/RedBlack.html) is very useful. You can also find [here](http://ion.uwinnipeg.ca/~ychen2/advancedAD/Red-black%20Tree.pdf) the pseudo-code logic of the tree's function.
 
-## HeapOrdering
+## Heap based ordering
 
 This implementation is based on a heap data structure, and refines it by adding an unsorted portion after it. This gives us an approximation of a heap, and thus operations are performed in constant time. The main entry point is the `update` function, calling internally either `insert`, `increase`, `decrease` or `remove`.
 
@@ -88,6 +88,10 @@ We recommend developers using VS Code to set their local config as below:
 In doing so the code will be formatted on each save.
 
 We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
+
+# Audits
+
+The code concerning the [heap based ordering data-structure](./contracts/HeapOrdering.sol) has been audited by [Omniscia](https://omniscia.io) and the report can be found [online](https://omniscia.io/reports/morpho-heap-ordering-structure/) or in the file [Morpho_Omniscia](./audits/Morpho_Omniscia.pdf).
 
 # Questions
 
