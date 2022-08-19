@@ -13,27 +13,30 @@ methods {
 }
 
 definition inDLL(address _id) returns bool =
-    getValueOf(_id) != 0;
+    getPrev(_id) != 0 || getNext(_id) != 0;
+
+invariant tipIsZero()
+    getHead() == 0 <=> getTail() == 0
 
 invariant zeroIsNotLinked()
     ! inDLL(0)
+    { preserved { requireInvariant tipIsZero(); } }
 
 invariant twoWayLinked(address prev, address next)
-    getNext(prev) == next <=> getPrev(next) == prev
+    prev != 0 && next != 0 => (getNext(prev) == next <=> getPrev(next) == prev)
 
 invariant inDLLCharacterization(address _id)
-    inDLL(_id) <=> (getPrev(_id) != 0 || getNext(_id) != 0)
+    inDLL(_id) <=> getValueOf(_id) != 0
     { preserved { requireInvariant twoWayLinked(getPrev(_id), _id); } }
 
 invariant zeroPrev(address _id)
-    (inDLL(_id) && getPrev(_id) == 0) <=> _id == getHead()
+    inDLL(_id) && getPrev(_id) == 0 <=> _id == getHead()
     { preserved { 
         requireInvariant inDLLCharacterization(_id);
       }
       preserved remove(address rem) {
         requireInvariant inDLLCharacterization(_id);
         requireInvariant twoWayLinked(rem, getNext(rem));
-        // requireInvariant zeroPrev(rem);
         requireInvariant twoWayLinked(getPrev(rem), rem);
         requireInvariant zeroIsNotLinked();
         requireInvariant inDLLCharacterization(0);
