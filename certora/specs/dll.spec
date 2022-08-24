@@ -13,38 +13,68 @@ methods {
 }
 
 definition inDLL(address _id) returns bool =
+    getValueOf(_id) != 0;
+
+definition linked(address _id) returns bool =
     getPrev(_id) != 0 || getNext(_id) != 0;
+
+invariant zeroNotInDLL()
+    ! inDLL(0)
+
+invariant headPrevIsZero()
+    getPrev(getHead()) == 0 && (getValueOf(getHead()) == 0 => getHead() == 0)
+    { preserved remove(address rem) {
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        requireInvariant zeroNotInDLL();
+        requireInvariant linkedIsInDLL(getNext(rem));
+      }
+    }
+
+invariant tailNextIsZero()
+    getNext(getTail()) == 0
 
 invariant tipIsZero()
     getHead() == 0 <=> getTail() == 0
 
 invariant zeroIsNotLinked()
-    ! inDLL(0)
+    getPrev(0) == 0 && getNext(0) == 0
     { preserved { requireInvariant tipIsZero(); } }
 
 invariant twoWayLinked(address prev, address next)
     prev != 0 && next != 0 => (getNext(prev) == next <=> getPrev(next) == prev)
-
-invariant inDLLCharacterization(address _id)
-    inDLL(_id) <=> getValueOf(_id) != 0
-    { preserved { requireInvariant twoWayLinked(getPrev(_id), _id); } }
-
-invariant zeroPrev(address _id)
-    inDLL(_id) && getPrev(_id) == 0 <=> _id == getHead()
-    { preserved { 
-        requireInvariant inDLLCharacterization(_id);
-      }
-      preserved remove(address rem) {
-        requireInvariant inDLLCharacterization(_id);
-        requireInvariant twoWayLinked(rem, getNext(rem));
+    { preserved remove(address rem) {
         requireInvariant twoWayLinked(getPrev(rem), rem);
-        requireInvariant zeroIsNotLinked();
-        requireInvariant inDLLCharacterization(0);
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        requireInvariant zeroNotInDLL();
+      }
+      preserved insertSorted(address add, uint256 amount) { // need to know that the node in front of which we insert is twoWayLinked with its prev element
+        // requireInvariant headPrevIsZero();
+        // requireInvariant tailNextIsZero();
       }
     }
 
-invariant zeroNext(address _id)
-    (inDLL(_id) && getNext(_id) == 0) <=> _id == getTail()
+invariant linkedIsInDLL(address _id)
+    linked(_id) => inDLL(_id)
+
+invariant hasNextExceptTail(address _id)
+    inDLL(_id) => _id == getTail() || getNext(_id) != 0
+
+invariant hasPrevExceptHead(address _id)
+    inDLL(_id) => _id == getHead() || getPrev(_id) != 0
+
+invariant headPrev(address _id)
+    getValueOf(_id) != 0 && getPrev(_id) == 0 => _id == getHead()
+    { preserved remove(address rem) {
+        requireInvariant linkedIsInDLL(_id);
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant zeroIsNotLinked();
+      }
+    }
+
+invariant tailNext(address _id)
+    getValueOf(_id) != 0 && getNext(_id) == 0 => _id == getTail()
 
 rule DLLisForwardLinkedPreservedRemove() {
     env e; address _id;
@@ -52,8 +82,9 @@ rule DLLisForwardLinkedPreservedRemove() {
     address tailBefore = getTail(); 
     uint256 lengthBefore = getLength();
     require isForwardLinkedBetween(headBefore, tailBefore, lengthBefore);
-    requireInvariant zeroPrev(_id);
-    requireInvariant zeroNext(_id);
+    requireInvariant headPrev(_id);
+    requireInvariant tailNext(_id);
+    requireInvariant zeroNotInDLL(); 
 
     remove(_id);
 
@@ -65,23 +96,11 @@ rule DLLisForwardLinkedPreservedRemove() {
 
 invariant DLLisForwardLinked()
     isForwardLinkedBetween(getHead(), getTail(), getLength())
-    // { preserved { require DLLisForwardLinkedPreservedRemove(); } }
-
+    { preserved remove(address rem) 
+        { requireInvariant headPrev(rem);
+          requireInvariant tailNext(rem);
+          requireInvariant zeroNotInDLL(); }
+    }
 
 invariant DLLisDecrSorted()
     isDecrSortedFrom(getHead(), getLength())
-
-invariant hasNextExceptTail(address _id)
-    getValueOf(_id) != 0 => _id == getTail() || getNext(_id) != 0
-
-invariant hasPrevExceptHead(address _id)
-    getValueOf(_id) != 0 => _id == getHead() || getPrev(_id) != 0
-
-invariant nextIsNonNull(address _id)
-    getNext(_id) != 0 => getValueOf(_id) != 0
-    
-invariant prevIsNonNull(address _id)
-    getPrev(_id) != 0 => getValueOf(_id) != 0
-
-invariant isDecreasinglySorted(address _id)
-    getNext(_id) != 0 => getValueOf(_id) >= getValueOf(getNext(_id))
