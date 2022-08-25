@@ -32,7 +32,20 @@ invariant headPrevIsZero()
     }
 
 invariant tailNextIsZero()
-    getNext(getTail()) == 0
+    getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0)
+    { preserved remove(address rem) {
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        requireInvariant zeroNotInDLL();
+        requireInvariant linkedIsInDLL(getPrev(rem));
+      } 
+      preserved insertSorted(address id, uint256 amount) {
+        requireInvariant twoWayLinked(id, getNext(id)); // not respecting this invariant
+        requireInvariant twoWayLinked(getPrev(id), id);
+        requireInvariant twoWayLinked(getTail(), getNext(getTail()));
+        requireInvariant zeroNotInDLL();
+      }
+    }
 
 invariant tipIsZero()
     getHead() == 0 <=> getTail() == 0
@@ -49,13 +62,23 @@ invariant twoWayLinked(address prev, address next)
         requireInvariant zeroNotInDLL();
       }
       preserved insertSorted(address add, uint256 amount) { // need to know that the node in front of which we insert is twoWayLinked with its prev element
-        // requireInvariant headPrevIsZero();
-        // requireInvariant tailNextIsZero();
+        requireInvariant headPrevIsZero();
+        requireInvariant tailNextIsZero();
       }
     }
 
 invariant linkedIsInDLL(address _id)
     linked(_id) => inDLL(_id)
+    { preserved remove(address rem) {
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant zeroNotInDLL();
+      }
+      preserved {
+        requireInvariant zeroIsNotLinked();
+        requireInvariant zeroNotInDLL();
+      }
+    }
 
 invariant hasNextExceptTail(address _id)
     inDLL(_id) => _id == getTail() || getNext(_id) != 0
