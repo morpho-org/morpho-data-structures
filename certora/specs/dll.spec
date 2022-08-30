@@ -40,7 +40,7 @@ invariant tailNextIsZero()
         requireInvariant linkedIsInDLL(getPrev(rem));
       } 
       preserved insertSorted(address id, uint256 amount) {
-        requireInvariant twoWayLinked(id, getNext(id)); // not respecting this invariant
+        requireInvariant twoWayLinked(id, getNext(id));
         requireInvariant twoWayLinked(getPrev(id), id);
         requireInvariant twoWayLinked(getTail(), getNext(getTail()));
         requireInvariant zeroNotInDLL();
@@ -54,18 +54,28 @@ invariant zeroIsNotLinked()
     getPrev(0) == 0 && getNext(0) == 0
     { preserved { requireInvariant tipIsZero(); } }
 
+hook Sstore currentContract.dll.insertBefore address next STORAGE { // Q: put that hook in the twoWayLinked invariant ?
+    requireInvariant bothWayLinked(next); // Q: can't call functions inside a hook, but this invariant does ?
+}
+
+definition isTwoWayLinked(address prev, address next) returns bool =
+    prev != 0 && next != 0 => (getNext(prev) == next <=> getPrev(next) == prev);
+
 invariant twoWayLinked(address prev, address next)
-    prev != 0 && next != 0 => (getNext(prev) == next <=> getPrev(next) == prev)
+    isTwoWayLinked(prev, next)
     { preserved remove(address rem) {
         requireInvariant twoWayLinked(getPrev(rem), rem);
         requireInvariant twoWayLinked(rem, getNext(rem));
         requireInvariant zeroNotInDLL();
       }
-      preserved insertSorted(address add, uint256 amount) { // need to know that the node in front of which we insert is twoWayLinked with its prev element
+      preserved insertSorted(address add, uint256 amount) { // this is where we need to requireInvariant on 'next'
         requireInvariant headPrevIsZero();
         requireInvariant tailNextIsZero();
       }
     }
+
+invariant bothWayLinked(address _id) // Q: how to require the invariant twoWayLinked here ?
+    isTwoWayLinked(_id, getNext(_id)) && isTwoWayLinked(getPrev(_id), _id)
 
 invariant linkedIsInDLL(address _id)
     linked(_id) => inDLL(_id)

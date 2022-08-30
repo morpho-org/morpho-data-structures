@@ -1,6 +1,6 @@
 diff -ruN DLL.sol DLL.sol
 --- DLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ DLL.sol	2022-08-24 12:18:04.950653696 +0200
++++ DLL.sol	2022-08-30 09:41:19.184608154 +0200
 @@ -0,0 +1,68 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
@@ -71,9 +71,17 @@ diff -ruN DLL.sol DLL.sol
 +    }
 +}
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2022-08-03 15:44:17.491772970 +0200
-+++ DoubleLinkedList.sol	2022-08-24 12:18:23.530409415 +0200
-@@ -89,33 +89,23 @@
+--- DoubleLinkedList.sol	2022-05-31 14:28:35.619981325 +0200
++++ DoubleLinkedList.sol	2022-08-30 10:12:56.778971403 +0200
+@@ -14,6 +14,7 @@
+         mapping(address => Account) accounts;
+         address head;
+         address tail;
++        address insertBefore;
+     }
+ 
+     /// ERRORS ///
+@@ -89,33 +90,25 @@
      /// @param _list The list to search in.
      /// @param _id The address of the account.
      /// @param _value The value of the account.
@@ -90,7 +98,8 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
          if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
  
 -        uint256 numberOfIterations;
-         address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
+-        address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
++        address next = _list.head; // `_id` will be inserted before `next`.
  
 -        while (
 -            numberOfIterations < _maxIterations &&
@@ -104,6 +113,8 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 -            }
          }
  
++        _list.insertBefore = next;
++
          // Account is not the new tail.
 -        if (next != address(0) && _list.accounts[next].value < _value) {
 +        if (next != address(0)) {
@@ -112,12 +123,12 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
                  _list.accounts[_id] = Account(address(0), next, _value);
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-08-24 12:18:04.950653696 +0200
++++ .gitignore	2022-08-30 09:41:19.184608154 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore
 diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOptimized.sol
---- test/TestRedBlackBinaryTreeOptimized.sol	2022-07-09 10:02:06.467881506 +0200
+--- test/TestRedBlackBinaryTreeOptimized.sol	2022-05-31 14:27:08.709981906 +0200
 +++ test/TestRedBlackBinaryTreeOptimized.sol	1970-01-01 01:00:00.000000000 +0100
 @@ -1,42 +0,0 @@
 -// SPDX-License-Identifier: UNLICENSED
@@ -163,7 +174,7 @@ diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOp
 -    }
 -}
 diff -ruN test/TestRedBlackBinaryTree.sol test/TestRedBlackBinaryTree.sol
---- test/TestRedBlackBinaryTree.sol	2022-07-09 10:02:06.467881506 +0200
+--- test/TestRedBlackBinaryTree.sol	2022-05-31 14:28:35.619981325 +0200
 +++ test/TestRedBlackBinaryTree.sol	1970-01-01 01:00:00.000000000 +0100
 @@ -1,50 +0,0 @@
 -// SPDX-License-Identifier: UNLICENSED
