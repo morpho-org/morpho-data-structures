@@ -54,27 +54,40 @@ invariant zeroIsNotLinked()
     getPrev(0) == 0 && getNext(0) == 0
     { preserved { requireInvariant tipIsZero(); } }
 
-hook Sstore currentContract.dll.insertBefore address next STORAGE { // Q: put that hook in the twoWayLinked invariant ?
-    requireInvariant bothWayLinked(next); // Q: can't call functions inside a hook, but this invariant does ?
+ghost address insertBefore;
+hook Sstore currentContract.dll.insertBefore address next STORAGE {
+    require insertBefore == next;
 }
 
-definition isTwoWayLinked(address prev, address next) returns bool =
-    prev != 0 && next != 0 => (getNext(prev) == next <=> getPrev(next) == prev);
+definition isTwoWayLinked(address first, address second) returns bool =
+    first != 0 && second != 0 => (getNext(first) == second <=> getPrev(second) == first);
 
-invariant twoWayLinked(address prev, address next)
-    isTwoWayLinked(prev, next)
-    { preserved remove(address rem) {
+invariant twoWayLinked(address first, address second)
+    isTwoWayLinked(first, second)
+    filtered { f -> f.selector != insertSorted(address,uint256).selector } 
+    { preserved remove(address rem) { 
         requireInvariant twoWayLinked(getPrev(rem), rem);
         requireInvariant twoWayLinked(rem, getNext(rem));
         requireInvariant zeroNotInDLL();
       }
-      preserved insertSorted(address add, uint256 amount) { // this is where we need to requireInvariant on 'next'
-        requireInvariant headPrevIsZero();
-        requireInvariant tailNextIsZero();
-      }
     }
 
-invariant bothWayLinked(address _id) // Q: how to require the invariant twoWayLinked here ?
+rule insertSortedTwoWayLinked(address _id, uint256 _value) {
+    env e; address next;
+    address first; address second;
+
+    require isTwoWayLinked(first, second);
+    require isTwoWayLinked(getPrev(next), next);
+    require isTwoWayLinked(next, getNext(next));
+
+    insertSorted(_id, _value);
+
+    // require next == insertBefore;
+
+    assert isTwoWayLinked(first, second);
+}
+
+invariant bothWayLinked(address _id)
     isTwoWayLinked(_id, getNext(_id)) && isTwoWayLinked(getPrev(_id), _id)
 
 invariant linkedIsInDLL(address _id)
