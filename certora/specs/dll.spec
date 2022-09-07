@@ -53,10 +53,12 @@ rule insertSortedLinkedIsInDll(address _id, uint256 _value) {
     require linked(getPrev(next)) => inDLL(getPrev(next));
     requireInvariant zeroNotInDLL();
     requireInvariant headValue();
+    requireInvariant tailValue();
     requireInvariant zeroIsNotLinked();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant headPrev(next);
+    requireInvariant tailNext(prev);
 
     insertSorted(_id, _value);
 
