@@ -1,7 +1,7 @@
 diff -ruN DLL.sol DLL.sol
 --- DLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ DLL.sol	2022-09-07 09:17:02.260580568 +0200
-@@ -0,0 +1,78 @@
++++ DLL.sol	2022-09-07 13:49:17.161174605 +0200
+@@ -0,0 +1,82 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
 +
@@ -46,6 +46,10 @@ diff -ruN DLL.sol DLL.sol
 +        dll.insertSorted(_id, _value);
 +    }
 +
++    function getInsertAfter() public view returns (address) {
++        return dll.insertAfter;
++    }
++
 +    function getInsertBefore() public view returns (address) {
 +        return dll.insertBefore;
 +    }
@@ -82,16 +86,17 @@ diff -ruN DLL.sol DLL.sol
 +}
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 --- DoubleLinkedList.sol	2022-05-31 14:28:35.619981325 +0200
-+++ DoubleLinkedList.sol	2022-09-07 09:15:39.534228023 +0200
-@@ -14,6 +14,7 @@
++++ DoubleLinkedList.sol	2022-09-07 13:48:35.999567263 +0200
+@@ -14,6 +14,8 @@
          mapping(address => Account) accounts;
          address head;
          address tail;
 +        address insertBefore; // HARNESS
++        address insertAfter; // HARNESS
      }
  
      /// ERRORS ///
-@@ -89,33 +90,25 @@
+@@ -89,33 +91,27 @@
      /// @param _list The list to search in.
      /// @param _id The address of the account.
      /// @param _value The value of the account.
@@ -109,6 +114,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
  
 -        uint256 numberOfIterations;
 -        address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
++        _list.insertAfter = address(0);
 +        address next = _list.head; // `_id` will be inserted before `next`.
  
 -        while (
@@ -117,13 +123,14 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 -            _list.accounts[next].value >= _value
 -        ) {
 +        while (next != address(0) && _list.accounts[next].value >= _value) {
++            _list.insertAfter = next;
              next = _list.accounts[next].next;
 -            unchecked {
 -                ++numberOfIterations;
 -            }
          }
  
-+        _list.insertBefore = next; // HARNESS
++        _list.insertBefore = next;
 +
          // Account is not the new tail.
 -        if (next != address(0) && _list.accounts[next].value < _value) {
@@ -133,7 +140,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
                  _list.accounts[_id] = Account(address(0), next, _value);
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-09-06 18:24:16.308614938 +0200
++++ .gitignore	2022-09-07 13:33:32.834994790 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore
