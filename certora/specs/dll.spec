@@ -39,12 +39,26 @@ definition isTwoWayLinked(address first, address second) returns bool =
 invariant zeroNotInDLL()
     ! inDLL(0)
 
-invariant tipIsZero()
-    getHead() == 0 <=> getTail() == 0
-
 invariant zeroIsNotLinked()
     getPrev(0) == 0 && getNext(0) == 0
-    { preserved { requireInvariant tipIsZero(); } }
+    filtered { f -> f.selector != insertSorted(address, uint256).selector }
+
+rule zeroIsNotLinkedPreservedInsertSorted(address _id, uint256 _value) {
+    env e; address next; address prev;
+    address addr;
+    
+    require getPrev(0) == 0 && getNext(0) == 0;
+    requireInvariant twoWayLinked(prev, getNext(prev));
+    requireInvariant noNextIsTail(prev);
+
+    insertSorted(_id, _value);
+
+    require prev == getInsertAfter();
+    require next == getInsertBefore();
+
+    assert getPrev(0) == 0 && getNext(0) == 0;
+
+}
 
 invariant headPrevAndValue()
     getPrev(getHead()) == 0 && (getValueOf(getHead()) == 0 => getHead() == 0)
@@ -106,8 +120,8 @@ rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant headPrevAndValue();
     requireInvariant tailNextAndValue();
     requireInvariant twoWayLinked(getPrev(next), next);
-    requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noPrevIsHead(next);
+    requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
     insertSorted(_id, _value);
