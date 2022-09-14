@@ -70,19 +70,30 @@ invariant headPrevAndValue()
 
 invariant tailNextAndValue()
     getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0)
+    filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(rem), rem);
         requireInvariant twoWayLinked(rem, getNext(rem));
         requireInvariant linkedIsInDLL(getPrev(rem));
       }
-      preserved insertSorted(address id, uint256 amount) {
-        requireInvariant zeroEmpty();
-        requireInvariant twoWayLinked(id, getNext(id));
-        requireInvariant twoWayLinked(getPrev(id), id);
-        requireInvariant twoWayLinked(getTail(), getNext(getTail()));
-      }
     }
+
+rule tailNextAndValuePreservedInsertSorted(address _id, uint256 _amount) {
+    env e; address next; address prev;
+
+    require getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0);
+    requireInvariant zeroEmpty();
+    requireInvariant twoWayLinked(getPrev(next), next);
+    requireInvariant twoWayLinked(prev, getNext(prev));
+
+    insertSorted(_id, _amount);
+    
+    require prev == getInsertAfter();
+    require next == getInsertBefore();
+    
+    assert getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0);
+}
 
 invariant noPrevIsHead(address _id)
     inDLL(_id) && getPrev(_id) == 0 => _id == getHead()
