@@ -97,16 +97,62 @@ rule tailNextAndValuePreservedInsertSorted(address _id, uint256 _amount) {
 
 invariant noPrevIsHead(address _id)
     inDLL(_id) && getPrev(_id) == 0 => _id == getHead()
+    filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant linkedIsInDLL(_id);
         requireInvariant twoWayLinked(rem, getNext(rem));
         requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant noPrevIsHead(rem);
       }
     }
 
+rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _amount) {
+    env e; address next; address prev;
+    address addr;
+
+    require inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
+    requireInvariant zeroEmpty();
+    requireInvariant twoWayLinked(getPrev(next), next);
+    requireInvariant twoWayLinked(prev, getNext(prev));
+    requireInvariant noNextIsTail(prev);
+
+    insertSorted(_id, _amount);
+    
+    require prev == getInsertAfter();
+    require next == getInsertBefore();
+    
+    assert inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
+}
+
 invariant noNextIsTail(address _id)
     inDLL(_id) && getNext(_id) == 0 => _id == getTail()
+    filtered { f -> f.selector != insertSorted(address, uint256).selector }
+    { preserved remove(address rem) {
+        requireInvariant zeroEmpty();
+        requireInvariant linkedIsInDLL(_id);
+        requireInvariant twoWayLinked(rem, getNext(rem));
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        requireInvariant noNextIsTail(rem);
+      }
+    }
+
+rule noNextisTailPreservedInsertSorted(address _id, uint256 _amount) {
+    env e; address next; address prev;
+    address addr;
+
+    require inDLL(addr) && getNext(addr) == 0 => addr == getTail();
+    requireInvariant zeroEmpty();
+    requireInvariant twoWayLinked(getPrev(next), next);
+    requireInvariant twoWayLinked(prev, getNext(prev));
+
+    insertSorted(_id, _amount);
+    
+    require prev == getInsertAfter();
+    require next == getInsertBefore();
+    
+    assert inDLL(addr) && getNext(addr) == 0 => addr == getTail();
+}
 
 invariant linkedIsInDLL(address _id)
     linked(_id) => inDLL(_id)
