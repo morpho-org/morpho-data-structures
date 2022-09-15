@@ -7,20 +7,12 @@ methods {
     remove(address) envfree
     insertSorted(address, uint256) envfree
     // added through harness
-    initialized() returns (bool) envfree
     getInsertBefore() returns (address) envfree
     getInsertAfter() returns (address) envfree
     getLength() returns (uint256) envfree
     isForwardLinkedBetween(address, address, uint256) returns (bool) envfree
     isDecrSortedFrom(address, uint256) returns (bool) envfree
 }
-
-// axiom init()
-//     ! initialized() => (head == 0 && tail == 0 &&
-//                         forall address addr.
-//                         dll.accounts[addr].prev == 0 &&
-//                         dll.accounts[addr].next == 0 &&
-//                         dll.accounts[addr].value == 0)
 
 // DEFINITIONS
 
@@ -215,24 +207,6 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 
     assert isTwoWayLinked(first, second);
 }
-
-// rule isForwardLinkedPreservedRemove() {
-//     env e; address _id;
-//     address headBefore = getHead();
-//     address tailBefore = getTail();
-//     uint256 lengthBefore = getLength();
-//     require isForwardLinkedBetween(headBefore, tailBefore, lengthBefore);
-//     requireInvariant noPrevIsHead(_id);
-//     requireInvariant noNextIsTail(_id);
-//     requireInvariant zeroNotInDLL();
-
-//     remove(_id);
-
-//     address headAfter = getHead();
-//     address tailAfter = getTail();
-//     uint256 lengthAfter = getLength();
-//     assert isForwardLinkedBetween(headAfter, tailAfter, lengthAfter);
-// }
 
 invariant DLLisForwardLinked()
     isForwardLinkedBetween(getHead(), getTail(), getLength())
