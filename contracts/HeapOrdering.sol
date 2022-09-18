@@ -181,7 +181,9 @@ library HeapOrdering {
         uint256 size = _heap.size;
         swap(_heap, size, accountsLength);
         shiftUp(_heap, size);
-        _heap.size = computeSize(size + 1, _maxSortedUsers);
+        unchecked {
+            _heap.size = computeSize(size + 1, _maxSortedUsers);
+        }
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
@@ -221,7 +223,9 @@ library HeapOrdering {
         else {
             swap(_heap, size, index);
             shiftUp(_heap, size);
-            _heap.size = computeSize(size + 1, _maxSortedUsers);
+            unchecked {
+                _heap.size = computeSize(size + 1, _maxSortedUsers);
+            }
         }
     }
 
@@ -239,8 +243,10 @@ library HeapOrdering {
         uint256 accountsLength = _heap.accounts.length;
 
         // Swap the last account and the account to remove, then pop it.
-        swap(_heap, index, accountsLength - 1);
-        if (_heap.size == accountsLength) _heap.size--;
+        unchecked {
+            swap(_heap, index, accountsLength - 1);
+            if (_heap.size == accountsLength) _heap.size--;
+        }
         _heap.accounts.pop();
         delete _heap.indexOf[_id];
 
@@ -285,8 +291,10 @@ library HeapOrdering {
     /// @return The address of the tail.
     function getTail(HeapArray storage _heap) internal view returns (address) {
         uint256 accountsLength = _heap.accounts.length;
-        if (accountsLength > 0) return _heap.accounts[accountsLength - 1].id;
-        else return address(0);
+        unchecked {
+            if (accountsLength > 0) return _heap.accounts[accountsLength - 1].id;
+            else return address(0);
+        }
     }
 
     /// @notice Returns the address coming before `_id` in accounts.
@@ -296,8 +304,10 @@ library HeapOrdering {
     /// @return The address of the previous account.
     function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 index = _heap.indexOf[_id];
-        if (index > ROOT) return _heap.accounts[index - 1].id;
-        else return address(0);
+        unchecked {
+            if (index > ROOT) return _heap.accounts[index - 1].id;
+            else return address(0);
+        }
     }
 
     /// @notice Returns the address coming after `_id` in accounts.
@@ -307,8 +317,10 @@ library HeapOrdering {
     /// @return The address of the next account.
     function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 index = _heap.indexOf[_id];
-        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
-            return address(0);
-        else return _heap.accounts[index + 1].id;
+        unchecked {
+            if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
+                return address(0);
+            else return _heap.accounts[index + 1].id;
+        }
     }
 }
