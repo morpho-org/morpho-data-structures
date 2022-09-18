@@ -130,7 +130,6 @@ library HeapOrdering {
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
-        uint256 rightChildIndex;
         // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
 
         while (childIndex < size) {
@@ -138,13 +137,12 @@ library HeapOrdering {
 
             // Find the child with largest value.
             unchecked {
-                rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
-            }
-            if (rightChildIndex < size) {
-                Account memory rightChild = _heap.accounts[rightChildIndex];
-                if (rightChild.value > childToSwap.value) {
-                    childToSwap = rightChild;
-                    childIndex = rightChildIndex;
+                if (childIndex + 1 < size) {
+                    Account memory rightChild = _heap.accounts[childIndex + 1];
+                    if (rightChild.value > childToSwap.value) {
+                        childToSwap = rightChild;
+                        childIndex += 1;
+                    }
                 }
             }
 
@@ -154,6 +152,7 @@ library HeapOrdering {
                 childIndex = (childIndex << 1) + 1;
             } else break;
         }
+
         setAccount(_heap, _index, accountToShift);
     }
 
