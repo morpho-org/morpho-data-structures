@@ -436,18 +436,18 @@ contract TestHeapOrdering is DSTest {
         MAX_SORTED_USERS = 4;
         for (uint256 i = 0; i < 16; i++) update(accounts[i], 0, 20 - i);
 
-        uint256 index5Before = heap.indexes[accounts[5]];
-        uint256 index0Before = heap.indexes[accounts[0]];
+        uint256 index5Before = heap.indexOf[accounts[5]];
+        uint256 index0Before = heap.indexOf[accounts[0]];
 
         update(accounts[5], 15, 1);
 
-        uint256 index5After = heap.indexes[accounts[5]];
+        uint256 index5After = heap.indexOf[accounts[5]];
 
         assertEq(index5Before, index5After);
 
         update(accounts[0], 20, 2);
 
-        uint256 index0After = heap.indexes[accounts[0]];
+        uint256 index0After = heap.indexOf[accounts[0]];
 
         assertGt(index0After, index0Before);
     }
@@ -459,7 +459,7 @@ contract TestHeapOrdering is DSTest {
 
         update(accounts[17], 20 - 17, 5);
 
-        uint256 index17After = heap.indexes[accounts[17]];
+        uint256 index17After = heap.indexOf[accounts[17]];
 
         assertEq(index17After, 5);
     }
@@ -471,7 +471,7 @@ contract TestHeapOrdering is DSTest {
 
         update(accounts[17], 20 - 17, 40);
 
-        uint256 index17After = heap.indexes[accounts[17]];
+        uint256 index17After = heap.indexOf[accounts[17]];
 
         assertEq(index17After, 0);
     }
@@ -526,10 +526,10 @@ contract TestHeapOrdering is DSTest {
 
         // Insert does a swap with the same index.
         update(accounts[3], 0, 10);
-        assertEq(heap.indexes[accounts[0]], 0);
-        assertEq(heap.indexes[accounts[1]], 1);
-        assertEq(heap.indexes[accounts[2]], 2);
-        assertEq(heap.indexes[accounts[3]], 3);
+        assertEq(heap.indexOf[accounts[0]], 0);
+        assertEq(heap.indexOf[accounts[1]], 1);
+        assertEq(heap.indexOf[accounts[2]], 2);
+        assertEq(heap.indexOf[accounts[3]], 3);
     }
 
     function testIncreaseAndRemoveNoSwap() public {
@@ -541,16 +541,16 @@ contract TestHeapOrdering is DSTest {
 
         // Increase does a swap with the same index.
         update(accounts[2], 40, 45);
-        assertEq(heap.indexes[accounts[0]], 0);
-        assertEq(heap.indexes[accounts[1]], 1);
-        assertEq(heap.indexes[accounts[2]], 2);
-        assertEq(heap.indexes[accounts[3]], 3);
+        assertEq(heap.indexOf[accounts[0]], 0);
+        assertEq(heap.indexOf[accounts[1]], 1);
+        assertEq(heap.indexOf[accounts[2]], 2);
+        assertEq(heap.indexOf[accounts[3]], 3);
 
         // Remove does a swap with the same index.
         update(accounts[3], 30, 0);
-        assertEq(heap.indexes[accounts[0]], 0);
-        assertEq(heap.indexes[accounts[1]], 1);
-        assertEq(heap.indexes[accounts[2]], 2);
+        assertEq(heap.indexOf[accounts[0]], 0);
+        assertEq(heap.indexOf[accounts[1]], 1);
+        assertEq(heap.indexOf[accounts[2]], 2);
     }
 
     function testOverflowNewValue() public {
