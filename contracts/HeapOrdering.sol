@@ -12,7 +12,7 @@ library HeapOrdering {
     struct HeapArray {
         Account[] accounts; // All the accounts.
         uint256 size; // The size of the heap portion of the structure, should be less than accounts length, the rest is an unordered array.
-        mapping(address => uint256) indexes; // A mapping from an address to an index in accounts. From index i, the parent index is (i-1)/2, the left child index is 2*i+1 and the right child index is 2*i+2.
+        mapping(address => uint256) indexOf; // A mapping from an address to an index in accounts. From index i, the parent index is (i-1)/2, the left child index is 2*i+1 and the right child index is 2*i+2.
     }
 
     /// CONSTANTS ///
@@ -69,22 +69,22 @@ library HeapOrdering {
 
     /// @notice Sets `_index` in the `_heap` to be `_account`.
     /// @dev The heap may lose its invariant about the order of the values stored.
-    /// @dev Only call this function with a rank within array's bounds.
+    /// @dev Only call this function with an index within array's bounds.
     /// @param _heap The heap to modify.
-    /// @param _index The rank of the account in the heap to be set.
-    /// @param _account The account to set the `_rank` to.
+    /// @param _index The index of the account in the heap to be set.
+    /// @param _account The account to set the `_index` to.
     function setAccount(
         HeapArray storage _heap,
         uint256 _index,
         Account memory _account
     ) private {
         _heap.accounts[_index] = _account;
-        _heap.indexes[_account.id] = _index;
+        _heap.indexOf[_account.id] = _index;
     }
 
     /// @notice Swaps two accounts in the `_heap`.
     /// @dev The heap may lose its invariant about the order of the values stored.
-    /// @dev Only call this function with indexes within array's bounds.
+    /// @dev Only call this function with indexOf within array's bounds.
     /// @param _heap The heap to modify.
     /// @param _index1 The index of the first account in the heap.
     /// @param _index2 The index of the second account in the heap.
@@ -108,12 +108,15 @@ library HeapOrdering {
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
         Account memory parentAccount;
-        while (
-            _index > ROOT &&
-            valueToShift > (parentAccount = _heap.accounts[(_index - 1) >> 1]).value
-        ) {
-            setAccount(_heap, _index, parentAccount);
-            _index = (_index - 1) >> 1;
+        unchecked {
+            // _index is checked to be greater than 0 before subtracting 1
+            while (
+                _index > ROOT &&
+                valueToShift > (parentAccount = _heap.accounts[(_index - 1) >> 1]).value
+            ) {
+                setAccount(_heap, _index, parentAccount);
+                _index = (_index - 1) >> 1;
+            }
         }
         setAccount(_heap, _index, accountToShift);
     }
@@ -173,7 +176,7 @@ library HeapOrdering {
         // Put the account at the end of accounts.
         uint256 accountsLength = _heap.accounts.length;
         _heap.accounts.push(Account(_id, _value));
-        _heap.indexes[_id] = accountsLength;
+        _heap.indexOf[_id] = accountsLength;
 
         // Move the account at the end of the heap and restore the invariant.
         uint256 size = _heap.size;
@@ -192,7 +195,7 @@ library HeapOrdering {
         address _id,
         uint96 _newValue
     ) private {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
 
         // We only need to restore the invariant if the account is a node in the heap
@@ -211,7 +214,7 @@ library HeapOrdering {
         uint96 _newValue,
         uint256 _maxSortedUsers
     ) private {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
         uint256 size = _heap.size;
 
@@ -233,14 +236,14 @@ library HeapOrdering {
         address _id,
         uint96 _removedValue
     ) private {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
         // Swap the last account and the account to remove, then pop it.
         swap(_heap, index, accountsLength - 1);
         if (_heap.size == accountsLength) _heap.size--;
         _heap.accounts.pop();
-        delete _heap.indexes[_id];
+        delete _heap.indexOf[_id];
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
         if (index < _heap.size) {
@@ -263,7 +266,7 @@ library HeapOrdering {
     /// @param _id The address of the account.
     /// @return The value of the account.
     function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         if (index >= _heap.accounts.length) return 0;
         Account memory account = _heap.accounts[index];
         if (account.id != _id) return 0;
@@ -293,7 +296,7 @@ library HeapOrdering {
     /// @param _id The address of the account.
     /// @return The address of the previous account.
     function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         if (index > ROOT) return _heap.accounts[index - 1].id;
         else return address(0);
     }
@@ -304,7 +307,7 @@ library HeapOrdering {
     /// @param _id The address of the account.
     /// @return The address of the next account.
     function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
             return address(0);
         else return _heap.accounts[index + 1].id;
