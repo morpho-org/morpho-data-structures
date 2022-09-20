@@ -6,6 +6,10 @@ install:
 	@git submodule update --init --recursive
 	@yarn
 
+gas-report:
+	@echo Run all tests
+	@forge test -vvv --gas-report
+
 test:
 	@echo Run all tests
 	@forge test -vvv
