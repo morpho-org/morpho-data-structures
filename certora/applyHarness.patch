@@ -1,6 +1,6 @@
 diff -ruN DLL.sol DLL.sol
 --- DLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ DLL.sol	2022-09-15 17:36:08.555701626 +0200
++++ DLL.sol	2022-09-23 18:20:58.577395623 +0200
 @@ -0,0 +1,76 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
@@ -51,7 +51,7 @@ diff -ruN DLL.sol DLL.sol
 +    function getLength() public view returns (uint256) {
 +        address current = dll.head;
 +        uint256 len;
-+        for (; current != address(0); len++) {}
++        for (; current != address(0); len++) current = getNext(current);
 +        return len;
 +    }
 +
@@ -80,7 +80,7 @@ diff -ruN DLL.sol DLL.sol
 +}
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 --- DoubleLinkedList.sol	2022-05-31 14:28:35.619981325 +0200
-+++ DoubleLinkedList.sol	2022-09-15 17:36:08.555701626 +0200
++++ DoubleLinkedList.sol	2022-09-23 18:20:28.997853176 +0200
 @@ -14,6 +14,8 @@
          mapping(address => Account) accounts;
          address head;
@@ -134,7 +134,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
                  _list.accounts[_id] = Account(address(0), next, _value);
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-09-15 17:05:47.313689798 +0200
++++ .gitignore	2022-09-23 18:20:28.997853176 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore
