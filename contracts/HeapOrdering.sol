@@ -290,10 +290,11 @@ library HeapOrdering {
     /// @return The address of the tail.
     function getTail(HeapArray storage _heap) internal view returns (address) {
         uint256 accountsLength = _heap.accounts.length;
-        unchecked {
-            if (accountsLength > 0) return _heap.accounts[accountsLength - 1].id;
-            else return address(0);
-        }
+        if (accountsLength > 0) {
+            unchecked {
+                return _heap.accounts[accountsLength - 1].id;
+            }
+        } else return address(0);
     }
 
     /// @notice Returns the address coming before `_id` in accounts.
@@ -303,10 +304,11 @@ library HeapOrdering {
     /// @return The address of the previous account.
     function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 index = _heap.indexOf[_id];
-        unchecked {
-            if (index > ROOT) return _heap.accounts[index - 1].id;
-            else return address(0);
-        }
+        if (index > ROOT) {
+            unchecked {
+                return _heap.accounts[index - 1].id;
+            }
+        } else return address(0);
     }
 
     /// @notice Returns the address coming after `_id` in accounts.
