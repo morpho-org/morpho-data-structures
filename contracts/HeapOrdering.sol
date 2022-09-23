@@ -274,7 +274,7 @@ library HeapOrdering {
         if (index >= _heap.accounts.length) return 0;
         Account memory account = _heap.accounts[index];
         if (account.id != _id) return 0;
-        else return account.value;
+        return account.value;
     }
 
     /// @notice Returns the address at the head of the `_heap`.
@@ -282,7 +282,7 @@ library HeapOrdering {
     /// @return The address of the head.
     function getHead(HeapArray storage _heap) internal view returns (address) {
         if (_heap.accounts.length > 0) return _heap.accounts[ROOT].id;
-        else return address(0);
+        return address(0);
     }
 
     /// @notice Returns the address at the tail of unsorted portion of the `_heap`.
@@ -294,7 +294,8 @@ library HeapOrdering {
             unchecked {
                 return _heap.accounts[accountsLength - 1].id;
             }
-        } else return address(0);
+        }
+        return address(0);
     }
 
     /// @notice Returns the address coming before `_id` in accounts.
@@ -308,7 +309,8 @@ library HeapOrdering {
             unchecked {
                 return _heap.accounts[index - 1].id;
             }
-        } else return address(0);
+        }
+        return address(0);
     }
 
     /// @notice Returns the address coming after `_id` in accounts.
@@ -321,7 +323,7 @@ library HeapOrdering {
         unchecked {
             if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
                 return address(0);
-            else return _heap.accounts[index + 1].id;
+            return _heap.accounts[index + 1].id;
         }
     }
 }
