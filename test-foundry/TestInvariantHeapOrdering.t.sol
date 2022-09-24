@@ -7,7 +7,7 @@ import "forge-std/console.sol";
 
 import "@contracts/HeapOrdering.sol";
 
-contract ContractToFuzz is DSTest {
+contract Heap {
     using HeapOrdering for HeapOrdering.HeapArray;
 
     uint256 public MAX_SORTED_USERS = 16;
@@ -21,39 +21,63 @@ contract ContractToFuzz is DSTest {
 
     /// Helpers ///
 
-    function heapLength() public view returns (uint256) {
+    function length() public view returns (uint256) {
         return heap.length();
     }
 
+    function size() public view returns (uint256) {
+        return heap.size;
+    }
+
     function accountValue(uint256 i) public view returns (uint256) {
-        return heap.accounts[i - 1].value;
+        return heap.accounts[i].value;
+    }
+
+    function accountId(uint256 i) public view returns (address) {
+        return heap.accounts[i].id;
+    }
+
+    function indexOf(address id) public view returns (uint256) {
+        return heap.indexOf[id];
     }
 }
 
-contract TestHeapInvariant {
-    ContractToFuzz public con;
+contract TestHeapInvariant is DSTest {
+    Heap public heap;
 
     function setUp() public {
-        con = new ContractToFuzz();
+        heap = new Heap();
     }
 
     // Rule:
-    // For all i in [[0, MAX_SORTED_USERS / 2]],
-    // value[i] >= value[2i] and value[i] >= value[2i + 1]
-    function invariantHeap() public view {
-        uint256 length = con.heapLength();
+    // For all i in [[0, size]],
+    // value[i] >= value[2i + 1] and value[i] >= value[2i + 2]
+    function invariantHeap() public {
+        uint256 length = heap.length();
 
         for (uint256 i = 1; i < length; ++i) {
-            if (
-                (!(i * 2 >= length ||
-                    i * 2 >= con.MAX_SORTED_USERS() / 2 ||
-                    con.accountValue(i) >= con.accountValue(i * 2)) &&
-                    (i * 2 + 1 >= length ||
-                        i * 2 + 1 >= con.MAX_SORTED_USERS() / 2 ||
-                        con.accountValue(i) >= con.accountValue(i * 2 + 1)))
-            ) {
-                require(false);
-            }
+            assertTrue(
+                (i * 2 + 1 >= length || i * 2 + 1 >= heap.size() || heap.accountValue(i) >= heap.accountValue(i * 2 + 1))
+            ); // prettier-ignore
+            assertTrue(
+                (i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountValue(i) >= heap.accountValue(i * 2 + 2))
+            ); // prettier-ignore
         }
+    }
+
+    // Rule:
+    // For all i in [[0, length]], indexOf(account.id[i]) == i
+    function invariantIndexOf() public {
+        uint256 length = heap.length();
+
+        for (uint256 i = 1; i < length; ++i) {
+            assertTrue(heap.indexOf(heap.accountId(i)) == i);
+        }
+    }
+
+    // Rule:
+    // size <= 2 * MAX_SORTED_USERS
+    function invariantSize() public {
+        assertTrue(heap.size() <= 2 * heap.MAX_SORTED_USERS());
     }
 }

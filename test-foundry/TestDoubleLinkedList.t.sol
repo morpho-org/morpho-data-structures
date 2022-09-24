@@ -217,7 +217,7 @@ contract TestDoubleLinkedList is Test {
         }
 
         // Add last 10 accounts at the same value.
-        for (uint256 i = NDS - 10; i < NDS; i++) {
+        for (uint256 i = accounts.length - 10; i < NDS; i++) {
             list.insertSorted(accounts[i], 10, newNDS);
         }
 
