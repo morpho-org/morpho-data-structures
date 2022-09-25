@@ -2,9 +2,9 @@
 pragma solidity ^0.8.0;
 
 import "@contracts/ThreeHeapOrdering.sol";
-import "./ICommonHeapOrdering.sol";
+import "./IConcreteHeapOrdering.sol";
 
-contract ConcreteThreeHeapOrdering is ICommonHeapOrdering {
+contract ConcreteThreeHeapOrdering is IConcreteHeapOrdering {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
 
     ThreeHeapOrdering.HeapArray internal heap;
