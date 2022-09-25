@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GNU AGPLv3
 pragma solidity ^0.8.0;
 
-import "./helpers/CommonHeapOrdering.sol";
+import "./TestCommonHeapOrdering.t.sol";
 import "./helpers/ConcreteHeapOrdering.sol";
 
-contract TestHeapOrdering is CommonHeapOrdering {
+contract TestHeapOrdering is TestCommonHeapOrdering {
     constructor() {
         heap = new ConcreteHeapOrdering();
     }

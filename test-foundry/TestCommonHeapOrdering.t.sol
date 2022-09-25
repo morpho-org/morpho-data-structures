@@ -6,10 +6,10 @@ import "forge-std/Vm.sol";
 import "forge-std/console.sol";
 
 import "@contracts/HeapOrdering.sol";
-import "./ICommonHeapOrdering.sol";
+import "./helpers/IConcreteHeapOrdering.sol";
 
-abstract contract CommonHeapOrdering is Test {
-    ICommonHeapOrdering internal heap;
+abstract contract TestCommonHeapOrdering is Test {
+    IConcreteHeapOrdering internal heap;
 
     Vm public hevm = Vm(HEVM_ADDRESS);
 
