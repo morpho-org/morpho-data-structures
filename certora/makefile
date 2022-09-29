@@ -9,11 +9,11 @@ help:
 	@echo "  make record: record a new patch file capturing the differences between $(CONTRACTS_DIR) and $(MUNGED_DIR)"
 
 munged: $(wildcard $(CONTRACTS_DIR)/*.sol) $(PATCH)
-	@test -d ${MUNGED_DIR} && rm -rI ${MUNGED_DIR} || echo "creating ${MUNGED_DIR} from scratch..."
+	@rm -rf ${MUNGED_DIR}
 	@cp -r $(CONTRACTS_DIR) ${MUNGED_DIR}
 	@patch -p0 -d ${MUNGED_DIR} < $(PATCH)
 
 record:
 	diff -ruN $(CONTRACTS_DIR) $(MUNGED_DIR) | sed 's+\.\./contracts/++g' | sed 's+munged/++g' > $(PATCH)
 
-.PHONY: help munged record
+.PHONY: help record # do not add munged here, it is used to protect munged edits
