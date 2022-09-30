@@ -9,9 +9,9 @@ methods {
     // added through harness
     getInsertBefore() returns (address) envfree
     getInsertAfter() returns (address) envfree
-    getLength() returns (uint256) envfree
-    isForwardLinkedBetween(address, address, uint256) returns (bool) envfree
-    isDecrSortedFrom(address, uint256) returns (bool) envfree
+    prevFromHead(address) returns (address) envfree
+    isForwardLinkedBetween(address, address) returns (bool) envfree
+    isDecrSortedFrom(address) returns (bool) envfree
 }
 
 // DEFINITIONS
@@ -209,25 +209,30 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 }
 
 invariant DLLisForwardLinked()
-    isForwardLinkedBetween(getHead(), getTail(), getLength())
+    isForwardLinkedBetween(getHead(), getTail())
     filtered { f -> f.selector != remove(address).selector }
 
 rule DLLisForwardLinkedPreservedRemove(address rem) {
-    env e;
+    env e; address prev;
 
-    require isForwardLinkedBetween(getHead(), getTail(), getLength());
+    require prev == prevFromHead(rem);
+
+    require isForwardLinkedBetween(getHead(), getTail());
     requireInvariant zeroEmpty();
+    requireInvariant headPrevAndValue();
+    requireInvariant tailNextAndValue();
     requireInvariant noPrevIsHead(rem);
     requireInvariant twoWayLinked(getPrev(rem), rem);
+    requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(rem);
 
     remove(rem);
 
-    assert isForwardLinkedBetween(getHead(), getTail(), getLength());
+    assert isForwardLinkedBetween(getHead(), getTail());
 }
 
 invariant DLLisDecrSorted()
-    isDecrSortedFrom(getHead(), getLength())
+    isDecrSortedFrom(getHead())
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant noPrevIsHead(rem);
