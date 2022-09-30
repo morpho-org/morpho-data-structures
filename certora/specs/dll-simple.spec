@@ -210,7 +210,24 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 
 invariant DLLisForwardLinked()
     isForwardLinkedBetween(getHead(), getTail())
-    filtered { f -> f.selector != remove(address).selector }
+    filtered { f -> f.selector != remove(address).selector &&
+                    f.selector != insertSorted(address, uint256).selector }
+
+rule DLLisForwardLinkedPreservedInsertSorted(address _id, uint256 _value) {
+    env e; address prev;
+
+    require isForwardLinkedBetween(getHead(), getTail());
+    requireInvariant zeroEmpty();
+    requireInvariant headPrevAndValue();
+    requireInvariant tailNextAndValue();
+    requireInvariant noNextIsTail(prev);
+
+    insertSorted(_id, _value);
+
+    require prev == getInsertAfter();
+
+    assert isForwardLinkedBetween(getHead(), getTail());
+}
 
 rule DLLisForwardLinkedPreservedRemove(address rem) {
     env e; address prev;

@@ -1,7 +1,7 @@
 diff -ruN DLL.sol DLL.sol
 --- DLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ DLL.sol	2022-09-29 18:07:48.707303249 +0200
-@@ -0,0 +1,82 @@
++++ DLL.sol	2022-09-30 14:57:52.658495991 +0200
+@@ -0,0 +1,87 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
 +
@@ -55,27 +55,32 @@ diff -ruN DLL.sol DLL.sol
 +        return dll.insertBefore;
 +    }
 +
-+    function getLength() public view returns (uint256) {
++    function getLength() internal view returns (uint256) {
 +        uint256 len;
 +        for (address current = dll.head; current != address(0); len++) current = getNext(current);
 +        return len;
 +    }
 +
-+    function isForwardLinkedBetween(
-+        address _start,
-+        address _end,
-+        uint256 _maxIterations
-+    ) public view returns (bool) {
-+        if (_start == address(0) && _end == address(0)) return true;
-+        for (; _maxIterations > 0; _maxIterations--) {
-+            if (_start == _end) return true;
-+            _start = dll.getNext(_start);
++    function linkBetween(address _start, address _end) internal view returns (bool, address) {
++        if (_start == _end) return (true, address(0));
++        for (uint256 maxIter = getLength(); maxIter > 0; maxIter--) {
++            address next = dll.getNext(_start);
++            if (next == _end) return (true, _start);
++            _start = next;
 +        }
-+        return false;
++        return (false, address(0));
 +    }
 +
-+    function isDecrSortedFrom(address _start, uint256 _maxIterations) public view returns (bool) {
-+        for (; _maxIterations > 0; _maxIterations--) {
++    function isForwardLinkedBetween(address _start, address _end) public view returns (bool ret) {
++        (ret, ) = linkBetween(_start, _end);
++    }
++
++    function prevFromHead(address _end) public view returns (address last) {
++        (, last) = linkBetween(getHead(), _end);
++    }
++
++    function isDecrSortedFrom(address _start) public view returns (bool) {
++        for (uint256 maxIter = getLength(); maxIter > 0; maxIter--) {
 +            address next = dll.getNext(_start);
 +            if (next == address(0)) return true;
 +            if (getValueOf(_start) < getValueOf(next)) return false;
@@ -86,7 +91,7 @@ diff -ruN DLL.sol DLL.sol
 +}
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 --- DoubleLinkedList.sol	2022-05-31 14:28:35.619981325 +0200
-+++ DoubleLinkedList.sol	2022-09-29 18:04:49.699311765 +0200
++++ DoubleLinkedList.sol	2022-09-29 20:03:18.806652050 +0200
 @@ -14,6 +14,8 @@
          mapping(address => Account) accounts;
          address head;
@@ -140,7 +145,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
                  _list.accounts[_id] = Account(address(0), next, _value);
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-09-29 18:04:49.699311765 +0200
++++ .gitignore	2022-09-29 20:03:18.806652050 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore
