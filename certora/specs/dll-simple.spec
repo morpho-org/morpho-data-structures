@@ -210,12 +210,27 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 
 invariant DLLisForwardLinked()
     isForwardLinkedBetween(getHead(), getTail(), getLength())
-    { preserved remove(address rem) {
-          requireInvariant zeroEmpty();
-          requireInvariant noPrevIsHead(rem);
-          requireInvariant noNextIsTail(rem);
-        }
-    }
+    filtered { f -> f.selector != remove(address).selector }
+
+rule DLLisForwardLinkedPreservedRemove(address rem) {
+    env e;
+
+    require isForwardLinkedBetween(getHead(), getTail(), getLength());
+    requireInvariant zeroEmpty();
+    requireInvariant noPrevIsHead(rem);
+    requireInvariant twoWayLinked(getPrev(rem), rem);
+    requireInvariant noNextIsTail(rem);
+
+    remove(rem);
+
+    assert isForwardLinkedBetween(getHead(), getTail(), getLength());
+}
 
 invariant DLLisDecrSorted()
     isDecrSortedFrom(getHead(), getLength())
+    { preserved remove(address rem) {
+        requireInvariant zeroEmpty();
+        requireInvariant noPrevIsHead(rem);
+        requireInvariant twoWayLinked(getPrev(rem), rem);
+        }
+    }
