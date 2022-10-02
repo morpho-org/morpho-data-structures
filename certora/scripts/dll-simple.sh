@@ -9,5 +9,4 @@ certoraRun \
     --optimistic_loop \
     --send_only \
     --msg "Simple DLL verification" \
-    --staging \
     $@
