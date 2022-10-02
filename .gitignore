@@ -37,3 +37,5 @@ yarn-error.log*
 #certora
 .certora*
 last_conf*
+certora_debug_log.txt
+resource_errors.json
