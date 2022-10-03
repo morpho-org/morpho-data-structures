@@ -195,7 +195,6 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 
     require isTwoWayLinked(first, second);
     require isTwoWayLinked(getPrev(next), next);
-    require isTwoWayLinked(next, getNext(next));
     requireInvariant zeroEmpty();
     requireInvariant headPrevAndValue();
     requireInvariant tailNextAndValue();
@@ -206,6 +205,47 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
     require next == getInsertBefore();
 
     assert isTwoWayLinked(first, second);
+}
+
+invariant DLLisForwardLinkedId(address addr)
+    inDLL(addr) => isForwardLinkedBetween(getHead(), addr)
+    filtered { f -> f.selector != remove(address).selector &&
+                    f.selector != insertSorted(address, uint256).selector }
+
+rule DLLisForwardLinkedIdPreservedInsertSorted(address addr) {
+    env e; address id; uint256 amount; address prev;
+
+    require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
+    requireInvariant zeroEmpty();
+    requireInvariant headPrevAndValue();
+    requireInvariant tailNextAndValue();
+    requireInvariant twoWayLinked(prev, getNext(prev));
+    requireInvariant noNextIsTail(prev);
+
+    insertSorted(id, amount);
+
+    require prev == getInsertAfter();
+
+    assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
+}
+
+rule DLLisForwardLinkedIdPreservedRemove(address addr) {
+    env e; address rem; address prev;
+
+    require prev == prevFromHead(rem);
+
+    require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
+    requireInvariant zeroEmpty();
+    requireInvariant headPrevAndValue();
+    requireInvariant tailNextAndValue();
+    requireInvariant noPrevIsHead(rem);
+    requireInvariant twoWayLinked(getPrev(rem), rem);
+    requireInvariant twoWayLinked(prev, getNext(prev));
+    requireInvariant noNextIsTail(rem);
+
+    remove(rem);
+
+    assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
 
 invariant DLLisForwardLinked()
