@@ -51,7 +51,7 @@ rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
 }
 
 invariant headPrevAndValue()
-    getPrev(getHead()) == 0 && (getValueOf(getHead()) == 0 => getHead() == 0)
+    getPrev(getHead()) == 0 && (getHead() != 0 => inDLL(getHead()))
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(rem), rem);
@@ -61,7 +61,7 @@ invariant headPrevAndValue()
     }
 
 invariant tailNextAndValue()
-    getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0)
+    getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()))
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
@@ -74,7 +74,7 @@ invariant tailNextAndValue()
 rule tailNextAndValuePreservedInsertSorted(address _id, uint256 _amount) {
     env e; address next; address prev;
 
-    require getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0);
+    require getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()));
     requireInvariant zeroEmpty();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
@@ -84,7 +84,7 @@ rule tailNextAndValuePreservedInsertSorted(address _id, uint256 _amount) {
     require prev == getInsertAfter();
     require next == getInsertBefore();
     
-    assert getNext(getTail()) == 0 && (getValueOf(getTail()) == 0 => getTail() == 0);
+    assert getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()));
 }
 
 invariant noPrevIsHead(address _id)
@@ -207,12 +207,12 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
     assert isTwoWayLinked(first, second);
 }
 
-invariant DLLisForwardLinkedId(address addr)
+invariant DLLisForwardLinked(address addr)
     inDLL(addr) => isForwardLinkedBetween(getHead(), addr)
     filtered { f -> f.selector != remove(address).selector &&
                     f.selector != insertSorted(address, uint256).selector }
 
-rule DLLisForwardLinkedIdPreservedInsertSorted(address addr) {
+rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
     env e; address id; uint256 amount; address prev;
 
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
@@ -229,7 +229,7 @@ rule DLLisForwardLinkedIdPreservedInsertSorted(address addr) {
     assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
 
-rule DLLisForwardLinkedIdPreservedRemove(address addr) {
+rule DLLisForwardLinkedPreservedRemove(address addr) {
     env e; address rem; address prev;
 
     require prev == prevFromHead(rem);
@@ -246,46 +246,6 @@ rule DLLisForwardLinkedIdPreservedRemove(address addr) {
     remove(rem);
 
     assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
-}
-
-invariant DLLisForwardLinked()
-    isForwardLinkedBetween(getHead(), getTail())
-    filtered { f -> f.selector != remove(address).selector &&
-                    f.selector != insertSorted(address, uint256).selector }
-
-rule DLLisForwardLinkedPreservedInsertSorted(address _id, uint256 _value) {
-    env e; address prev;
-
-    require isForwardLinkedBetween(getHead(), getTail());
-    requireInvariant zeroEmpty();
-    requireInvariant headPrevAndValue();
-    requireInvariant tailNextAndValue();
-    requireInvariant noNextIsTail(prev);
-
-    insertSorted(_id, _value);
-
-    require prev == getInsertAfter();
-
-    assert isForwardLinkedBetween(getHead(), getTail());
-}
-
-rule DLLisForwardLinkedPreservedRemove(address rem) {
-    env e; address prev;
-
-    require prev == prevFromHead(rem);
-
-    require isForwardLinkedBetween(getHead(), getTail());
-    requireInvariant zeroEmpty();
-    requireInvariant headPrevAndValue();
-    requireInvariant tailNextAndValue();
-    requireInvariant noPrevIsHead(rem);
-    requireInvariant twoWayLinked(getPrev(rem), rem);
-    requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(rem);
-
-    remove(rem);
-
-    assert isForwardLinkedBetween(getHead(), getTail());
 }
 
 invariant DLLisDecrSorted()
