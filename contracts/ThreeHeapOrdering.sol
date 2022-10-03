@@ -94,6 +94,7 @@ library ThreeHeapOrdering {
     ) private {
         Account memory parentAccount;
         uint256 parentIndex;
+
         while (
             _index > ROOT &&
             _accountToShift.value >
@@ -102,6 +103,7 @@ library ThreeHeapOrdering {
             setAccount(_heap, _index, parentAccount);
             _index = parentIndex;
         }
+
         setAccount(_heap, _index, _accountToShift);
     }
 
@@ -140,6 +142,7 @@ library ThreeHeapOrdering {
             _index = targetIndex;
             nextIndex = _index * 3;
         }
+
         setAccount(_heap, _index, _accountToShift);
     }
 
@@ -268,7 +271,7 @@ library ThreeHeapOrdering {
     /// @param _heap The heap to get the head.
     /// @return The address of the head.
     function getHead(HeapArray storage _heap) internal view returns (address) {
-        if (_heap.accounts.length > 0) return _heap.accounts[0].id;
+        if (_heap.accounts.length > 0) return _heap.accounts[ROOT].id;
         else return address(0);
     }
 
