@@ -12,7 +12,7 @@ library ThreeHeapOrdering {
     struct HeapArray {
         Account[] accounts; // All the accounts.
         uint256 size; // The size of the heap portion of the structure, should be less than accounts length, the rest is an unordered array.
-        mapping(address => uint256) indexes; // A mapping from an address to a index in accounts.
+        mapping(address => uint256) indexOf; // A mapping from an address to an index in accounts.
     }
 
     /// CONSTANTS ///
@@ -79,7 +79,7 @@ library ThreeHeapOrdering {
         Account memory _account
     ) private {
         _heap.accounts[_index] = _account;
-        _heap.indexes[_account.id] = _index;
+        _heap.indexOf[_account.id] = _index;
     }
 
     /// @notice Moves an account up the heap until its value is smaller than the one of its parent.
@@ -165,7 +165,7 @@ library ThreeHeapOrdering {
         if (size < accountsLength) {
             Account memory firstAccountNotSorted = _heap.accounts[size];
 
-            _heap.indexes[firstAccountNotSorted.id] = accountsLength;
+            _heap.indexOf[firstAccountNotSorted.id] = accountsLength;
             _heap.accounts.push(firstAccountNotSorted);
         } else _heap.accounts.push();
 
@@ -183,7 +183,7 @@ library ThreeHeapOrdering {
         address _id,
         uint96 _newValue
     ) private {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
 
         if (index < (_heap.size - 1) / 3) shiftDown(_heap, Account(_id, _newValue), index);
         else _heap.accounts[index].value = _newValue;
@@ -201,7 +201,7 @@ library ThreeHeapOrdering {
         uint96 _newValue,
         uint256 _maxSortedUsers
     ) private {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
         uint256 size = _heap.size;
 
@@ -224,8 +224,8 @@ library ThreeHeapOrdering {
         address _id,
         uint96 _removedValue
     ) private {
-        uint256 index = _heap.indexes[_id];
-        delete _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
+        delete _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
         if (_heap.size == accountsLength) _heap.size--;
@@ -257,7 +257,7 @@ library ThreeHeapOrdering {
     /// @param _id The address of the account.
     /// @return The value of the account.
     function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         if (index >= _heap.accounts.length) return 0;
         Account memory account = _heap.accounts[index];
         if (account.id != _id) return 0;
@@ -287,7 +287,7 @@ library ThreeHeapOrdering {
     /// @param _id The address of the account.
     /// @return The address of the previous account.
     function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         if (index > ROOT) return _heap.accounts[index - 1].id;
         else return address(0);
     }
@@ -298,7 +298,7 @@ library ThreeHeapOrdering {
     /// @param _id The address of the account.
     /// @return The address of the next account.
     function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 index = _heap.indexes[_id];
+        uint256 index = _heap.indexOf[_id];
         if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
             return address(0);
         else return _heap.accounts[index + 1].id;

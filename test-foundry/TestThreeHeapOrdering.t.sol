@@ -216,14 +216,14 @@ contract TestThreeHeapOrdering is CommonHeapOrdering {
 
         // Increase does a swap with the same index.
         update(accounts[1], 50, 55);
-        assertEq(heap.indexes(accounts[0]), 0);
-        assertEq(heap.indexes(accounts[1]), 1);
-        assertEq(heap.indexes(accounts[2]), 2);
+        assertEq(heap.indexOf(accounts[0]), 0);
+        assertEq(heap.indexOf(accounts[1]), 1);
+        assertEq(heap.indexOf(accounts[2]), 2);
 
         // Remove does a swap with the same index.
         update(accounts[2], 40, 0);
-        assertEq(heap.indexes(accounts[0]), 0);
-        assertEq(heap.indexes(accounts[1]), 1);
+        assertEq(heap.indexOf(accounts[0]), 0);
+        assertEq(heap.indexOf(accounts[1]), 1);
     }
 
     function testRemoveShiftDown() public {

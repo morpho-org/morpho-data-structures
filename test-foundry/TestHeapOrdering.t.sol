@@ -195,15 +195,15 @@ contract TestHeapOrdering is CommonHeapOrdering {
 
         // Increase does a swap with the same index.
         update(accounts[2], 40, 45);
-        assertEq(heap.indexes(accounts[0]), 0);
-        assertEq(heap.indexes(accounts[1]), 1);
-        assertEq(heap.indexes(accounts[2]), 2);
-        assertEq(heap.indexes(accounts[3]), 3);
+        assertEq(heap.indexOf(accounts[0]), 0);
+        assertEq(heap.indexOf(accounts[1]), 1);
+        assertEq(heap.indexOf(accounts[2]), 2);
+        assertEq(heap.indexOf(accounts[3]), 3);
 
         // Remove does a swap with the same index.
         update(accounts[3], 30, 0);
-        assertEq(heap.indexes(accounts[0]), 0);
-        assertEq(heap.indexes(accounts[1]), 1);
-        assertEq(heap.indexes(accounts[2]), 2);
+        assertEq(heap.indexOf(accounts[0]), 0);
+        assertEq(heap.indexOf(accounts[1]), 1);
+        assertEq(heap.indexOf(accounts[2]), 2);
     }
 }

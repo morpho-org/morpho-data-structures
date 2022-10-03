@@ -11,7 +11,7 @@ interface ICommonHeapOrdering {
 
     function accountsValue(uint256 _index) external view returns (uint256);
 
-    function indexes(address _id) external view returns (uint256);
+    function indexOf(address _id) external view returns (uint256);
 
     function length() external view returns (uint256);
 

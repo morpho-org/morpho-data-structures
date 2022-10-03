@@ -13,7 +13,7 @@ contract ConcreteHeapOrdering is ICommonHeapOrdering {
         return heap.accounts[_index].value;
     }
 
-    function indexes(address _id) external view returns (uint256) {
+    function indexOf(address _id) external view returns (uint256) {
         return heap.indexOf[_id];
     }
 
