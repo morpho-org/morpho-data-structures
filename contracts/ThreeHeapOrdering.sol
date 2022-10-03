@@ -120,14 +120,12 @@ library ThreeHeapOrdering {
         uint256 size = _heap.size;
         Account memory targetAccount = _accountToShift;
         uint256 targetIndex = _index;
-        Account memory nextAccount;
         uint256 nextIndex = _index * 3;
-        uint256 rightChildIndex;
 
         for (;;) {
-            rightChildIndex = nextIndex + 3;
+            uint256 rightChildIndex = nextIndex + 3;
             while (++nextIndex <= rightChildIndex && nextIndex < size) {
-                nextAccount = _heap.accounts[nextIndex];
+                Account memory nextAccount = _heap.accounts[nextIndex];
                 if (nextAccount.value > targetAccount.value) {
                     targetAccount = nextAccount;
                     targetIndex = nextIndex;
