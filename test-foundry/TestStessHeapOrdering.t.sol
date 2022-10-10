@@ -7,15 +7,16 @@ import "@contracts/HeapOrdering.sol";
 
 contract HeapStorage {
     HeapOrdering.HeapArray internal heap;
-    uint256 public TESTED_SIZE = 10000;
-    uint256 public MAX_SORTED_USERS = TESTED_SIZE;
+    uint128 public TESTED_SIZE = 10000;
+    uint128 public MAX_SORTED_USERS = TESTED_SIZE;
     uint256 public incrementAmount = 5;
 
     function setUp() public {
         for (uint256 i = 0; i < TESTED_SIZE; i++) {
             address id = address(uint160(i + 1));
-            heap.indexOf[id] = heap.accounts.length;
-            heap.accounts.push(HeapOrdering.Account(id, uint96(TESTED_SIZE - i)));
+            heap.indexOf[id] = heap.arrayLength;
+            heap.accounts[heap.arrayLength] = HeapOrdering.Account(id, uint96(TESTED_SIZE - i));
+            heap.arrayLength++;
             heap.size = MAX_SORTED_USERS;
         }
     }

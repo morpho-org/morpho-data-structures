@@ -14,7 +14,7 @@ contract TestHeapOrdering is DSTest {
 
     address[] public accounts;
     uint256 public NB_ACCOUNTS = 50;
-    uint256 public MAX_SORTED_USERS = 50;
+    uint128 public MAX_SORTED_USERS = 50;
     address public ADDR_ZERO = address(0);
 
     HeapOrdering.HeapArray internal heap;
@@ -420,7 +420,7 @@ contract TestHeapOrdering is DSTest {
 
         for (uint256 i = 10; i < 15; i++) update(accounts[i], 0, i - 9);
 
-        for (uint256 i = 10; i < 15; i++) assertLe(heap.accounts[i].value, 10);
+        for (uint128 i = 10; i < 15; i++) assertLe(heap.accounts[i].value, 10);
     }
 
     function testInsertWrap() public {
@@ -488,7 +488,7 @@ contract TestHeapOrdering is DSTest {
         uint256 sizeAfter = heap.size;
 
         assertLt(sizeAfter, sizeBefore);
-        assertEq(heap.accounts.length, 2);
+        assertEq(heap.arrayLength, 2);
     }
 
     function testRemoveShiftDown() public {

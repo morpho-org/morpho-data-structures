@@ -43,7 +43,7 @@ contract Helper is Random {
     function updateHeap(
         address _id,
         uint256 _newValue,
-        uint256 _max_sorted_users
+        uint128 _max_sorted_users
     ) public {
         HeapOrdering.HeapArray storage heap = getCurrentHeap();
         uint256 formerValue = HeapOrdering.getValueOf(heap, _id);
@@ -59,11 +59,11 @@ contract Helper is Random {
         // Check that for the parent value (at rank i) is always greater than the ones of his children
         // (at rank 2i, 2i + 1), for ranks <= head size
         HeapOrdering.HeapArray storage heap = getCurrentHeap();
-        for (uint256 rank = 1; rank < getSize(); rank++) {
+        for (uint128 rank = 1; rank < getSize(); rank++) {
             HeapOrdering.Account memory user = heap.accounts[rank - 1];
             // child = 0 (left) or child = 1 (right)
-            for (uint256 child; child <= 1; child++) {
-                uint256 childRank = rank * 2 + child;
+            for (uint128 child; child <= 1; child++) {
+                uint128 childRank = rank * 2 + child;
                 if (childRank <= getSize()) {
                     HeapOrdering.Account memory childUser = heap.accounts[childRank - 1];
                     require(
@@ -87,7 +87,7 @@ contract TestHeapRandomHeapOrdering is DSTest {
         uint256 N_USERS = n;
         uint256 RANGE_VALUES = 2 * n;
         uint256 N_ITERS = 3 * n;
-        uint256 max_sorted_users = helper.randomUint256(N_USERS);
+        uint128 max_sorted_users = uint128(helper.randomUint256(N_USERS));
         for (uint256 iter; iter < N_ITERS; iter++) {
             address user = helper.randomAddress(N_USERS);
             uint256 newValue;
@@ -97,7 +97,7 @@ contract TestHeapRandomHeapOrdering is DSTest {
             }
             if (helper.randomUint256(N_ITERS) <= 3) {
                 // change max users approximately 3 times per test
-                max_sorted_users = helper.randomUint256(N_USERS);
+                max_sorted_users = uint128(helper.randomUint256(N_USERS));
             }
             helper.updateHeap(user, newValue, max_sorted_users);
         }
