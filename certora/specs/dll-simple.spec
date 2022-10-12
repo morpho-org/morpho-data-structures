@@ -28,6 +28,11 @@ definition isEmpty(address _id) returns bool =
 definition isTwoWayLinked(address first, address second) returns bool =
     first != 0 && second != 0 => (getNext(first) == second <=> getPrev(second) == first);
 
+definition isHeadWellFormed() returns bool =
+    getPrev(getHead()) == 0 && (getHead() != 0 => inDLL(getHead()));
+
+definition isTailWellFormed() returns bool =
+    getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()));
 
 // INVARIANTS & RULES
 
@@ -50,8 +55,8 @@ rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
     assert isEmpty(0);
 }
 
-invariant headPrevAndValue()
-    getPrev(getHead()) == 0 && (getHead() != 0 => inDLL(getHead()))
+invariant headWellFormed()
+    isHeadWellFormed()
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(rem), rem);
@@ -60,8 +65,8 @@ invariant headPrevAndValue()
       }
     }
 
-invariant tailNextAndValue()
-    getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()))
+invariant tailWellFormed()
+    isTailWellFormed()
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
@@ -71,10 +76,10 @@ invariant tailNextAndValue()
       }
     }
 
-rule tailNextAndValuePreservedInsertSorted(address _id, uint256 _amount) {
+rule tailWellFormedPreservedInsertSorted(address _id, uint256 _amount) {
     env e; address next; address prev;
 
-    require getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()));
+    require isTailWellFormed();
     requireInvariant zeroEmpty();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
@@ -84,7 +89,7 @@ rule tailNextAndValuePreservedInsertSorted(address _id, uint256 _amount) {
     require prev == getInsertAfter();
     require next == getInsertBefore();
     
-    assert getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()));
+    assert isTailWellFormed();
 }
 
 invariant noPrevIsHead(address _id)
@@ -173,8 +178,8 @@ rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
     require linked(addr) => inDLL(addr);
     require linked(getPrev(next)) => inDLL(getPrev(next));
     requireInvariant zeroEmpty();
-    requireInvariant headPrevAndValue();
-    requireInvariant tailNextAndValue();
+    requireInvariant headWellFormed();
+    requireInvariant tailWellFormed();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant noPrevIsHead(next);
     requireInvariant twoWayLinked(prev, getNext(prev));
@@ -205,8 +210,8 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
     require isTwoWayLinked(first, second);
     require isTwoWayLinked(getPrev(next), next);
     requireInvariant zeroEmpty();
-    requireInvariant headPrevAndValue();
-    requireInvariant tailNextAndValue();
+    requireInvariant headWellFormed();
+    requireInvariant tailWellFormed();
     requireInvariant linkedIsInDLL(_id);
 
     insertSorted(_id, _value);
@@ -226,8 +231,8 @@ rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
 
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
     requireInvariant zeroEmpty();
-    requireInvariant headPrevAndValue();
-    requireInvariant tailNextAndValue();
+    requireInvariant headWellFormed();
+    requireInvariant tailWellFormed();
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
@@ -245,8 +250,8 @@ rule DLLisForwardLinkedPreservedRemove(address addr) {
 
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
     requireInvariant zeroEmpty();
-    requireInvariant headPrevAndValue();
-    requireInvariant tailNextAndValue();
+    requireInvariant headWellFormed();
+    requireInvariant tailWellFormed();
     requireInvariant noPrevIsHead(rem);
     requireInvariant twoWayLinked(getPrev(rem), rem);
     requireInvariant twoWayLinked(prev, getNext(prev));
@@ -270,7 +275,7 @@ invariant DLLisDecrSorted()
 
 // result: isForwardLinkedBetween(getHead(), getTail())
 // explanation: if getTail() == 0, then from tipsZero() we know that getHead() == 0 so the result follows
-// otherwise, from tailNextAndValue(), we know that inDLL(getTail()) so the result follows from DLLisForwardLinked(getTail()).
+// otherwise, from tailWellFormed(), we know that inDLL(getTail()) so the result follows from DLLisForwardLinked(getTail()).
 
 // result: forall addr. isForwardLinkedBetween(addr, getTail())
 // explanation: it can be obtained from the previous result and DLLisForwardLinked.
@@ -283,5 +288,5 @@ invariant DLLisDecrSorted()
 
 // result: there are no cycles that do not contain the 0 address
 // explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead()
-// is part of the cycle. This is absurd because we know from headPrevAndValue() that the previous element of
+// is part of the cycle. This is absurd because we know from headWellFormed() that the previous element of
 // getHead() is the 0 address. 
