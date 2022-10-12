@@ -247,10 +247,7 @@ library HeapOrdering {
 
         // Swap the last account and the account to remove, then pop it.
         swap(_heap, index, accountsLength - 1);
-        if (_size == accountsLength) {
-            _size--;
-            _heap.size = _size;
-        }
+        if (_size == accountsLength) _heap.size = --_size;
         _heap.accounts.pop();
         delete _heap.indexOf[_id];
 
