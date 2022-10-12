@@ -126,22 +126,25 @@ library HeapOrdering {
     /// @dev This functions restores the invariant about the order of the values stored when the account at `_index` is the only one with value smaller than what it should be.
     /// @param _heap The heap to modify.
     /// @param _index The index of the account to move.
-    function shiftDown(HeapArray storage _heap, uint256 _index) private {
-        uint256 size = _heap.size;
+    function shiftDown(
+        HeapArray storage _heap,
+        uint256 _index,
+        uint256 _size
+    ) private {
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
         // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
 
-        while (childIndex < size) {
+        while (childIndex < _size) {
             Account memory childToSwap = _heap.accounts[childIndex];
 
             // Find the child with largest value.
             unchecked {
                 rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
             }
-            if (rightChildIndex < size) {
+            if (rightChildIndex < _size) {
                 Account memory rightChild = _heap.accounts[rightChildIndex];
                 if (rightChild.value > childToSwap.value) {
                     childToSwap = rightChild;
@@ -201,7 +204,7 @@ library HeapOrdering {
         _heap.accounts[index].value = _newValue;
 
         // We only need to restore the invariant if the account is a node in the heap
-        if (index < _size >> 1) shiftDown(_heap, index);
+        if (index < _size >> 1) shiftDown(_heap, index, _size);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
@@ -253,7 +256,7 @@ library HeapOrdering {
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
         if (index < _size) {
-            if (_removedValue > _heap.accounts[index].value) shiftDown(_heap, index);
+            if (_removedValue > _heap.accounts[index].value) shiftDown(_heap, index, _size);
             else shiftUp(_heap, index);
         }
     }
