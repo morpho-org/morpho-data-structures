@@ -137,7 +137,7 @@ rule noNextisTailPreservedInsertSorted(address _id, uint256 _amount) {
     requireInvariant zeroEmpty();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant DLLisForwardLinked();
+    requireInvariant DLLisForwardLinked(getTail());
 
     insertSorted(_id, _amount);
     
