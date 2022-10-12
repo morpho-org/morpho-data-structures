@@ -147,6 +147,15 @@ rule noNextisTailPreservedInsertSorted(address _id, uint256 _amount) {
     assert inDLL(addr) && getNext(addr) == 0 => addr == getTail();
 }
 
+invariant tipsZero()
+    getTail() == 0 <=> getHead() == 0
+    { preserved remove(address rem) {
+        requireInvariant zeroEmpty();
+        requireInvariant noNextIsTail(rem);
+        requireInvariant noPrevIsHead(rem);
+      }
+    }
+
 invariant linkedIsInDLL(address _id)
     linked(_id) => inDLL(_id)
     filtered { f -> f.selector != insertSorted(address,uint256).selector }
