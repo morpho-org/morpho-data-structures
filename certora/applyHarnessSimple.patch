@@ -1,6 +1,6 @@
 diff -ruN DLL.sol DLL.sol
 --- DLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ DLL.sol	2022-09-30 14:57:52.658495991 +0200
++++ DLL.sol	2022-10-12 13:40:11.203854752 +0200
 @@ -0,0 +1,87 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
@@ -90,9 +90,9 @@ diff -ruN DLL.sol DLL.sol
 +    }
 +}
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2022-05-31 14:28:35.619981325 +0200
-+++ DoubleLinkedList.sol	2022-09-29 20:03:18.806652050 +0200
-@@ -14,6 +14,8 @@
+--- DoubleLinkedList.sol	2022-10-12 12:13:53.644238893 +0200
++++ DoubleLinkedList.sol	2022-10-12 14:04:16.197251013 +0200
+@@ -18,6 +18,8 @@
          mapping(address => Account) accounts;
          address head;
          address tail;
@@ -101,7 +101,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
      }
  
      /// ERRORS ///
-@@ -89,33 +91,27 @@
+@@ -93,33 +95,27 @@
      /// @param _list The list to search in.
      /// @param _id The address of the account.
      /// @param _value The value of the account.
@@ -124,33 +124,34 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
  
 -        while (
 -            numberOfIterations < _maxIterations &&
--            next != _list.tail &&
+-            next != address(0) &&
 -            _list.accounts[next].value >= _value
 -        ) {
-+        while (next != address(0) && _list.accounts[next].value >= _value) {
-+            _list.insertAfter = next;
-             next = _list.accounts[next].next;
+-            next = _list.accounts[next].next;
 -            unchecked {
 -                ++numberOfIterations;
 -            }
++        while (next != address(0) && _list.accounts[next].value >= _value) {
++            _list.insertAfter = next;
++             next = _list.accounts[next].next;
          }
  
 +        _list.insertBefore = next;
 +
          // Account is not the new tail.
--        if (next != address(0) && _list.accounts[next].value < _value) {
+-        if (numberOfIterations < _maxIterations && next != address(0)) {
 +        if (next != address(0)) {
              // Account is the new head.
              if (next == _list.head) {
-                 _list.accounts[_id] = Account(address(0), next, _value);
+                 _list.accounts[_id] = Account({prev: address(0), next: next, value: _value});
 diff -ruN .gitignore .gitignore
 --- .gitignore	1970-01-01 01:00:00.000000000 +0100
-+++ .gitignore	2022-09-29 20:03:18.806652050 +0200
++++ .gitignore	2022-10-12 13:40:11.203854752 +0200
 @@ -0,0 +1,2 @@
 +*
 +!.gitignore
 diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOptimized.sol
---- test/TestRedBlackBinaryTreeOptimized.sol	2022-05-31 14:27:08.709981906 +0200
+--- test/TestRedBlackBinaryTreeOptimized.sol	2022-10-12 11:50:02.411224085 +0200
 +++ test/TestRedBlackBinaryTreeOptimized.sol	1970-01-01 01:00:00.000000000 +0100
 @@ -1,42 +0,0 @@
 -// SPDX-License-Identifier: UNLICENSED
@@ -196,7 +197,7 @@ diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOp
 -    }
 -}
 diff -ruN test/TestRedBlackBinaryTree.sol test/TestRedBlackBinaryTree.sol
---- test/TestRedBlackBinaryTree.sol	2022-05-31 14:28:35.619981325 +0200
+--- test/TestRedBlackBinaryTree.sol	2022-10-12 11:50:02.411224085 +0200
 +++ test/TestRedBlackBinaryTree.sol	1970-01-01 01:00:00.000000000 +0100
 @@ -1,50 +0,0 @@
 -// SPDX-License-Identifier: UNLICENSED
