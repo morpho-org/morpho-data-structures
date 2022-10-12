@@ -39,14 +39,14 @@ library HeapOrdering {
         address _id,
         uint256 _formerValue,
         uint256 _newValue,
-        uint128 _maxSortedUsers
+        uint256 _maxSortedUsers
     ) internal {
         uint96 formerValue = SafeCast.toUint96(_formerValue);
         uint96 newValue = SafeCast.toUint96(_newValue);
 
-        uint128 size = _heap.size;
-        uint128 newSize = computeSize(size, _maxSortedUsers);
-        if (size != newSize) _heap.size = newSize;
+        uint256 size = _heap.size;
+        uint256 newSize = computeSize(size, _maxSortedUsers);
+        if (size != newSize) _heap.size = uint128(newSize);
 
         if (formerValue != newValue) {
             if (newValue == 0) remove(_heap, _id, formerValue);
@@ -63,7 +63,7 @@ library HeapOrdering {
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
-    function computeSize(uint128 _size, uint128 _maxSortedUsers) private pure returns (uint128) {
+    function computeSize(uint256 _size, uint256 _maxSortedUsers) private pure returns (uint256) {
         while (_size >= _maxSortedUsers) _size >>= 1;
         return _size;
     }
@@ -127,7 +127,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _index The index of the account to move.
     function shiftDown(HeapArray storage _heap, uint256 _index) private {
-        uint128 size = _heap.size;
+        uint256 size = _heap.size;
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
@@ -169,22 +169,22 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint96 _value,
-        uint128 _maxSortedUsers
+        uint256 _maxSortedUsers
     ) private {
         // `_heap` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
 
         // Put the account at the end of accounts.
-        uint128 accountsLength = _heap.arrayLength;
+        uint256 accountsLength = _heap.arrayLength;
         _heap.accounts[accountsLength] = Account(_id, _value);
-        _heap.arrayLength = accountsLength + 1;
+        _heap.arrayLength = uint128(accountsLength + 1);
         _heap.indexOf[_id] = accountsLength;
 
         // Move the account at the end of the heap and restore the invariant.
-        uint128 size = _heap.size;
+        uint256 size = _heap.size;
         swap(_heap, size, accountsLength);
         shiftUp(_heap, size);
-        _heap.size = computeSize(size + 1, _maxSortedUsers);
+        _heap.size = uint128(computeSize(size + 1, _maxSortedUsers));
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
@@ -214,17 +214,17 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint96 _newValue,
-        uint128 _maxSortedUsers
+        uint256 _maxSortedUsers
     ) private {
         uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
-        uint128 size = _heap.size;
+        uint256 size = _heap.size;
 
         if (index < size) shiftUp(_heap, index);
         else {
             swap(_heap, size, index);
             shiftUp(_heap, size);
-            _heap.size = computeSize(size + 1, _maxSortedUsers);
+            _heap.size = uint128(computeSize(size + 1, _maxSortedUsers));
         }
     }
 
@@ -239,16 +239,16 @@ library HeapOrdering {
         uint96 _removedValue
     ) private {
         uint256 index = _heap.indexOf[_id];
-        uint128 accountsLength = _heap.arrayLength;
+        uint256 accountsLength = _heap.arrayLength;
 
         // Swap the last account and the account to remove, then pop it.
-        uint128 newArrayLength = accountsLength - 1;
+        uint256 newArrayLength = accountsLength - 1;
         swap(_heap, index, newArrayLength);
         unchecked {
             // accountsLength - 1 is performed in the line above, so these cannot underflow.
             delete _heap.accounts[newArrayLength];
-            _heap.arrayLength = newArrayLength;
-            if (_heap.size == accountsLength) _heap.size = newArrayLength;
+            _heap.arrayLength = uint128(newArrayLength);
+            if (_heap.size == accountsLength) _heap.size = uint128(newArrayLength);
         }
         delete _heap.indexOf[_id];
 
@@ -292,7 +292,7 @@ library HeapOrdering {
     /// @param _heap The heap to get the tail.
     /// @return The address of the tail.
     function getTail(HeapArray storage _heap) internal view returns (address) {
-        uint128 accountsLength = _heap.arrayLength;
+        uint256 accountsLength = _heap.arrayLength;
         if (accountsLength > 0) return _heap.accounts[accountsLength - 1].id;
         else return address(0);
     }
