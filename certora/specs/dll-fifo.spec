@@ -5,13 +5,15 @@ methods {
     getNext(address) returns (address) envfree
     getPrev(address) returns (address) envfree
     remove(address) envfree
-    insertSorted(address, uint256) envfree
+    insertSorted(address, uint256, uint256) envfree
     // added through harness
     getInsertBefore() returns (address) envfree
     getInsertAfter() returns (address) envfree
     prevFromHead(address) returns (address) envfree
     isForwardLinkedBetween(address, address) returns (bool) envfree
     isDecrSortedFrom(address) returns (bool) envfree
+
+    maxIterations() returns (uint256) envfree => NONDET
 }
 
 // DEFINITIONS
@@ -38,7 +40,7 @@ definition isTailWellFormed() returns bool =
 
 invariant zeroEmpty()
     isEmpty(0)
-    filtered { f -> f.selector != insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != insertSorted(address, uint256, uint256).selector }
 
 rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
     env e; address prev;
@@ -48,7 +50,7 @@ rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
-    insertSorted(_id, _value);
+    insertSorted(_id, _value, maxIterations());
 
     require prev == getInsertAfter();
 
@@ -67,7 +69,7 @@ invariant headWellFormed()
 
 invariant tailWellFormed()
     isTailWellFormed()
-    filtered { f -> f.selector != insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != insertSorted(address, uint256, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(rem), rem);
@@ -84,7 +86,7 @@ rule tailWellFormedPreservedInsertSorted(address _id, uint256 _amount) {
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
 
-    insertSorted(_id, _amount);
+    insertSorted(_id, _amount, maxIterations());
     
     require prev == getInsertAfter();
     require next == getInsertBefore();
@@ -94,7 +96,7 @@ rule tailWellFormedPreservedInsertSorted(address _id, uint256 _amount) {
 
 invariant noPrevIsHead(address _id)
     inDLL(_id) && getPrev(_id) == 0 => _id == getHead()
-    filtered { f -> f.selector != insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != insertSorted(address, uint256, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant linkedIsInDLL(_id);
@@ -114,7 +116,7 @@ rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _amount) {
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
-    insertSorted(_id, _amount);
+    insertSorted(_id, _amount, maxIterations());
     
     require prev == getInsertAfter();
     require next == getInsertBefore();
@@ -124,7 +126,7 @@ rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _amount) {
 
 invariant noNextIsTail(address _id)
     inDLL(_id) && getNext(_id) == 0 => _id == getTail()
-    filtered { f -> f.selector != insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != insertSorted(address, uint256, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant linkedIsInDLL(_id);
@@ -144,7 +146,7 @@ rule noNextisTailPreservedInsertSorted(address _id, uint256 _amount) {
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant DLLisForwardLinked(getTail());
 
-    insertSorted(_id, _amount);
+    insertSorted(_id, _amount, maxIterations());
     
     require prev == getInsertAfter();
     require next == getInsertBefore();
@@ -163,7 +165,7 @@ invariant tipsZero()
 
 invariant linkedIsInDLL(address _id)
     linked(_id) => inDLL(_id)
-    filtered { f -> f.selector != insertSorted(address,uint256).selector }
+    filtered { f -> f.selector != insertSorted(address, uint256, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(rem, getNext(rem));
@@ -185,7 +187,7 @@ rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
-    insertSorted(_id, _value);
+    insertSorted(_id, _value, maxIterations());
 
     require prev == getInsertAfter();
     require next == getInsertBefore();
@@ -195,7 +197,7 @@ rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
 
 invariant twoWayLinked(address first, address second)
     isTwoWayLinked(first, second)
-    filtered { f -> f.selector != insertSorted(address,uint256).selector }
+    filtered { f -> f.selector != insertSorted(address, uint256, uint256).selector }
     { preserved remove(address rem) {
         requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(rem), rem);
@@ -214,7 +216,7 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant tailWellFormed();
     requireInvariant linkedIsInDLL(_id);
 
-    insertSorted(_id, _value);
+    insertSorted(_id, _value, maxIterations());
 
     require next == getInsertBefore();
 
@@ -224,7 +226,7 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 invariant DLLisForwardLinked(address addr)
     inDLL(addr) => isForwardLinkedBetween(getHead(), addr)
     filtered { f -> f.selector != remove(address).selector &&
-                    f.selector != insertSorted(address, uint256).selector }
+                    f.selector != insertSorted(address, uint256, uint256).selector }
 
 rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
     env e; address id; uint256 amount; address prev;
@@ -236,7 +238,7 @@ rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
-    insertSorted(id, amount);
+    insertSorted(id, amount, maxIterations());
 
     require prev == getInsertAfter();
 
