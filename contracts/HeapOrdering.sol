@@ -11,7 +11,6 @@ library HeapOrdering {
 
     struct HeapArray {
         Account[] accounts; // All the accounts.
-        uint256 size; // The size of the heap portion of the structure, should be less than accounts length, the rest is an unordered array.
         mapping(address => uint256) indexOf; // A mapping from an address to an index in accounts. From index i, the parent index is (i-1)/2, the left child index is 2*i+1 and the right child index is 2*i+2.
     }
 
@@ -43,29 +42,15 @@ library HeapOrdering {
         uint96 formerValue = SafeCast.toUint96(_formerValue);
         uint96 newValue = SafeCast.toUint96(_newValue);
 
-        uint256 size = _heap.size;
-        uint256 newSize = computeSize(size, _maxSortedUsers);
-        if (size != newSize) _heap.size = newSize;
-
         if (formerValue != newValue) {
-            if (newValue == 0) remove(_heap, _id, formerValue);
+            if (newValue == 0) remove(_heap, _id, formerValue, _maxSortedUsers);
             else if (formerValue == 0) insert(_heap, _id, newValue, _maxSortedUsers);
             else if (formerValue < newValue) increase(_heap, _id, newValue, _maxSortedUsers);
-            else decrease(_heap, _id, newValue);
+            else decrease(_heap, _id, newValue, _maxSortedUsers);
         }
     }
 
     /// PRIVATE ///
-
-    /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
-    /// @dev We use division by 2 to remove the leaves of the heap.
-    /// @param _size The old size of the heap.
-    /// @param _maxSortedUsers The maximum size of the heap.
-    /// @return The new size computed.
-    function computeSize(uint256 _size, uint256 _maxSortedUsers) private pure returns (uint256) {
-        while (_size >= _maxSortedUsers) _size >>= 1;
-        return _size;
-    }
 
     /// @notice Sets `_index` in the `_heap` to be `_account`.
     /// @dev The heap may lose its invariant about the order of the values stored.
@@ -125,22 +110,26 @@ library HeapOrdering {
     /// @dev This functions restores the invariant about the order of the values stored when the account at `_index` is the only one with value smaller than what it should be.
     /// @param _heap The heap to modify.
     /// @param _index The index of the account to move.
-    function shiftDown(HeapArray storage _heap, uint256 _index) private {
-        uint256 size = _heap.size;
+    /// @param _maxSortedUsers .
+    function shiftDown(
+        HeapArray storage _heap,
+        uint256 _index,
+        uint256 _maxSortedUsers
+    ) private {
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
         // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
 
-        while (childIndex < size) {
+        while (childIndex < _heap.accounts.length) {
             Account memory childToSwap = _heap.accounts[childIndex];
 
             // Find the child with largest value.
             unchecked {
                 rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
             }
-            if (rightChildIndex < size) {
+            if (rightChildIndex < _heap.accounts.length) {
                 Account memory rightChild = _heap.accounts[rightChildIndex];
                 if (rightChild.value > childToSwap.value) {
                     childToSwap = rightChild;
@@ -178,11 +167,10 @@ library HeapOrdering {
         _heap.accounts.push(Account(_id, _value));
         _heap.indexOf[_id] = accountsLength;
 
-        // Move the account at the end of the heap and restore the invariant.
-        uint256 size = _heap.size;
-        swap(_heap, size, accountsLength);
-        shiftUp(_heap, size);
-        _heap.size = computeSize(size + 1, _maxSortedUsers);
+        uint256 at = block.number % _heap.accounts.length;
+
+        swap(_heap, at, accountsLength);
+        shiftUp(_heap, at);
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
@@ -190,16 +178,18 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
+    /// @param _maxSortedUsers .
     function decrease(
         HeapArray storage _heap,
         address _id,
-        uint96 _newValue
+        uint96 _newValue,
+        uint256 _maxSortedUsers
     ) private {
         uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
 
         // We only need to restore the invariant if the account is a node in the heap
-        if (index < _heap.size >> 1) shiftDown(_heap, index);
+        if (index < _maxSortedUsers) shiftDown(_heap, index, _heap.accounts.length - 1);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
@@ -216,13 +206,11 @@ library HeapOrdering {
     ) private {
         uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
-        uint256 size = _heap.size;
 
-        if (index < size) shiftUp(_heap, index);
+        if (index < _maxSortedUsers) shiftUp(_heap, index);
         else {
-            swap(_heap, size, index);
-            shiftUp(_heap, size);
-            _heap.size = computeSize(size + 1, _maxSortedUsers);
+            swap(_heap, _heap.accounts.length - 1, index);
+            shiftUp(_heap, _heap.accounts.length - 1);
         }
     }
 
@@ -234,20 +222,21 @@ library HeapOrdering {
     function remove(
         HeapArray storage _heap,
         address _id,
-        uint96 _removedValue
+        uint96 _removedValue,
+        uint256 _maxSortedUsers
     ) private {
         uint256 index = _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
         // Swap the last account and the account to remove, then pop it.
         swap(_heap, index, accountsLength - 1);
-        if (_heap.size == accountsLength) _heap.size--;
         _heap.accounts.pop();
         delete _heap.indexOf[_id];
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
-        if (index < _heap.size) {
-            if (_removedValue > _heap.accounts[index].value) shiftDown(_heap, index);
+        if (index < _maxSortedUsers) {
+            if (_removedValue > _heap.accounts[index].value)
+                shiftDown(_heap, index, accountsLength - 1);
             else shiftUp(_heap, index);
         }
     }

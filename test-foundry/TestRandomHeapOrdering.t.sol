@@ -50,21 +50,16 @@ contract Helper is Random {
         HeapOrdering.update(heap, _id, formerValue, _newValue, _max_sorted_users);
     }
 
-    function getSize() private view returns (uint256) {
-        HeapOrdering.HeapArray storage heap = getCurrentHeap();
-        return heap.size;
-    }
-
-    function checkOrdering() public view {
+    function checkOrdering(uint256 _max_sorted_users) public view {
         // Check that for the parent value (at rank i) is always greater than the ones of his children
         // (at rank 2i, 2i + 1), for ranks <= head size
         HeapOrdering.HeapArray storage heap = getCurrentHeap();
-        for (uint256 rank = 1; rank < getSize(); rank++) {
+        for (uint256 rank = 1; rank < _max_sorted_users; rank++) {
             HeapOrdering.Account memory user = heap.accounts[rank - 1];
             // child = 0 (left) or child = 1 (right)
             for (uint256 child; child <= 1; child++) {
                 uint256 childRank = rank * 2 + child;
-                if (childRank <= getSize()) {
+                if (childRank <= _max_sorted_users) {
                     HeapOrdering.Account memory childUser = heap.accounts[childRank - 1];
                     require(
                         user.value >= childUser.value,
@@ -101,7 +96,7 @@ contract TestHeapRandomHeapOrdering is DSTest {
             }
             helper.updateHeap(user, newValue, max_sorted_users);
         }
-        helper.checkOrdering();
+        helper.checkOrdering(max_sorted_users);
         helper.clearHeap();
     }
 
