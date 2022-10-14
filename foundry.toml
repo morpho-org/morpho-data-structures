@@ -5,4 +5,4 @@ solc_version = "0.8.17"
 
 [invariant]
 runs = 256
-depth = 256
+depth = 64
