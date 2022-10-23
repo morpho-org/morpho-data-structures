@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "forge-std/Vm.sol";
 import "forge-std/console.sol";
 
 import "@contracts/HeapOrdering.sol";
@@ -10,8 +9,6 @@ import "./helpers/IConcreteHeapOrdering.sol";
 
 abstract contract TestCommonHeapOrdering is Test {
     IConcreteHeapOrdering internal heap;
-
-    Vm public hevm = Vm(HEVM_ADDRESS);
 
     address[] public accounts;
     uint256 public NB_ACCOUNTS = 50;
@@ -65,7 +62,7 @@ abstract contract TestCommonHeapOrdering is Test {
     }
 
     function testShouldNotInsertZeroAddress() public {
-        hevm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
+        vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
         update(address(0), 0, 10);
     }
 
@@ -340,12 +337,12 @@ abstract contract TestCommonHeapOrdering is Test {
     }
 
     function testOverflowNewValue() public {
-        hevm.expectRevert("SafeCast: value doesn't fit in 96 bits");
+        vm.expectRevert("SafeCast: value doesn't fit in 96 bits");
         update(accounts[0], 0, uint256(type(uint128).max));
     }
 
     function testOverflowFormerValue() public {
-        hevm.expectRevert("SafeCast: value doesn't fit in 96 bits");
+        vm.expectRevert("SafeCast: value doesn't fit in 96 bits");
         update(accounts[0], uint256(type(uint128).max), 0);
     }
 }
