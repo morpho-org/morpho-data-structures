@@ -35,5 +35,8 @@ yarn-error.log*
 
 
 #certora
+certora/munged-simple/*
+certora/munged-fifo/*
 .certora*
 last_conf*
+certora_debug_log.txt
