@@ -49,6 +49,7 @@ rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
     require isEmpty(0);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
+    requireInvariant tipsZero();
 
     insertSorted(_id, _value, maxIterations());
 
@@ -115,6 +116,7 @@ rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _amount) {
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
+    requireInvariant tipsZero();
 
     insertSorted(_id, _amount, maxIterations());
     
@@ -186,6 +188,7 @@ rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant noPrevIsHead(next);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
+    requireInvariant tipsZero();
 
     insertSorted(_id, _value, maxIterations());
 
@@ -232,6 +235,7 @@ rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
     env e; address id; uint256 amount; address prev;
 
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
+    require inDLL(getTail()) => isForwardLinkedBetween(getHead(), getTail());
     requireInvariant zeroEmpty();
     requireInvariant headWellFormed();
     requireInvariant tailWellFormed();
@@ -263,15 +267,6 @@ rule DLLisForwardLinkedPreservedRemove(address addr) {
 
     assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
-
-invariant DLLisDecrSorted()
-    isDecrSortedFrom(getHead())
-    { preserved remove(address rem) {
-        requireInvariant zeroEmpty();
-        requireInvariant noPrevIsHead(rem);
-        requireInvariant twoWayLinked(getPrev(rem), rem);
-        }
-    }
 
 // Derived results
 
