@@ -237,8 +237,10 @@ rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
     require inDLL(getTail()) => isForwardLinkedBetween(getHead(), getTail());
     requireInvariant zeroEmpty();
+    requireInvariant tipsZero();
     requireInvariant headWellFormed();
     requireInvariant tailWellFormed();
+    requireInvariant linkedIsInDLL(id);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant noNextIsTail(prev);
 
