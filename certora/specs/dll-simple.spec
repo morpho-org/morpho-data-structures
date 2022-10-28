@@ -48,7 +48,7 @@ invariant zeroEmpty()
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
 
 rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
-    env e; address prev;
+    address prev;
     address addr;
 
     require isEmpty(0);
@@ -84,7 +84,7 @@ invariant tailWellFormed()
     }
 
 rule tailWellFormedPreservedInsertSorted(address _id, uint256 _amount) {
-    env e; address next; address prev;
+    address next; address prev;
 
     require isTailWellFormed();
     requireInvariant zeroEmpty();
@@ -121,7 +121,7 @@ invariant noPrevIsHead(address _id)
     }
 
 rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _amount) {
-    env e; address next; address prev;
+    address next; address prev;
     address addr;
 
     require inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
@@ -152,7 +152,7 @@ invariant noNextIsTail(address _id)
     }
 
 rule noNextisTailPreservedInsertSorted(address _id, uint256 _amount) {
-    env e; address next; address prev;
+    address next; address prev;
     address addr;
 
     require inDLL(addr) && getNext(addr) == 0 => addr == getTail();
@@ -181,7 +181,7 @@ invariant linkedIsInDLL(address _id)
     }
 
 rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
-    env e; address next; address prev;
+    address next; address prev;
     address addr;
 
     require linked(addr) => inDLL(addr);
@@ -212,7 +212,7 @@ invariant twoWayLinked(address first, address second)
     }
 
 rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
-    env e; address next;
+    address next;
     address first; address second;
 
     require isTwoWayLinked(first, second);
@@ -234,7 +234,7 @@ invariant DLLisForwardLinked(address addr)
                     f.selector != insertSorted(address, uint256).selector }
 
 rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
-    env e; address id; uint256 amount; address prev;
+    address id; uint256 amount; address prev;
 
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 
@@ -250,7 +250,7 @@ rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
 }
 
 rule DLLisForwardLinkedPreservedRemove(address addr) {
-    env e; address rem; address prev;
+    address rem; address prev;
 
     require prev == prevFromHead(rem);
 
