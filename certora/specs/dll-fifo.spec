@@ -275,20 +275,54 @@ rule DLLisForwardLinkedPreservedRemove(address addr) {
     assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
 
-rule insertSortedOrder() {
+rule insertSortedOrder1() {
+    address id; uint256 amount; address prev;
+
+    uint256 maxIter = maxIterations();
+
+    safeAssumptions();
+    requireInvariant twoWayLinked(prev, getNext(prev));
+
+    insertSorted(id, amount, maxIter);
+
+    require prev == getInsertAfter();
+
+    uint256 iter = lenUpTo(id);
+
+    assert (iter > maxIter => id == getTail());
+}
+
+rule insertSortedOrder2() {
+    address id; uint256 amount; address prev;
+
+    uint256 maxIter = maxIterations();
+
+    safeAssumptions();
+    requireInvariant twoWayLinked(prev, getNext(prev));
+
+    insertSorted(id, amount, maxIter);
+
+    require prev == getInsertAfter();
+
+    uint256 iter = lenUpTo(id);
+
+    assert (iter <= maxIter => greaterThanUpTo(amount, id));
+}
+
+rule insertSortedOrder3() {
     address id; uint256 amount; address next;
 
     uint256 maxIter = maxIterations();
+
+    safeAssumptions();
+    requireInvariant linkedIsInDll(id);
 
     insertSorted(id, amount, maxIter);
 
     uint256 iter = lenUpTo(id);
 
-    assert (iter > maxIter => id == getTail());
-    assert (iter <= maxIter => greaterThanFromTo(amount, id));
-
     require next == getInsertBefore();
-    assert (iter <= maxIter => id != getTail() => amount > getValueOf(next));
+    assert (iter <= maxIter => amount > getValueOf(next));
 }
 
 
