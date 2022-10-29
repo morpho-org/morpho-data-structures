@@ -189,8 +189,11 @@ library ThreeHeapOrdering {
     ) private {
         uint256 index = _heap.indexOf[_id];
 
-        if (index < (_heap.size - 1) / 3) shiftDown(_heap, Account(_id, _newValue), index);
-        else _heap.accounts[index].value = _newValue;
+        // Safe because _heap.size >= 1
+        unchecked {
+            if (index < (_heap.size - 1) / 3) shiftDown(_heap, Account(_id, _newValue), index);
+            else _heap.accounts[index].value = _newValue;
+        }
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
