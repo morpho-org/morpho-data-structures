@@ -95,13 +95,16 @@ library ThreeHeapOrdering {
         Account memory parentAccount;
         uint256 parentIndex;
 
-        while (
-            _index > ROOT &&
-            _accountToShift.value >
-            (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value
-        ) {
-            setAccount(_heap, _index, parentAccount);
-            _index = parentIndex;
+        // Safe because _index >= 1
+        unchecked {
+            while (
+                _index > ROOT &&
+                _accountToShift.value >
+                (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value
+            ) {
+                setAccount(_heap, _index, parentAccount);
+                _index = parentIndex;
+            }
         }
 
         setAccount(_heap, _index, _accountToShift);
