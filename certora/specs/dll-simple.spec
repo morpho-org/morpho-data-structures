@@ -7,8 +7,8 @@ methods {
     remove(address) envfree
     insertSorted(address, uint256) envfree
     // added through harness
-    getInsertBefore() returns (address) envfree
-    getInsertAfter() returns (address) envfree
+    getInsertedBefore() returns (address) envfree
+    getInsertedAfter() returns (address) envfree
     prevFromHead(address) returns (address) envfree
     isForwardLinkedBetween(address, address) returns (bool) envfree
     isDecrSortedFrom(address) returns (bool) envfree
@@ -57,7 +57,7 @@ rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
 
     insertSorted(_id, _value);
 
-    require prev == getInsertAfter();
+    require prev == getInsertedAfter();
 
     assert isEmpty(0);
 }
@@ -93,8 +93,8 @@ rule tailWellFormedPreservedInsertSorted(address _id, uint256 _amount) {
 
     insertSorted(_id, _amount);
     
-    require prev == getInsertAfter();
-    require next == getInsertBefore();
+    require prev == getInsertedAfter();
+    require next == getInsertedBefore();
     
     assert isTailWellFormed();
 }
@@ -133,8 +133,8 @@ rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _amount) {
 
     insertSorted(_id, _amount);
     
-    require prev == getInsertAfter();
-    require next == getInsertBefore();
+    require prev == getInsertedAfter();
+    require next == getInsertedBefore();
     
     assert inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
 }
@@ -164,8 +164,8 @@ rule noNextisTailPreservedInsertSorted(address _id, uint256 _amount) {
 
     insertSorted(_id, _amount);
     
-    require prev == getInsertAfter();
-    require next == getInsertBefore();
+    require prev == getInsertedAfter();
+    require next == getInsertedBefore();
     
     assert inDLL(addr) && getNext(addr) == 0 => addr == getTail();
 }
@@ -195,8 +195,8 @@ rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
 
     insertSorted(_id, _value);
 
-    require prev == getInsertAfter();
-    require next == getInsertBefore();
+    require prev == getInsertedAfter();
+    require next == getInsertedBefore();
 
     assert linked(addr) => inDLL(addr);
 }
@@ -223,7 +223,7 @@ rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
 
     insertSorted(_id, _value);
 
-    require next == getInsertBefore();
+    require next == getInsertedBefore();
 
     assert isTwoWayLinked(first, second);
 }
@@ -244,7 +244,7 @@ rule DLLisForwardLinkedPreservedInsertSorted(address addr) {
 
     insertSorted(id, amount);
 
-    require prev == getInsertAfter();
+    require prev == getInsertedAfter();
 
     assert inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
