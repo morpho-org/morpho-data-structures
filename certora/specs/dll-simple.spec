@@ -34,6 +34,12 @@ definition isHeadWellFormed() returns bool =
 definition isTailWellFormed() returns bool =
     getNext(getTail()) == 0 && (getTail() != 0 => inDLL(getTail()));
 
+definition hasNoPrevIsHead(address addr) returns bool =
+    inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
+
+definition hasNoNextIsTail(address addr) returns bool =
+    inDLL(addr) && getNext(addr) == 0 => addr == getTail();
+
 function safeAssumptions() { 
     requireInvariant zeroEmpty();
     requireInvariant headWellFormed();
@@ -52,7 +58,7 @@ rule zeroEmptyPreservedInsertSorted(address _id, uint256 _value) {
 
     require isEmpty(0);
     requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(prev);
+    requireInvariant nodeHasNoNextIsTail(prev);
 
     insertSorted(_id, _value);
 
@@ -102,57 +108,55 @@ invariant tipsZero()
     getTail() == 0 <=> getHead() == 0
     { preserved remove(address _id) {
         requireInvariant zeroEmpty();
-        requireInvariant noNextIsTail(_id);
-        requireInvariant noPrevIsHead(_id);
+        requireInvariant nodeHasNoNextIsTail(_id);
+        requireInvariant nodeHasNoPrevIsHead(_id);
       }
     }
 
-invariant noPrevIsHead(address addr)
-    inDLL(addr) && getPrev(addr) == 0 => addr == getHead()
+invariant nodeHasNoPrevIsHead(address addr)
+    hasNoPrevIsHead(addr)
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address _id) {
         safeAssumptions();
         requireInvariant twoWayLinked(_id, getNext(_id));
         requireInvariant twoWayLinked(getPrev(_id), _id);
-        requireInvariant noPrevIsHead(_id);
+        requireInvariant nodeHasNoPrevIsHead(_id);
       }
     }
 
 rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _value) {
-    address next; address prev;
-    address addr;
+    address addr; address next; address prev;
 
-    require inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
+    require hasNoPrevIsHead(addr);
 
     safeAssumptions();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(prev);
+    requireInvariant nodeHasNoNextIsTail(prev);
 
     insertSorted(_id, _value);
     
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
     
-    assert inDLL(addr) && getPrev(addr) == 0 => addr == getHead();
+    assert hasNoPrevIsHead(addr);
 }
 
-invariant noNextIsTail(address addr)
-    inDLL(addr) && getNext(addr) == 0 => addr == getTail()
+invariant nodeHasNoNextIsTail(address addr)
+    hasNoNextIsTail(addr)
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address _id) {
         safeAssumptions();
         requireInvariant twoWayLinked(_id, getNext(_id));
         requireInvariant twoWayLinked(getPrev(_id), _id);
-        requireInvariant noNextIsTail(_id);
+        requireInvariant nodeHasNoNextIsTail(_id);
       }
     }
 
 rule noNextisTailPreservedInsertSorted(address _id, uint256 _value) {
-    address next; address prev;
-    address addr;
+    address addr; address next; address prev;
 
-    require inDLL(addr) && getNext(addr) == 0 => addr == getTail();
+    require hasNoNextIsTail(addr);
 
     safeAssumptions();
     requireInvariant twoWayLinked(getPrev(next), next);
@@ -164,7 +168,7 @@ rule noNextisTailPreservedInsertSorted(address _id, uint256 _value) {
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
     
-    assert inDLL(addr) && getNext(addr) == 0 => addr == getTail();
+    assert hasNoNextIsTail(addr);
 }
 
 invariant linkedIsInDLL(address addr)
@@ -178,17 +182,16 @@ invariant linkedIsInDLL(address addr)
     }
 
 rule linkedIsInDllPreservedInsertSorted(address _id, uint256 _value) {
-    address next; address prev;
-    address addr;
+    address addr; address next; address prev;
 
     require linked(addr) => inDLL(addr);
     require linked(getPrev(next)) => inDLL(getPrev(next));
 
     safeAssumptions();
     requireInvariant twoWayLinked(getPrev(next), next);
-    requireInvariant noPrevIsHead(next);
+    requireInvariant nodeHasNoPrevIsHead(next);
     requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(prev);
+    requireInvariant nodeHasNoNextIsTail(prev);
 
     insertSorted(_id, _value);
 
@@ -236,7 +239,7 @@ rule DLLisForwardLinkedPreservedInsertSorted(address _id, uint256 _value) {
 
     safeAssumptions();
     requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(prev);
+    requireInvariant nodeHasNoNextIsTail(prev);
 
     insertSorted(_id, _value);
 
@@ -253,10 +256,10 @@ rule DLLisForwardLinkedPreservedRemove(address _id) {
     require inDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 
     safeAssumptions();
-    requireInvariant noPrevIsHead(_id);
+    requireInvariant nodeHasNoPrevIsHead(_id);
     requireInvariant twoWayLinked(getPrev(_id), _id);
     requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(_id);
+    requireInvariant nodeHasNoNextIsTail(_id);
 
     remove(_id);
 
@@ -267,7 +270,7 @@ invariant DLLisDecrSorted()
     isDecrSortedFrom(getHead())
     { preserved remove(address _id) {
         safeAssumptions();
-        requireInvariant noPrevIsHead(_id);
+        requireInvariant nodeHasNoPrevIsHead(_id);
         requireInvariant twoWayLinked(getPrev(_id), _id);
         }
     }
