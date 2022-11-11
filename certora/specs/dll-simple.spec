@@ -112,7 +112,6 @@ invariant noPrevIsHead(address addr)
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address _id) {
         safeAssumptions();
-        requireInvariant linkedIsInDLL(addr);
         requireInvariant twoWayLinked(_id, getNext(_id));
         requireInvariant twoWayLinked(getPrev(_id), _id);
         requireInvariant noPrevIsHead(_id);
@@ -143,7 +142,6 @@ invariant noNextIsTail(address addr)
     filtered { f -> f.selector != insertSorted(address, uint256).selector }
     { preserved remove(address _id) {
         safeAssumptions();
-        requireInvariant linkedIsInDLL(addr);
         requireInvariant twoWayLinked(_id, getNext(_id));
         requireInvariant twoWayLinked(getPrev(_id), _id);
         requireInvariant noNextIsTail(_id);
