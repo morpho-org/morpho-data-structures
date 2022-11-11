@@ -299,12 +299,13 @@ rule insertSortedDecreasingOrder(address _id, uint256 _value) {
 
 // result: forall addr. isForwardLinkedBetween(addr, getTail())
 // explanation: it can be obtained from the previous result and DLLisForwardLinked.
+// Going from head to tail should lead to addr in between (otherwise addr is never reached because there is nothing after the tail).
 
 // result: "BackwardLinked" dual results
 // explanation: it can be obtained from ForwardLinked and twoWayLinked.
 
 // result: there is only one list
-// explanation: it comes from the fact that every non zero address is linked to getHead().
+// explanation: it comes from the fact that every non zero address that is in the DLL is linked to getHead().
 
 // result: there are no cycles that do not contain the 0 address
 // explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead()
