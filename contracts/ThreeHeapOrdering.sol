@@ -27,7 +27,7 @@ library ThreeHeapOrdering {
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_heap`.
-    /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0.
+    /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0. Don't call this function with `_maxSortedUsers` equal to 0.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to update.
     /// @param _formerValue The former value of the account to update.
