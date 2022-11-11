@@ -1,13 +1,13 @@
 #!/bin/sh
 
-make -C certora munged-simple
+make -C certora munged-fifo
 
 certoraRun \
-    certora/munged-simple/DLL.sol \
+    certora/munged-fifo/DLL.sol \
     --verify DLL:certora/specs/sanity.spec \
     --loop_iter 7 \
     --optimistic_loop \
     --send_only \
     --staging \
-    --msg "Simple DLL sanity" \
+    --msg "FIFO DLL sanity" \
     $@

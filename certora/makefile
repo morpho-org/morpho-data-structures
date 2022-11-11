@@ -20,4 +20,4 @@ record-fifo:
 clean:
 	rm -rf munged-simple munged-fifo
 
-.PHONY: help clean # do not add munged here, it is used to protect munged edits
+.PHONY: help clean # do not add munged here, as it is useful to protect munged edits
