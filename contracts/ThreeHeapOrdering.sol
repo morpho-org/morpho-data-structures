@@ -183,7 +183,8 @@ library ThreeHeapOrdering {
     ) private {
         uint256 index = _heap.indexOf[_id];
 
-        if (index < (_heap.size - 1) / 3) shiftDown(_heap, Account(_id, _newValue), index);
+        // We only need to take care of sorting if there are nodes below in the heap.
+        if (3 * index + 1 < _heap.size) shiftDown(_heap, Account(_id, _newValue), index);
         else _heap.accounts[index].value = _newValue;
     }
 

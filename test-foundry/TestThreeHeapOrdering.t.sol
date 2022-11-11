@@ -195,6 +195,31 @@ contract TestThreeHeapOrdering is CommonHeapOrdering {
         assertEq(heap.accountsValue(5), 1);
     }
 
+    function testDecreaseGuardLimit() public {
+        update(accounts[0], 0, 20);
+        update(accounts[1], 0, 19);
+        update(accounts[2], 0, 18);
+        update(accounts[3], 0, 17);
+        update(accounts[4], 0, 16);
+        update(accounts[5], 0, 15);
+        update(accounts[6], 0, 14);
+        update(accounts[7], 0, 13);
+
+        assertEq(heap.accountsValue(0), 20);
+        assertEq(heap.accountsValue(1), 19);
+        assertEq(heap.accountsValue(2), 18);
+        assertEq(heap.accountsValue(3), 17);
+        assertEq(heap.accountsValue(4), 16);
+        assertEq(heap.accountsValue(5), 15);
+        assertEq(heap.accountsValue(6), 14);
+        assertEq(heap.accountsValue(7), 13);
+
+        update(accounts[2], 18, 1);
+
+        assertEq(heap.accountsValue(2), 13);
+        assertEq(heap.accountsValue(7), 1);
+    }
+
     function testInsertWrap() public {
         MAX_SORTED_USERS = 30;
         for (uint256 i = 0; i < 30; i++) update(accounts[i], 0, NB_ACCOUNTS - i);

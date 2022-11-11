@@ -125,6 +125,23 @@ contract TestHeapOrdering is CommonHeapOrdering {
         assertEq(heap.accountsValue(5), 10);
     }
 
+    function testDecreaseGuardLimit() public {
+        update(accounts[0], 0, 20);
+        update(accounts[1], 0, 19);
+        update(accounts[2], 0, 18);
+        update(accounts[3], 0, 17);
+
+        assertEq(heap.accountsValue(0), 20);
+        assertEq(heap.accountsValue(1), 19);
+        assertEq(heap.accountsValue(2), 18);
+        assertEq(heap.accountsValue(3), 17);
+
+        update(accounts[1], 19, 1);
+
+        assertEq(heap.accountsValue(1), 17);
+        assertEq(heap.accountsValue(3), 1);
+    }
+
     function testInsertWrap() public {
         MAX_SORTED_USERS = 20;
         for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, NB_ACCOUNTS - i);

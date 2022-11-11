@@ -198,7 +198,7 @@ library HeapOrdering {
         uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
 
-        // We only need to restore the invariant if the account is a node in the heap
+        // We only need to take care of sorting if there are nodes below in the heap.
         if (index < _heap.size >> 1) shiftDown(_heap, index);
     }
 
