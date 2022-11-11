@@ -48,10 +48,11 @@ library ThreeHeapOrdering {
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
-            if (newValue == 0) remove(_heap, _id, formerValue);
-            else if (formerValue == 0) insert(_heap, _id, newValue, _maxSortedUsers);
-            else if (formerValue < newValue) increase(_heap, _id, newValue, _maxSortedUsers);
-            else decrease(_heap, _id, newValue);
+            if (newValue == 0) remove(_heap, newSize, _id, formerValue);
+            else if (formerValue == 0) insert(_heap, newSize, _id, newValue, _maxSortedUsers);
+            else if (formerValue < newValue)
+                increase(_heap, newSize, _id, newValue, _maxSortedUsers);
+            else decrease(_heap, newSize, _id, newValue);
         }
     }
 
@@ -110,21 +111,22 @@ library ThreeHeapOrdering {
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
     /// @dev This functions restores the invariant about the order of the values stored when the account to move is the only one with value smaller than what it should be.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
     function shiftDown(
         HeapArray storage _heap,
+        uint256 _size,
         Account memory _accountToShift,
         uint256 _index
     ) private {
-        uint256 size = _heap.size;
         Account memory targetAccount = _accountToShift;
         uint256 targetIndex = _index;
         uint256 nextIndex = _index * 3;
 
         while (true) {
             uint256 rightChildIndex = nextIndex + 3;
-            while (++nextIndex <= rightChildIndex && nextIndex < size) {
+            while (++nextIndex <= rightChildIndex && nextIndex < _size) {
                 Account memory nextAccount = _heap.accounts[nextIndex];
                 if (nextAccount.value > targetAccount.value) {
                     targetAccount = nextAccount;
@@ -148,11 +150,13 @@ library ThreeHeapOrdering {
     /// @dev Only call this function when `_id` is not in the `_heap`.
     /// @dev Reverts with AddressIsZero if `_value` is 0.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to insert.
     /// @param _value The value of the account to insert.
     /// @param _maxSortedUsers The maximum size of the heap.
     function insert(
         HeapArray storage _heap,
+        uint256 _size,
         address _id,
         uint96 _value,
         uint256 _maxSortedUsers
@@ -160,63 +164,68 @@ library ThreeHeapOrdering {
         // `_heap` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
 
-        uint256 size = _heap.size;
         uint256 accountsLength = _heap.accounts.length;
 
         _heap.accounts.push();
 
-        if (size != accountsLength) setAccount(_heap, _heap.accounts[size], accountsLength);
+        if (_size != accountsLength) setAccount(_heap, _heap.accounts[_size], accountsLength);
 
-        shiftUp(_heap, Account(_id, _value), size);
-        _heap.size = computeSize(size + 1, _maxSortedUsers);
+        shiftUp(_heap, Account(_id, _value), _size);
+        _heap.size = computeSize(_size + 1, _maxSortedUsers);
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a value greater than `_newValue`.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
     function decrease(
         HeapArray storage _heap,
+        uint256 _size,
         address _id,
         uint96 _newValue
     ) private {
         uint256 index = _heap.indexOf[_id];
 
-        if (index < (_heap.size - 1) / 3) shiftDown(_heap, Account(_id, _newValue), index);
+        // We only need to take care of sorting if there are nodes below in the heap.
+        if (3 * index + 1 < _size) shiftDown(_heap, _size, Account(_id, _newValue), index);
         else _heap.accounts[index].value = _newValue;
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a smaller value than `_newValue`.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to increase the amount.
     /// @param _newValue The new value of the account.
     /// @param _maxSortedUsers The maximum size of the heap.
     function increase(
         HeapArray storage _heap,
+        uint256 _size,
         address _id,
         uint96 _newValue,
         uint256 _maxSortedUsers
     ) private {
         uint256 index = _heap.indexOf[_id];
-        uint256 size = _heap.size;
 
-        if (index < size) shiftUp(_heap, Account(_id, _newValue), index);
+        if (index < _size) shiftUp(_heap, Account(_id, _newValue), index);
         else {
-            setAccount(_heap, _heap.accounts[size], index);
-            shiftUp(_heap, Account(_id, _newValue), size);
-            _heap.size = computeSize(size + 1, _maxSortedUsers);
+            setAccount(_heap, _heap.accounts[_size], index);
+            shiftUp(_heap, Account(_id, _newValue), _size);
+            _heap.size = computeSize(_size + 1, _maxSortedUsers);
         }
     }
 
     /// @notice Removes an account in the `_heap`.
     /// @dev Only call when this function `_id` is in the `_heap` with value `_removedValue`.
-    /// @param _heap The heap to modify.
+    /// @param _heap The computed heap to modify.
+    /// @param _size The size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
     function remove(
         HeapArray storage _heap,
+        uint256 _size,
         address _id,
         uint96 _removedValue
     ) private {
@@ -224,7 +233,7 @@ library ThreeHeapOrdering {
         delete _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
-        if (_heap.size == accountsLength) _heap.size--;
+        if (_size == accountsLength) _heap.size = --_size;
         if (index == accountsLength - 1) {
             _heap.accounts.pop();
             return;
@@ -233,8 +242,8 @@ library ThreeHeapOrdering {
         Account memory lastAccount = _heap.accounts[accountsLength - 1];
         _heap.accounts.pop();
 
-        if (index < _heap.size) {
-            if (_removedValue > lastAccount.value) shiftDown(_heap, lastAccount, index);
+        if (index < _size) {
+            if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
         } else setAccount(_heap, lastAccount, index);
     }
