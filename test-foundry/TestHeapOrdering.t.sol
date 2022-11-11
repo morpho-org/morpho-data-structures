@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: GNU AGPLv3
 pragma solidity ^0.8.0;
 
-import "ds-test/test.sol";
-import "forge-std/Vm.sol";
-import "forge-std/console.sol";
-
 import "./helpers/CommonHeapOrdering.sol";
 import "./helpers/ConcreteHeapOrdering.sol";
 
