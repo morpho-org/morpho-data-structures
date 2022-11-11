@@ -48,6 +48,9 @@ function safeAssumptions() {
 }
 
 // INVARIANTS & RULES
+// Notice that some invariants have the preservation proof separated for some public functions,
+// or even all of the public functions (in that last case they are still relevant for proving 
+// the property at initial state).
 
 invariant zeroEmpty()
     isEmpty(0)
