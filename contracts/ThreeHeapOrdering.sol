@@ -163,7 +163,7 @@ library ThreeHeapOrdering {
         uint256 size = _heap.size;
         uint256 accountsLength = _heap.accounts.length;
 
-        if (size < accountsLength) {
+        if (size != accountsLength) {
             Account memory firstAccountNotSorted = _heap.accounts[size];
 
             _heap.indexOf[firstAccountNotSorted.id] = accountsLength;
