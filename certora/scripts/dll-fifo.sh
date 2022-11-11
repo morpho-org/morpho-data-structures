@@ -3,8 +3,8 @@
 make -C certora munged-fifo
 
 certoraRun \
-    certora/munged-fifo/DLL.sol \
-    --verify DLL:certora/specs/dll-fifo.spec \
+    certora/munged-fifo/MockDLL.sol \
+    --verify MockDLL:certora/specs/dll-fifo.spec \
     --loop_iter 4 \
     --optimistic_loop \
     --send_only \
