@@ -48,11 +48,11 @@ library HeapOrdering {
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
-            if (newValue == 0) remove(_heap, _id, newSize, formerValue);
-            else if (formerValue == 0) insert(_heap, _id, newSize, newValue, _maxSortedUsers);
+            if (newValue == 0) remove(_heap, newSize, _id, formerValue);
+            else if (formerValue == 0) insert(_heap, newSize, _id, newValue, _maxSortedUsers);
             else if (formerValue < newValue)
-                increase(_heap, _id, newSize, newValue, _maxSortedUsers);
-            else decrease(_heap, _id, newSize, newValue);
+                increase(_heap, newSize, _id, newValue, _maxSortedUsers);
+            else decrease(_heap, newSize, _id, newValue);
         }
     }
 
@@ -125,11 +125,12 @@ library HeapOrdering {
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
     /// @dev This functions restores the invariant about the order of the values stored when the account at `_index` is the only one with value smaller than what it should be.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _index The index of the account to move.
     function shiftDown(
         HeapArray storage _heap,
-        uint256 _index,
-        uint256 _size
+        uint256 _size,
+        uint256 _index
     ) private {
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
@@ -165,13 +166,14 @@ library HeapOrdering {
     /// @dev Only call this function when `_id` is not in the `_heap`.
     /// @dev Reverts with AddressIsZero if `_value` is 0.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to insert.
     /// @param _value The value of the account to insert.
     /// @param _maxSortedUsers The maximum size of the heap.
     function insert(
         HeapArray storage _heap,
-        address _id,
         uint256 _size,
+        address _id,
         uint96 _value,
         uint256 _maxSortedUsers
     ) private {
@@ -192,31 +194,33 @@ library HeapOrdering {
     /// @notice Decreases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a value greater than `_newValue`.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
     function decrease(
         HeapArray storage _heap,
-        address _id,
         uint256 _size,
+        address _id,
         uint96 _newValue
     ) private {
         uint256 index = _heap.indexOf[_id];
         _heap.accounts[index].value = _newValue;
 
         // We only need to restore the invariant if the account is a node in the heap
-        if (index < _size >> 1) shiftDown(_heap, index, _size);
+        if (index < _size >> 1) shiftDown(_heap, _size, index);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a smaller value than `_newValue`.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to increase the amount.
     /// @param _newValue The new value of the account.
     /// @param _maxSortedUsers The maximum size of the heap.
     function increase(
         HeapArray storage _heap,
-        address _id,
         uint256 _size,
+        address _id,
         uint96 _newValue,
         uint256 _maxSortedUsers
     ) private {
@@ -234,12 +238,13 @@ library HeapOrdering {
     /// @notice Removes an account in the `_heap`.
     /// @dev Only call when this function `_id` is in the `_heap` with value `_removedValue`.
     /// @param _heap The heap to modify.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
     function remove(
         HeapArray storage _heap,
-        address _id,
         uint256 _size,
+        address _id,
         uint96 _removedValue
     ) private {
         uint256 index = _heap.indexOf[_id];
@@ -253,7 +258,7 @@ library HeapOrdering {
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
         if (index < _size) {
-            if (_removedValue > _heap.accounts[index].value) shiftDown(_heap, index, _size);
+            if (_removedValue > _heap.accounts[index].value) shiftDown(_heap, _size, index);
             else shiftUp(_heap, index);
         }
     }
