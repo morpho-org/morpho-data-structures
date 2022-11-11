@@ -203,7 +203,6 @@ library ThreeHeapOrdering {
         uint256 _maxSortedUsers
     ) private {
         uint256 index = _heap.indexOf[_id];
-        _heap.accounts[index].value = _newValue;
         uint256 size = _heap.size;
 
         if (index < size) shiftUp(_heap, Account(_id, _newValue), index);
