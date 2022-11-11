@@ -58,7 +58,7 @@ library ThreeHeapOrdering {
     /// PRIVATE ///
 
     /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
-    /// @dev We use division by 2 to remove the leaves of the heap.
+    /// @dev We use division by 3 to remove the leaves of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
@@ -75,8 +75,8 @@ library ThreeHeapOrdering {
     /// @param _account The account to set the `_index` to.
     function setAccount(
         HeapArray storage _heap,
-        uint256 _index,
-        Account memory _account
+        Account memory _account,
+        uint256 _index
     ) private {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
@@ -100,11 +100,11 @@ library ThreeHeapOrdering {
             _accountToShift.value >
             (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value
         ) {
-            setAccount(_heap, _index, parentAccount);
+            setAccount(_heap, parentAccount, _index);
             _index = parentIndex;
         }
 
-        setAccount(_heap, _index, _accountToShift);
+        setAccount(_heap, _accountToShift, _index);
     }
 
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
@@ -122,7 +122,7 @@ library ThreeHeapOrdering {
         uint256 targetIndex = _index;
         uint256 nextIndex = _index * 3;
 
-        for (;;) {
+        while (true) {
             uint256 rightChildIndex = nextIndex + 3;
             while (++nextIndex <= rightChildIndex && nextIndex < size) {
                 Account memory nextAccount = _heap.accounts[nextIndex];
@@ -134,14 +134,14 @@ library ThreeHeapOrdering {
 
             if (targetIndex == _index) break;
 
-            setAccount(_heap, _index, targetAccount);
+            setAccount(_heap, targetAccount, _index);
 
             targetAccount = _accountToShift;
             _index = targetIndex;
             nextIndex = _index * 3;
         }
 
-        setAccount(_heap, _index, _accountToShift);
+        setAccount(_heap, _accountToShift, _index);
     }
 
     /// @notice Inserts an account in the `_heap`.
@@ -208,8 +208,7 @@ library ThreeHeapOrdering {
 
         if (index < size) shiftUp(_heap, Account(_id, _newValue), index);
         else {
-            Account memory firstAccountNotSorted = _heap.accounts[size];
-            setAccount(_heap, index, firstAccountNotSorted);
+            setAccount(_heap, _heap.accounts[size], index);
             shiftUp(_heap, Account(_id, _newValue), size);
             _heap.size = computeSize(size + 1, _maxSortedUsers);
         }
@@ -241,7 +240,7 @@ library ThreeHeapOrdering {
         if (index < _heap.size) {
             if (_removedValue > lastAccount.value) shiftDown(_heap, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
-        } else setAccount(_heap, index, lastAccount);
+        } else setAccount(_heap, lastAccount, index);
     }
 
     /// GETTERS ///
