@@ -220,7 +220,7 @@ library ThreeHeapOrdering {
     /// @notice Removes an account in the `_heap`.
     /// @dev Only call when this function `_id` is in the `_heap` with value `_removedValue`.
     /// @param _heap The computed heap to modify.
-    /// @param _size The size of the heap.
+    /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
     function remove(
