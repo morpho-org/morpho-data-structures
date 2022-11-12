@@ -1,0 +1,4 @@
+[profile.default]
+src = "contracts"
+test = "test-foundry"
+solc_version = "0.8.17"
