@@ -49,10 +49,24 @@ library DoubleLinkedList {
         return _list.greatest;
     }
 
+    /// @notice Returns the address at the greatest of the `_list`.
+    /// @param _list The list to get the greatest.
+    /// @return The address of the greatest.
+    function getGreatest(List storage _list) internal view returns (address) {
+        return _list.greatest;
+    }
+
     /// @notice Returns the address at the smallest of the `_list`.
     /// @param _list The list to get the smallest.
     /// @return The address of the smallest.
     function getTail(List storage _list) internal view returns (address) {
+        return _list.smallest;
+    }
+
+    /// @notice Returns the address at the smallest of the `_list`.
+    /// @param _list The list to get the smallest.
+    /// @return The address of the smallest.
+    function getSmallest(List storage _list) internal view returns (address) {
         return _list.smallest;
     }
 
@@ -64,11 +78,27 @@ library DoubleLinkedList {
         return _list.accounts[_id].ltSelf;
     }
 
+    /// @notice Returns the ltSelf id address from the current `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the ltSelf account.
+    function getLessThan(List storage _list, address _id) internal view returns (address) {
+        return _list.accounts[_id].ltSelf;
+    }
+
     /// @notice Returns the gtSelf id address from the current `_id`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     /// @return The address of the gtSelf account.
     function getPrev(List storage _list, address _id) internal view returns (address) {
+        return _list.accounts[_id].gtSelf;
+    }
+
+    /// @notice Returns the gtSelf id address from the current `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the gtSelf account.
+    function getGreaterThan(List storage _list, address _id) internal view returns (address) {
         return _list.accounts[_id].gtSelf;
     }
 
