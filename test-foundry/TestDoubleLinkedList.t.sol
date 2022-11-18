@@ -274,6 +274,42 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getNext(accounts[2]), ADDR_ZERO);
     }
 
+    function testShouldInsertMultipleAccountsWithHint() public {
+        // Leave odd gaps
+        for (uint256 i; i < accounts.length; ++i) {
+            if (i % 2 == 1) {
+                continue;
+            }
+            list.insertSorted(accounts[i], i + 1, NDS);
+        }
+
+        // Fill them
+        for (uint256 i; i < accounts.length; ++i) {
+            if (i % 2 == 0) {
+                continue;
+            }
+
+            // Pick a random-ish hint from the even accounts.
+            uint256 hint = (i * 13) % NDS;
+            if (hint % 2 == 1) {
+                hint = (hint * 2) % NDS;
+            }
+
+            list.insertSorted(accounts[i], i + 1, NDS, accounts[hint]);
+        }
+
+        for (uint256 i = 0; i < accounts.length; i++) {
+            assertEq(list.getValueOf(accounts[i]), i + 1);
+
+            assertEq(
+                list.getGreaterThan(accounts[i]),
+                i < accounts.length - 1 ? accounts[i + 1] : ADDR_ZERO
+            );
+
+            assertEq(list.getLessThan(accounts[i]), i > 0 ? accounts[i - 1] : ADDR_ZERO);
+        }
+    }
+
     function testRevertOnMaxIterationsExceeded() public {
         list.insertSorted(accounts[0], 2, 0);
         vm.expectRevert(abi.encodeWithSelector(DoubleLinkedList.MaxIterationsExceeded.selector));
