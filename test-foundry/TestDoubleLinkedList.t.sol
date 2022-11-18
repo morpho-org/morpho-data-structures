@@ -11,15 +11,17 @@ contract TestDoubleLinkedList is Test {
 
     uint256 public NDS = 50;
     address[] public accounts;
+    mapping(address => uint256) public accountIndices;
     address public ADDR_ZERO = address(0);
 
     DoubleLinkedList.List public list;
 
     function setUp() public {
         accounts = new address[](NDS);
-        accounts[0] = address(this);
+        accounts[0] = address(0xA11CE0000000000);
         for (uint256 i = 1; i < NDS; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
+            accountIndices[accounts[i]] = i;
         }
     }
 
@@ -222,7 +224,10 @@ contract TestDoubleLinkedList is Test {
         }
 
         assertEq(list.getHead(), accounts[0]);
-        assertEq(list.getTail(), accounts[accounts.length - 1]);
+        // As the last 10 accounts were inserted with the same value, the tail
+        // can be any of them as insertSorted() makes no guarantee of stability
+        // with respect to insertion order.
+        assertGe(accountIndices[list.getTail()], accounts.length - 10);
 
         nextAccount = accounts[0];
         for (uint256 i = 0; i < 9; i++) {
@@ -235,5 +240,43 @@ contract TestDoubleLinkedList is Test {
             prevAccount = list.getPrev(prevAccount);
             assertEq(prevAccount, accounts[10 - i - 2]);
         }
+    }
+
+    function testShouldInsertTwoAccountsWithHint() public {
+        list.insertSorted(accounts[0], 2, NDS);
+        list.insertSorted(accounts[1], 1, NDS, accounts[0]);
+
+        assertEq(list.getHead(), accounts[0]);
+        assertEq(list.getTail(), accounts[1]);
+        assertEq(list.getValueOf(accounts[0]), 2);
+        assertEq(list.getValueOf(accounts[1]), 1);
+        assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
+        assertEq(list.getNext(accounts[0]), accounts[1]);
+        assertEq(list.getPrev(accounts[1]), accounts[0]);
+        assertEq(list.getNext(accounts[1]), ADDR_ZERO);
+    }
+
+    function testShouldInsertThreeAccountsWithHint() public {
+        list.insertSorted(accounts[0], 3, NDS);
+        list.insertSorted(accounts[2], 1, NDS, accounts[0]);
+        list.insertSorted(accounts[1], 2, NDS, accounts[0]);
+
+        assertEq(list.getHead(), accounts[0]);
+        assertEq(list.getTail(), accounts[2]);
+        assertEq(list.getValueOf(accounts[0]), 3);
+        assertEq(list.getValueOf(accounts[1]), 2);
+        assertEq(list.getValueOf(accounts[2]), 1);
+        assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
+        assertEq(list.getNext(accounts[0]), accounts[1]);
+        assertEq(list.getPrev(accounts[1]), accounts[0]);
+        assertEq(list.getNext(accounts[1]), accounts[2]);
+        assertEq(list.getPrev(accounts[2]), accounts[1]);
+        assertEq(list.getNext(accounts[2]), ADDR_ZERO);
+    }
+
+    function testRevertOnMaxIterationsExceeded() public {
+        list.insertSorted(accounts[0], 2, 0);
+        vm.expectRevert(abi.encodeWithSelector(DoubleLinkedList.MaxIterationsExceeded.selector));
+        list.insertSorted(accounts[1], 1, 0);
     }
 }
