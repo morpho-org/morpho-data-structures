@@ -34,6 +34,14 @@ library DoubleLinkedList {
 
     /// INTERNAL ///
 
+    /// @notice Checks if the list contains an `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @return Whether the list contains the account.
+    function contains(List storage _list, address _id) internal view returns (bool) {
+        return _list.accounts[_id].value > 0;
+    }
+
     /// @notice Returns the `account` linked to `_id`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.

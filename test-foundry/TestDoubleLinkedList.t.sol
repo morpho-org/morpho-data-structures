@@ -283,6 +283,10 @@ contract TestDoubleLinkedList is Test {
             list.insertSorted(accounts[i], i + 1, NDS);
         }
 
+        for (uint256 i; i < accounts.length; ++i) {
+            assertEq(list.contains(accounts[i]), i % 2 == 0);
+        }
+
         // Fill them
         for (uint256 i; i < accounts.length; ++i) {
             if (i % 2 == 0) {
