@@ -1,3 +1,12 @@
+# Statement of Significant Changes
+
+Forked from https://github.com/morpho-dao/morpho-data-structures under GNU AGPLv3
+
+* `contracts/DoubleLinkedList.sol` `insertSorted()` accepts a hint for insertion location. Final order of equal-value insertions is no longer guaranteed to be stable with respect to the insertion order.
+* `test-foundry/TestDoubleLinkedList.t.sol` verifying `insertSorted` with hint.
+
+---
+
 # Morpho Data Structures 🦋
 
 This repository contains the data structures that can be used for the Morpho's matching engine 🦋.
