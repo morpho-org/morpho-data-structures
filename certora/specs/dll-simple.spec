@@ -269,6 +269,22 @@ rule forwardLinkedPreservedRemove(address _id) {
     assert isInDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
 
+rule removeRemoves(address _id) {
+    safeAssumptions();
+
+    remove(_id);
+
+    assert !isInDLL(_id);
+}
+
+rule insertSortedInserts(address _id, uint256 _value) {
+    safeAssumptions();
+
+    insertSorted(_id, _value);
+
+    assert isInDLL(_id);
+}
+
 invariant decrSorted()
     isDecrSortedFrom(getHead())
     { preserved remove(address _id) {

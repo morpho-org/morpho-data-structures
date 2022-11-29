@@ -9,9 +9,10 @@ methods {
     // added through harness
     getInsertedBefore() returns (address) envfree
     getInsertedAfter() returns (address) envfree
+    getLength() returns (uint256) envfree
     prevFromHead(address) returns (address) envfree
     isForwardLinkedBetween(address, address) returns (bool) envfree
-    greaterThanUpTo(uint256, address) returns (bool) envfree
+    greaterThanUpTo(uint256, address, uint256) returns (bool) envfree
     lenUpTo(address) returns (uint256) envfree
 
     maxIterations() returns (uint256) envfree => NONDET
@@ -277,6 +278,22 @@ rule forwardLinkedPreservedRemove(address _id) {
     assert isInDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 }
 
+rule removeRemoves(address _id) {
+    safeAssumptions();
+
+    remove(_id);
+
+    assert !isInDLL(_id);
+}
+
+rule insertSortedInserts(address _id, uint256 _value) {
+    safeAssumptions();
+
+    insertSorted(_id, _value, maxIterations());
+
+    assert isInDLL(_id);
+}
+
 rule insertSortedDecreasingOrder(address _id, uint256 _value) {
     address prev;
 
@@ -292,8 +309,8 @@ rule insertSortedDecreasingOrder(address _id, uint256 _value) {
 
     uint256 positionInDLL = lenUpTo(_id);
 
-    assert (positionInDLL > maxIter => _id == getTail());
-    assert (positionInDLL <= maxIter => greaterThanUpTo(_value, _id) && _value > getValueOf(getNext(_id)));
+    assert positionInDLL > maxIter => greaterThanUpTo(_value, 0, maxIter) && _id == getTail();
+    assert positionInDLL <= maxIter => greaterThanUpTo(_value, _id, getLength()) && _value > getValueOf(getNext(_id));
 }
 
 // DERIVED RESULTS
