@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GNU AGPLv3
 pragma solidity ^0.8.0;
 
-interface ICommonHeapOrdering {
+interface IConcreteHeapOrdering {
     function update(
         address _id,
         uint256 _formerValue,
@@ -10,6 +10,8 @@ interface ICommonHeapOrdering {
     ) external;
 
     function accountsValue(uint256 _index) external view returns (uint256);
+
+    function accountsId(uint256 _index) external view returns (address);
 
     function indexOf(address _id) external view returns (uint256);
 
@@ -26,6 +28,4 @@ interface ICommonHeapOrdering {
     function getPrev(address) external view returns (address);
 
     function getNext(address) external view returns (address);
-
-    function verifyStructure() external view;
 }

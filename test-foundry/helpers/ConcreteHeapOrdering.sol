@@ -2,15 +2,19 @@
 pragma solidity ^0.8.0;
 
 import "@contracts/HeapOrdering.sol";
-import "./ICommonHeapOrdering.sol";
+import "./IConcreteHeapOrdering.sol";
 
-contract ConcreteHeapOrdering is ICommonHeapOrdering {
+contract ConcreteHeapOrdering is IConcreteHeapOrdering {
     using HeapOrdering for HeapOrdering.HeapArray;
 
     HeapOrdering.HeapArray internal heap;
 
     function accountsValue(uint256 _index) external view returns (uint256) {
         return heap.accounts[_index].value;
+    }
+
+    function accountsId(uint256 _index) external view returns (address) {
+        return heap.accounts[_index].id;
     }
 
     function indexOf(address _id) external view returns (uint256) {
@@ -52,28 +56,5 @@ contract ConcreteHeapOrdering is ICommonHeapOrdering {
 
     function getNext(address _id) external view returns (address) {
         return heap.getNext(_id);
-    }
-
-    function verifyStructure() external view {
-        uint256 firstChildIndex;
-        uint256 secondChildIndex;
-        uint256 initialValue;
-        uint256 firstChildValue;
-        uint256 secondChildValue;
-        uint256 heapSize = heap.size;
-
-        for (uint256 index = 0; index <= heapSize / 2; index++) {
-            initialValue = heap.accounts[index].value;
-            firstChildIndex = 2 * index + 1;
-            secondChildIndex = 2 * index + 2;
-            if (firstChildIndex < heapSize) {
-                firstChildValue = heap.accounts[firstChildIndex].value;
-                require(initialValue >= firstChildValue, "2-heap structure is not verified.");
-            }
-            if (secondChildIndex < heapSize) {
-                secondChildValue = heap.accounts[secondChildIndex].value;
-                require(initialValue >= secondChildValue, "2-heap structure is not verified.");
-            }
-        }
     }
 }

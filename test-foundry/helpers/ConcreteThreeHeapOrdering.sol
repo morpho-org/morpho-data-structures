@@ -2,15 +2,19 @@
 pragma solidity ^0.8.0;
 
 import "@contracts/ThreeHeapOrdering.sol";
-import "./ICommonHeapOrdering.sol";
+import "./IConcreteHeapOrdering.sol";
 
-contract ConcreteThreeHeapOrdering is ICommonHeapOrdering {
+contract ConcreteThreeHeapOrdering is IConcreteHeapOrdering {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
 
     ThreeHeapOrdering.HeapArray internal heap;
 
     function accountsValue(uint256 _index) external view returns (uint256) {
         return heap.accounts[_index].value;
+    }
+
+    function accountsId(uint256 _index) external view returns (address) {
+        return heap.accounts[_index].id;
     }
 
     function indexOf(address _id) external view returns (uint256) {
@@ -52,36 +56,5 @@ contract ConcreteThreeHeapOrdering is ICommonHeapOrdering {
 
     function getNext(address _id) external view returns (address) {
         return heap.getNext(_id);
-    }
-
-    function verifyStructure() external view {
-        uint256 firstChildIndex;
-        uint256 secondChildIndex;
-        uint256 thidChildIndex;
-        uint256 initialValue;
-        uint256 firstChildValue;
-        uint256 secondChildValue;
-        uint256 thirdChildValue;
-
-        uint256 heapSize = heap.size;
-
-        for (uint256 index; index <= heapSize / 3; index++) {
-            initialValue = heap.accounts[index].value;
-            firstChildIndex = 3 * index + 1;
-            secondChildIndex = 3 * index + 2;
-            thidChildIndex = 3 * index + 3;
-            if (firstChildIndex < heapSize) {
-                firstChildValue = heap.accounts[firstChildIndex].value;
-                require(initialValue >= firstChildValue, "3-heap structure is not verified.");
-            }
-            if (secondChildIndex < heapSize) {
-                secondChildValue = heap.accounts[secondChildIndex].value;
-                require(initialValue >= secondChildValue, "3-heap structure is not verified.");
-            }
-            if (thidChildIndex < heapSize) {
-                thirdChildValue = heap.accounts[thidChildIndex].value;
-                require(initialValue >= thirdChildValue, "3-heap structure is not verified.");
-            }
-        }
     }
 }
