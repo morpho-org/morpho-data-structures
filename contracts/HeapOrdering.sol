@@ -30,17 +30,15 @@ library HeapOrdering {
     /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to update.
-    /// @param _formerValue The former value of the account to update.
     /// @param _newValue The new value of the account to update.
     /// @param _maxSortedUsers The maximum size of the heap.
     function update(
         HeapArray storage _heap,
         address _id,
-        uint256 _formerValue,
         uint256 _newValue,
         uint256 _maxSortedUsers
     ) internal {
-        uint96 formerValue = SafeCast.toUint96(_formerValue);
+        uint96 formerValue = SafeCast.toUint96(getValueOf(_heap, _id));
         uint96 newValue = SafeCast.toUint96(_newValue);
 
         uint256 size = _heap.size;
