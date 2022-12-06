@@ -43,11 +43,10 @@ contract Helper is Random {
     function updateHeap(
         address _id,
         uint256 _newValue,
-        uint256 _max_sorted_users
+        uint256 _maxSortedUsers
     ) public {
         HeapOrdering.HeapArray storage heap = getCurrentHeap();
-        uint256 formerValue = HeapOrdering.getValueOf(heap, _id);
-        HeapOrdering.update(heap, _id, formerValue, _newValue, _max_sorted_users);
+        HeapOrdering.update(heap, _id, _newValue, _maxSortedUsers);
     }
 
     function getSize() private view returns (uint256) {
