@@ -34,7 +34,7 @@ library HeapOrdering {
         uint256 _formerValue,
         uint256 _newValue,
         uint256 _maxSortedUsers,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) internal {
         uint96 formerValue = SafeCast.toUint96(_formerValue);
         uint96 newValue = SafeCast.toUint96(_newValue);
@@ -44,10 +44,10 @@ library HeapOrdering {
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
-            if (newValue == 0) remove(_heap, _id, formerValue, getValueOf);
-            else if (formerValue == 0) insert(_heap, _id, _maxSortedUsers, getValueOf);
-            else if (formerValue < newValue) increase(_heap, _id, _maxSortedUsers, getValueOf);
-            else decrease(_heap, _id, getValueOf);
+            if (newValue == 0) remove(_heap, _id, formerValue, values);
+            else if (formerValue == 0) insert(_heap, _id, _maxSortedUsers, values);
+            else if (formerValue < newValue) increase(_heap, _id, _maxSortedUsers, values);
+            else decrease(_heap, _id, values);
         }
     }
 
@@ -113,13 +113,13 @@ library HeapOrdering {
     function shiftUp(
         HeapArray storage _heap,
         uint256 _rank,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) private {
         address accountToShift = getAccount(_heap, _rank);
-        uint256 valueToShift = getValueOf(accountToShift);
+        uint256 valueToShift = values[accountToShift];
         address parentAccount;
         while (
-            _rank > ROOT && valueToShift > getValueOf(parentAccount = getAccount(_heap, _rank >> 1))
+            _rank > ROOT && valueToShift > values[parentAccount = getAccount(_heap, _rank >> 1)]
         ) {
             setAccount(_heap, _rank, parentAccount);
             _rank >>= 1;
@@ -134,11 +134,11 @@ library HeapOrdering {
     function shiftDown(
         HeapArray storage _heap,
         uint256 _rank,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) private {
         uint256 size = _heap.size;
         address accountToShift = getAccount(_heap, _rank);
-        uint256 valueToShift = getValueOf(accountToShift);
+        uint256 valueToShift = values[accountToShift];
         uint256 childRank = _rank << 1;
         // At this point, childRank (resp. childRank+1) is the rank of the left (resp. right) child.
 
@@ -148,7 +148,7 @@ library HeapOrdering {
             // Find the child with largest value.
             if (childRank < size) {
                 address rightChild = getAccount(_heap, childRank + 1);
-                if (getValueOf(rightChild) > getValueOf(childToSwap)) {
+                if (values[rightChild] > values[childToSwap]) {
                     unchecked {
                         ++childRank; // This cannot overflow because childRank < size.
                     }
@@ -156,7 +156,7 @@ library HeapOrdering {
                 }
             }
 
-            if (getValueOf(childToSwap) > valueToShift) {
+            if (values[childToSwap] > valueToShift) {
                 setAccount(_heap, _rank, childToSwap);
                 _rank = childRank;
                 childRank <<= 1;
@@ -175,7 +175,7 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint256 _maxSortedUsers,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) private {
         // `_heap` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
@@ -188,7 +188,7 @@ library HeapOrdering {
         // Move the account at the end of the heap and restore the invariant.
         uint256 newSize = _heap.size + 1;
         swap(_heap, newSize, accountsLength);
-        shiftUp(_heap, newSize, getValueOf);
+        shiftUp(_heap, newSize, values);
         _heap.size = computeSize(newSize, _maxSortedUsers);
     }
 
@@ -199,12 +199,12 @@ library HeapOrdering {
     function decrease(
         HeapArray storage _heap,
         address _id,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) private {
         uint256 rank = _heap.ranks[_id];
 
         // We only need to restore the invariant if the account is a node in the heap
-        if (rank <= _heap.size >> 1) shiftDown(_heap, rank, getValueOf);
+        if (rank <= _heap.size >> 1) shiftDown(_heap, rank, values);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
@@ -216,15 +216,15 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint256 _maxSortedUsers,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) private {
         uint256 rank = _heap.ranks[_id];
         uint256 nextSize = _heap.size + 1;
 
-        if (rank < nextSize) shiftUp(_heap, rank, getValueOf);
+        if (rank < nextSize) shiftUp(_heap, rank, values);
         else {
             swap(_heap, nextSize, rank);
-            shiftUp(_heap, nextSize, getValueOf);
+            shiftUp(_heap, nextSize, values);
             _heap.size = computeSize(nextSize, _maxSortedUsers);
         }
     }
@@ -238,7 +238,7 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint96 _removedValue,
-        function(address) view returns (uint256) getValueOf
+        mapping(address => uint256) storage values
     ) private {
         uint256 rank = _heap.ranks[_id];
         uint256 accountsLength = _heap.accounts.length;
@@ -251,9 +251,8 @@ library HeapOrdering {
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
         if (rank <= _heap.size) {
-            if (_removedValue > getValueOf(getAccount(_heap, rank)))
-                shiftDown(_heap, rank, getValueOf);
-            else shiftUp(_heap, rank, getValueOf);
+            if (_removedValue > values[getAccount(_heap, rank)]) shiftDown(_heap, rank, values);
+            else shiftUp(_heap, rank, values);
         }
     }
 
