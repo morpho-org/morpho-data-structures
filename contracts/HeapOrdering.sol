@@ -21,6 +21,21 @@ library HeapOrdering {
 
     /// INTERNAL ///
 
+    function getValue(
+        address user,
+        uint256 slot,
+        uint256 offset
+    ) public view returns (uint256 value) {
+        uint256 valueSlot;
+        unchecked {
+            valueSlot = offset + uint256(keccak256(abi.encode(user, slot)));
+        }
+
+        assembly {
+            value := sload(valueSlot)
+        }
+    }
+
     /// @notice Updates an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0.
     /// @param _heap The heap to modify.
@@ -34,7 +49,8 @@ library HeapOrdering {
         uint256 _formerValue,
         uint256 _newValue,
         uint256 _maxSortedUsers,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) internal {
         uint96 formerValue = SafeCast.toUint96(_formerValue);
         uint96 newValue = SafeCast.toUint96(_newValue);
@@ -44,10 +60,10 @@ library HeapOrdering {
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
-            if (newValue == 0) remove(_heap, _id, formerValue, values);
-            else if (formerValue == 0) insert(_heap, _id, _maxSortedUsers, values);
-            else if (formerValue < newValue) increase(_heap, _id, _maxSortedUsers, values);
-            else decrease(_heap, _id, values);
+            if (newValue == 0) remove(_heap, _id, formerValue, slot, offset);
+            else if (formerValue == 0) insert(_heap, _id, _maxSortedUsers, slot, offset);
+            else if (formerValue < newValue) increase(_heap, _id, _maxSortedUsers, slot, offset);
+            else decrease(_heap, _id, slot, offset);
         }
     }
 
@@ -113,13 +129,15 @@ library HeapOrdering {
     function shiftUp(
         HeapArray storage _heap,
         uint256 _rank,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) private {
         address accountToShift = getAccount(_heap, _rank);
-        uint256 valueToShift = values[accountToShift];
+        uint256 valueToShift = getValue(accountToShift, slot, offset);
         address parentAccount;
         while (
-            _rank > ROOT && valueToShift > values[parentAccount = getAccount(_heap, _rank >> 1)]
+            _rank > ROOT &&
+            valueToShift > getValue(parentAccount = getAccount(_heap, _rank >> 1), slot, offset)
         ) {
             setAccount(_heap, _rank, parentAccount);
             _rank >>= 1;
@@ -134,11 +152,12 @@ library HeapOrdering {
     function shiftDown(
         HeapArray storage _heap,
         uint256 _rank,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) private {
         uint256 size = _heap.size;
         address accountToShift = getAccount(_heap, _rank);
-        uint256 valueToShift = values[accountToShift];
+        uint256 valueToShift = getValue(accountToShift, slot, offset);
         uint256 childRank = _rank << 1;
         // At this point, childRank (resp. childRank+1) is the rank of the left (resp. right) child.
 
@@ -148,7 +167,7 @@ library HeapOrdering {
             // Find the child with largest value.
             if (childRank < size) {
                 address rightChild = getAccount(_heap, childRank + 1);
-                if (values[rightChild] > values[childToSwap]) {
+                if (getValue(rightChild, slot, offset) > getValue(childToSwap, slot, offset)) {
                     unchecked {
                         ++childRank; // This cannot overflow because childRank < size.
                     }
@@ -156,7 +175,7 @@ library HeapOrdering {
                 }
             }
 
-            if (values[childToSwap] > valueToShift) {
+            if (getValue(childToSwap, slot, offset) > valueToShift) {
                 setAccount(_heap, _rank, childToSwap);
                 _rank = childRank;
                 childRank <<= 1;
@@ -175,7 +194,8 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint256 _maxSortedUsers,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) private {
         // `_heap` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
@@ -188,7 +208,7 @@ library HeapOrdering {
         // Move the account at the end of the heap and restore the invariant.
         uint256 newSize = _heap.size + 1;
         swap(_heap, newSize, accountsLength);
-        shiftUp(_heap, newSize, values);
+        shiftUp(_heap, newSize, slot, offset);
         _heap.size = computeSize(newSize, _maxSortedUsers);
     }
 
@@ -199,12 +219,13 @@ library HeapOrdering {
     function decrease(
         HeapArray storage _heap,
         address _id,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) private {
         uint256 rank = _heap.ranks[_id];
 
         // We only need to restore the invariant if the account is a node in the heap
-        if (rank <= _heap.size >> 1) shiftDown(_heap, rank, values);
+        if (rank <= _heap.size >> 1) shiftDown(_heap, rank, slot, offset);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
@@ -216,15 +237,16 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint256 _maxSortedUsers,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) private {
         uint256 rank = _heap.ranks[_id];
         uint256 nextSize = _heap.size + 1;
 
-        if (rank < nextSize) shiftUp(_heap, rank, values);
+        if (rank < nextSize) shiftUp(_heap, rank, slot, offset);
         else {
             swap(_heap, nextSize, rank);
-            shiftUp(_heap, nextSize, values);
+            shiftUp(_heap, nextSize, slot, offset);
             _heap.size = computeSize(nextSize, _maxSortedUsers);
         }
     }
@@ -238,7 +260,8 @@ library HeapOrdering {
         HeapArray storage _heap,
         address _id,
         uint96 _removedValue,
-        mapping(address => uint256) storage values
+        uint256 slot,
+        uint256 offset
     ) private {
         uint256 rank = _heap.ranks[_id];
         uint256 accountsLength = _heap.accounts.length;
@@ -251,8 +274,9 @@ library HeapOrdering {
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
         if (rank <= _heap.size) {
-            if (_removedValue > values[getAccount(_heap, rank)]) shiftDown(_heap, rank, values);
-            else shiftUp(_heap, rank, values);
+            if (_removedValue > getValue(getAccount(_heap, rank), slot, offset))
+                shiftDown(_heap, rank, slot, offset);
+            else shiftUp(_heap, rank, slot, offset);
         }
     }
 
