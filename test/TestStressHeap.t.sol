@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 
-import "@contracts/Heap.sol";
+import "src/Heap.sol";
 
 contract HeapStorage {
     BasicHeap.Heap internal heap;
