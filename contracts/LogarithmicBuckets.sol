@@ -15,7 +15,7 @@ library LogarithmicBuckets {
 
     /// CONSTANTS ///
 
-    uint256 private constant LOGBASE = 4;
+    uint256 private constant LOGBASE = 2;
 
     /// ERRORS ///
 

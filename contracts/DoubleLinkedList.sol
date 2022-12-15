@@ -146,7 +146,7 @@ library DoubleLinkedList {
         }
     }
 
-    /// @notice Inserts an account at the tail the `_list`.
+    /// @notice Inserts an account at the tail of the `_list`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     /// @param _value The value of the account.
