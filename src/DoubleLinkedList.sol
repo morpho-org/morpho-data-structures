@@ -151,4 +151,28 @@ library DoubleLinkedList {
             }
         }
     }
+
+    /// @notice Inserts an account at the tail of the `_list`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the account.
+    /// @param _value The value of the account.
+    function insertTail(
+        List storage _list,
+        address _id,
+        uint256 _value
+    ) internal {
+        if (_value == 0) revert ValueIsZero();
+        if (_id == address(0)) revert AddressIsZero();
+        if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
+
+        if (_list.head == address(0)) {
+            _list.accounts[_id] = Account(address(0), address(0), _value);
+            _list.head = _id;
+            _list.tail = _id;
+        } else {
+            _list.accounts[_id] = Account(_list.tail, address(0), _value);
+            _list.accounts[_list.tail].next = _id;
+            _list.tail = _id;
+        }
+    }
 }
