@@ -1,6 +1,6 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2022-10-25 18:11:24.798784245 +0200
-+++ DoubleLinkedList.sol	2022-11-11 11:23:07.676603276 +0100
+--- DoubleLinkedList.sol	2022-12-16 20:15:34.039800632 +0100
++++ DoubleLinkedList.sol	2022-12-16 20:33:41.874106437 +0100
 @@ -18,6 +18,8 @@
          mapping(address => Account) accounts;
          address head;
@@ -35,8 +35,8 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
              // Account is the new head.
 diff -ruN MockDLL.sol MockDLL.sol
 --- MockDLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ MockDLL.sol	2022-11-11 11:26:25.905847360 +0100
-@@ -0,0 +1,107 @@
++++ MockDLL.sol	2022-12-16 20:35:27.432652652 +0100
+@@ -0,0 +1,111 @@
 +// SPDX-License-Identifier: GNU AGPLv3
 +pragma solidity ^0.8.0;
 +
@@ -100,7 +100,7 @@ diff -ruN MockDLL.sol MockDLL.sol
 +        return dll.insertedBefore;
 +    }
 +
-+    function getLength() internal view returns (uint256) {
++    function getLength() public view returns (uint256) {
 +        uint256 len;
 +        for (address current = getHead(); current != address(0); current = getNext(current)) len++;
 +        return len;
@@ -124,9 +124,13 @@ diff -ruN MockDLL.sol MockDLL.sol
 +        (, last) = linkBetween(getHead(), _end);
 +    }
 +
-+    function greaterThanUpTo(uint256 _value, address _to) public view returns (bool) {
++    function greaterThanUpTo(
++        uint256 _value,
++        address _to,
++        uint256 _maxIter
++    ) public view returns (bool) {
 +        address from = getHead();
-+        for (uint256 maxIter = getLength(); maxIter > 0; maxIter--) {
++        for (; _maxIter > 0; _maxIter--) {
 +            if (from == _to) return true;
 +            if (getValueOf(from) < _value) return false;
 +            from = getNext(from);
@@ -145,7 +149,7 @@ diff -ruN MockDLL.sol MockDLL.sol
 +    }
 +}
 diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOptimized.sol
---- test/TestRedBlackBinaryTreeOptimized.sol	2022-10-25 18:11:24.798784245 +0200
+--- test/TestRedBlackBinaryTreeOptimized.sol	2022-12-16 20:12:44.271470415 +0100
 +++ test/TestRedBlackBinaryTreeOptimized.sol	1970-01-01 01:00:00.000000000 +0100
 @@ -1,42 +0,0 @@
 -// SPDX-License-Identifier: UNLICENSED
@@ -191,7 +195,7 @@ diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOp
 -    }
 -}
 diff -ruN test/TestRedBlackBinaryTree.sol test/TestRedBlackBinaryTree.sol
---- test/TestRedBlackBinaryTree.sol	2022-10-25 18:11:24.798784245 +0200
+--- test/TestRedBlackBinaryTree.sol	2022-12-16 20:12:44.271470415 +0100
 +++ test/TestRedBlackBinaryTree.sol	1970-01-01 01:00:00.000000000 +0100
 @@ -1,50 +0,0 @@
 -// SPDX-License-Identifier: UNLICENSED
