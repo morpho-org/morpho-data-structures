@@ -1,35 +1,41 @@
 // SPDX-License-Identifier: GNU AGPLv3
 pragma solidity ^0.8.0;
 
-import "ds-test/test.sol";
+import "forge-std/Test.sol";
 
-import "@contracts/HeapOrdering.sol";
+import "@contracts/Heap.sol";
 
 contract HeapStorage {
-    HeapOrdering.HeapArray internal heap;
+    BasicHeap.Heap internal heap;
     uint256 public TESTED_SIZE = 10000;
-    uint256 public MAX_SORTED_USERS = TESTED_SIZE;
     uint256 public incrementAmount = 5;
 
     function setUp() public {
         for (uint256 i = 0; i < TESTED_SIZE; i++) {
             address id = address(uint160(i + 1));
-            heap.accounts.push(HeapOrdering.Account(id, uint96(TESTED_SIZE - i)));
+            heap.accounts.push(BasicHeap.Account(id, TESTED_SIZE - i));
             heap.ranks[id] = heap.accounts.length;
-            heap.size = MAX_SORTED_USERS;
         }
     }
 
-    function update(
-        address _id,
-        uint256 _formerValue,
-        uint256 _newValue
-    ) public {
-        HeapOrdering.update(heap, _id, _formerValue, _newValue, MAX_SORTED_USERS);
+    function insert(address _id, uint256 _value) public {
+        BasicHeap.insert(heap, _id, _value);
+    }
+
+    function decrease(address _id, uint256 _newValue) public {
+        BasicHeap.decrease(heap, _id, _newValue);
+    }
+
+    function increase(address _id, uint256 _newValue) public {
+        BasicHeap.increase(heap, _id, _newValue);
+    }
+
+    function remove(address _id) public {
+        BasicHeap.remove(heap, _id);
     }
 }
 
-contract TestStressHeapOrdering is DSTest {
+contract TestStressHeap is Test {
     HeapStorage public hs = new HeapStorage();
     uint256 public ts;
     uint256 public im;
@@ -41,56 +47,56 @@ contract TestStressHeapOrdering is DSTest {
     }
 
     function testInsertOneTop() public {
-        hs.update(address(this), 0, ts + 1);
+        hs.insert(address(this), ts + 1);
     }
 
     function testInsertOneMiddle() public {
-        hs.update(address(this), 0, ts / 2);
+        hs.insert(address(this), ts / 2);
     }
 
     function testInsertOneBottom() public {
-        hs.update(address(this), 0, 1);
+        hs.insert(address(this), 1);
     }
 
     function testRemoveOneTop() public {
-        hs.update(address(uint160(1)), ts, 0);
+        hs.remove(address(uint160(1)));
     }
 
     function testRemoveOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, 0);
+        hs.remove(address(uint160(middle + 1)));
     }
 
     function testRemoveOneBottom() public {
         uint256 end = ts - 2 * im;
-        hs.update(address(uint160(end + 1)), ts - end, 0);
+        hs.remove(address(uint160(end + 1)));
     }
 
     function testIncreaseOneTop() public {
-        hs.update(address(uint160(1)), ts, ts + im);
+        hs.increase(address(uint160(1)), ts + im);
     }
 
     function testIncreaseOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, ts - middle + im);
+        hs.increase(address(uint160(middle + 1)), ts - middle + im);
     }
 
     function testIncreaseOneBottom() public {
         uint256 end = ts - 2 * im;
-        hs.update(address(uint160(end + 1)), ts - end, ts - end + im);
+        hs.increase(address(uint160(end + 1)), ts - end + im);
     }
 
     function testDecreaseOneTop() public {
-        hs.update(address(uint160(1)), ts, 1);
+        hs.decrease(address(uint160(1)), 1);
     }
 
     function testDecreaseOneMiddle() public {
         uint256 middle = ts / 2;
-        hs.update(address(uint160(middle + 1)), ts - middle, 1);
+        hs.decrease(address(uint160(middle + 1)), 1);
     }
 
     function testDecreaseOneBottom() public {
         uint256 end = ts - 2 * im;
-        hs.update(address(uint160(end + 1)), ts - end, ts - end - im);
+        hs.decrease(address(uint160(end + 1)), ts - end - im);
     }
 }
