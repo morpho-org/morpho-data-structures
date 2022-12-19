@@ -336,13 +336,17 @@ abstract contract TestCommonHeapOrdering is Test {
         assertEq(heap.indexOf(accounts[3]), 3);
     }
 
-    function testOverflowNewValue() public {
+    function testOverflowNewValue(uint256 value) public {
+        vm.assume(value > type(uint96).max);
+
         vm.expectRevert("SafeCast: value doesn't fit in 96 bits");
-        update(accounts[0], 0, uint256(type(uint128).max));
+        update(accounts[0], 0, value);
     }
 
-    function testOverflowFormerValue() public {
+    function testOverflowFormerValue(uint256 value) public {
+        vm.assume(value > type(uint96).max);
+
         vm.expectRevert("SafeCast: value doesn't fit in 96 bits");
-        update(accounts[0], uint256(type(uint128).max), 0);
+        update(accounts[0], value, 0);
     }
 }
