@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
+import "morpho-utils/src/math/Math.sol";
 import "./DoubleLinkedList.sol";
 
 library LogarithmicBuckets {
@@ -16,6 +17,7 @@ library LogarithmicBuckets {
     /// CONSTANTS ///
 
     uint256 private constant LOGBASE = 4;
+    uint256 private constant LOG2_LOGBASE = 2;
 
     /// ERRORS ///
 
@@ -76,12 +78,7 @@ library LogarithmicBuckets {
     /// @notice Compute the bucket index.
     /// @param _value The value of the index to compute.
     function computeBucketIndex(uint96 _value) private pure returns (uint256) {
-        for (uint256 i = 0; i < 128; i++) {
-            if (_value < LOGBASE**i) {
-                return i;
-            }
-        }
-        return 128;
+        return Math.log2(_value) / LOG2_LOGBASE;
     }
 
     /// GETTERS ///
