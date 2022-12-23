@@ -20,7 +20,7 @@ contract Heap is ConcreteHeapOrdering {
     }
 }
 
-contract TestHeapInvariant is Test {
+contract TestHeapOrderingInvariant is Test {
     Heap public heap;
 
     function setUp() public {
