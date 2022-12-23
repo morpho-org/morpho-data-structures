@@ -36,9 +36,11 @@ library LogarithmicBuckets {
         uint256 formerValue256 = getValueOf(_buckets, _id);
         uint96 formerValue = SafeCast.toUint96(formerValue256);
         uint96 newValue = SafeCast.toUint96(_newValue);
-        uint256 newBucketIndex = computeBucketIndex(newValue);
+        uint256 newBucketIndex;
 
-        if (newBucketIndex == getBucketOf(_buckets, _id)) {
+        if (formerValue != 0 && newValue == 0) {
+            remove(_buckets, _id);
+        } else if ((newBucketIndex = computeBucketIndex(newValue)) == getBucketOf(_buckets, _id)) {
             update_value(_buckets, _id, newValue);
         } else if (formerValue != newValue) {
             if (formerValue != 0) remove(_buckets, _id);
