@@ -8,3 +8,7 @@
 	path = lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
 	branch = v4.8.0
+[submodule "lib/morpho-utils"]
+	path = lib/morpho-utils
+	url = https://github.com/morpho-dao/morpho-utils
+	branch = feat/log2
