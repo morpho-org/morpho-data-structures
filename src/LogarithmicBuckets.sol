@@ -44,7 +44,7 @@ library LogarithmicBuckets {
             update_value(_buckets, _id, newValue);
         } else if (formerValue != newValue) {
             if (formerValue != 0) remove(_buckets, _id);
-            if (newValue != 0) insert(_buckets, _id, newValue);
+            insert(_buckets, _id, newValue, newBucketIndex);
         }
     }
 
@@ -83,11 +83,12 @@ library LogarithmicBuckets {
     function insert(
         BucketList storage _buckets,
         address _id,
-        uint96 _value
+        uint96 _value,
+        uint256 _newBucketIndex
     ) private {
         // `_buckets` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
-        uint256 bucketIndex = computeBucketIndex(_value);
+        uint256 bucketIndex = _newBucketIndex;
         _buckets.lists[bucketIndex].insertTail(_id, _value);
         _buckets.indexOf[_id] = bucketIndex;
         if (bucketIndex > _buckets.maxIndex) _buckets.maxIndex = bucketIndex;
@@ -147,5 +148,14 @@ library LogarithmicBuckets {
             }
         }
         return head;
+    }
+
+    /// @notice Returns the address of the next account in the bucket of _id.
+    /// @param _buckets The buckets to get the head.
+    /// @param _id current address.
+    /// @return The address of the head.
+    function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
+        uint256 bucketIndex = getBucketOf(_buckets, _id);
+        return _buckets.lists[bucketIndex].accounts[_id].next;
     }
 }
