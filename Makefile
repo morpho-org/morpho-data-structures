@@ -4,7 +4,7 @@ MAKEFLAGS += --no-print-directory
 
 
 install:
-    yarn
+	yarn
 	foundryup
 	git submodule update --init --recursive
 
