@@ -2,6 +2,12 @@
 .EXPORT_ALL_VARIABLES:
 MAKEFLAGS += --no-print-directory
 
+
+install:
+    yarn
+	foundryup
+	git submodule update --init --recursive
+
 contracts:
 	FOUNDRY_TEST=/dev/null forge build --sizes --force
 
