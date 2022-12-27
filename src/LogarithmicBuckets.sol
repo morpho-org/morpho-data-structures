@@ -22,6 +22,8 @@ library LogarithmicBuckets {
 
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
+    /// @notice Thrown when 0 value is inserted.
+    error ZeroValue();
 
     /// INTERNAL ///
 
@@ -30,7 +32,6 @@ library LogarithmicBuckets {
     function update(
         BucketList storage _buckets,
         address _id,
-        uint256,
         uint256 _newValue
     ) internal {
         uint256 formerValue256 = getValueOf(_buckets, _id);
@@ -40,7 +41,10 @@ library LogarithmicBuckets {
 
         if (formerValue != 0 && newValue == 0) {
             remove(_buckets, _id);
-        } else if ((newBucketIndex = computeBucketIndex(newValue)) == getBucketOf(_buckets, _id)) {
+        } else if (
+            (newBucketIndex = computeBucketIndex(newValue)) == getBucketOf(_buckets, _id) &&
+            formerValue != 0
+        ) {
             update_value(_buckets, _id, newValue);
         } else if (formerValue != newValue) {
             if (formerValue != 0) remove(_buckets, _id);
@@ -52,7 +56,8 @@ library LogarithmicBuckets {
 
     /// @notice Removes an account in the `_buckets`.
     /// @param _buckets The buckets to modify.
-    /// @param _id The address of the account to remove.
+    /// @param _id The address of the account to update.
+    /// @param _value The new value.
     function update_value(
         BucketList storage _buckets,
         address _id,
@@ -80,6 +85,10 @@ library LogarithmicBuckets {
         }
     }
 
+    /// @notice Removes an account in the `_buckets`.
+    /// @param _buckets The buckets to modify.
+    /// @param _id The address of the account to update.
+    /// @param _value The new value.
     function insert(
         BucketList storage _buckets,
         address _id,
@@ -88,6 +97,7 @@ library LogarithmicBuckets {
     ) private {
         // `_buckets` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
+        if (_value == 0) revert ZeroValue();
         uint256 bucketIndex = _newBucketIndex;
         _buckets.lists[bucketIndex].insertTail(_id, _value);
         _buckets.indexOf[_id] = bucketIndex;
