@@ -327,8 +327,7 @@ library HeapOrdering {
     /// @return The address of the next account.
     function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 rank = _heap.ranks[_id];
-        if (rank == 0 || rank >= _heap.accounts.length) return address(0);
-
-        return getAccount(_heap, rank + 1).id;
+        if (rank < _heap.accounts.length) return getAccount(_heap, rank + 1).id;
+        else return address(0);
     }
 }

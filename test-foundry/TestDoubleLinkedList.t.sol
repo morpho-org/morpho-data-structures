@@ -236,4 +236,21 @@ contract TestDoubleLinkedList is Test {
             assertEq(prevAccount, accounts[10 - i - 2]);
         }
     }
+
+    function testShouldInsertAtTheEndAfterMaxIterations() public {
+        uint256 firstNDS = 10;
+
+        for (uint256 i = 0; i < 5; i++) list.insertSorted(accounts[i], 50 - i, firstNDS);
+        for (uint256 i = 5; i < 10; i++) list.insertSorted(accounts[i], 10 - i, firstNDS);
+        // DLL is now: [50, ..., 46, 5, .. 1]
+
+        address firstTail = list.getTail();
+        assertEq(firstTail, accounts[9]);
+
+        uint256 newNDS = 5;
+
+        list.insertSorted(accounts[10], 10, newNDS);
+
+        assertEq(list.getNext(firstTail), accounts[10]);
+    }
 }
