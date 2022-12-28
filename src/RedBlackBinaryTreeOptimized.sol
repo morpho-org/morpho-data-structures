@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
 // A Solidity Red-Black Tree library to store and maintain a sorted data structure in a Red-Black binary search tree,
