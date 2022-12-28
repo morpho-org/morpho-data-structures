@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Data structures for Morpho's matching engine",
   "repository": "https://github.com/morpho-protocol/morpho-data-structures.git",
-  "author": "Morpho Labs",
+  "author": "Morpho Labs <security@morpho.xyz>",
   "license": "AGPL-3.0-only",
   "scripts": {
     "test": "npx hardhat test test-ts/*.ts",
