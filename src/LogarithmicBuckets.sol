@@ -54,7 +54,7 @@ library LogarithmicBuckets {
 
     /// PRIVATE ///
 
-    /// @notice Removes an account in the `_buckets`.
+    /// @notice Updates an account in the `_buckets`.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _value The new value.
@@ -64,7 +64,6 @@ library LogarithmicBuckets {
         uint96 _value
     ) private {
         uint256 index = _buckets.indexOf[_id];
-        // Revert if `_id` does not exist.
         _buckets.lists[index].accounts[_id].value = _value;
     }
 
@@ -79,13 +78,13 @@ library LogarithmicBuckets {
 
         if (index == _buckets.maxIndex) {
             while (_buckets.lists[index].head == address(0) && index > 0) {
-                index -= 1;
+                --index;
             }
             _buckets.maxIndex = index;
         }
     }
 
-    /// @notice Removes an account in the `_buckets`.
+    /// @notice Inserts an account in the `_buckets`.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _value The new value.
@@ -98,10 +97,9 @@ library LogarithmicBuckets {
         // `_buckets` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
         if (_value == 0) revert ZeroValue();
-        uint256 bucketIndex = _newBucketIndex;
-        _buckets.lists[bucketIndex].insertTail(_id, _value);
-        _buckets.indexOf[_id] = bucketIndex;
-        if (bucketIndex > _buckets.maxIndex) _buckets.maxIndex = bucketIndex;
+        _buckets.lists[_newBucketIndex].insertTail(_id, _value);
+        _buckets.indexOf[_id] = _newBucketIndex;
+        if (_newBucketIndex > _buckets.maxIndex) _buckets.maxIndex = _newBucketIndex;
     }
 
     /// @notice Compute the bucket index.
