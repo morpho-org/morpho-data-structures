@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "@contracts/LogarithmicBuckets.sol";
+import "src/LogarithmicBuckets.sol";
 
 contract TestLogBuckets is Test {
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;

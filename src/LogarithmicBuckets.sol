@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "lib/morpho-utils/src/math/Math.sol";
-import "./DoubleLinkedList.sol";
+import "./DoubleLinkedListFIFO.sol";
 
 library LogarithmicBuckets {
     using DoubleLinkedList for DoubleLinkedList.List;

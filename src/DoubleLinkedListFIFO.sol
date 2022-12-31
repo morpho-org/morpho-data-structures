@@ -1,10 +1,6 @@
-// SPDX-License-Identifier: AGPL-3.0-only
+// SPDX-License-Identifier: GNU AGPLv3
 pragma solidity ^0.8.0;
 
-/// @title Double Linked List.
-/// @author Morpho Labs.
-/// @custom:contact security@morpho.xyz
-/// @notice Modified double linked list with capped sorting insertion.
 library DoubleLinkedList {
     /// STRUCTS ///
 
@@ -78,8 +74,8 @@ library DoubleLinkedList {
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal {
+        if (_list.accounts[_id].value == 0) revert AccountDoesNotExist();
         Account memory account = _list.accounts[_id];
-        if (account.value == 0) revert AccountDoesNotExist();
 
         if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
         else _list.head = account.next;
@@ -89,66 +85,27 @@ library DoubleLinkedList {
         delete _list.accounts[_id];
     }
 
-    /// @notice Inserts an account in the `_list` at the right slot based on its `_value`.
+    /// @notice Inserts an account at the tail of the `_list`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     /// @param _value The value of the account.
-    /// @param _maxIterations The max number of iterations.
-    function insertSorted(
+    function insertTail(
         List storage _list,
         address _id,
-        uint256 _value,
-        uint256 _maxIterations
+        uint256 _value
     ) internal {
         if (_value == 0) revert ValueIsZero();
         if (_id == address(0)) revert AddressIsZero();
         if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
 
-        uint256 numberOfIterations;
-        address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
-
-        while (
-            numberOfIterations < _maxIterations &&
-            next != address(0) &&
-            _list.accounts[next].value >= _value
-        ) {
-            next = _list.accounts[next].next;
-            unchecked {
-                ++numberOfIterations;
-            }
-        }
-
-        // Account is not the new tail.
-        if (numberOfIterations < _maxIterations && next != address(0)) {
-            // Account is the new head.
-            if (next == _list.head) {
-                _list.accounts[_id] = Account({prev: address(0), next: next, value: _value});
-                _list.head = _id;
-                _list.accounts[next].prev = _id;
-            }
-            // Account is not the new head.
-            else {
-                address prev = _list.accounts[next].prev;
-                _list.accounts[_id] = Account({prev: prev, next: next, value: _value});
-                _list.accounts[prev].next = _id;
-                _list.accounts[next].prev = _id;
-            }
-        }
-        // Account is the new tail.
-        else {
-            // Account is the new head.
-            if (_list.head == address(0)) {
-                _list.accounts[_id] = Account({prev: address(0), next: address(0), value: _value});
-                _list.head = _id;
-                _list.tail = _id;
-            }
-            // Account is not the new head.
-            else {
-                address tail = _list.tail;
-                _list.accounts[_id] = Account({prev: tail, next: address(0), value: _value});
-                _list.accounts[tail].next = _id;
-                _list.tail = _id;
-            }
+        if (_list.head == address(0)) {
+            _list.accounts[_id] = Account(address(0), address(0), _value);
+            _list.head = _id;
+            _list.tail = _id;
+        } else {
+            _list.accounts[_id] = Account(_list.tail, address(0), _value);
+            _list.accounts[_list.tail].next = _id;
+            _list.tail = _id;
         }
     }
 }
