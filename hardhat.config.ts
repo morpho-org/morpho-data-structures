@@ -3,6 +3,8 @@ dotenv.config({ path: './.env.local' });
 import '@nomiclabs/hardhat-etherscan';
 import '@nomiclabs/hardhat-waffle';
 import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
+import 'solidity-coverage';
 
 module.exports = {
   defaultNetwork: 'hardhat',

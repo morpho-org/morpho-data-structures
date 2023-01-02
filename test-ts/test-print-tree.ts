@@ -22,7 +22,7 @@ describe('Test RedBlackBinaryTree Library', () => {
 
   describe('Print tree', () => {
     it('Apply instructions', async () => {
-      await testScenario('./test/instruction.json', testRedBlackBinaryTree);
+      await testScenario('./test-ts/instruction.json', testRedBlackBinaryTree);
       await printTreeStucture(testRedBlackBinaryTree);
     });
   });
