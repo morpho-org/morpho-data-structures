@@ -1,10 +1,10 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "@contracts/HeapOrdering.sol";
+import "src/HeapOrdering.sol";
 import "./helpers/IConcreteHeapOrdering.sol";
 
 abstract contract TestCommonHeapOrdering is Test {
@@ -336,13 +336,17 @@ abstract contract TestCommonHeapOrdering is Test {
         assertEq(heap.indexOf(accounts[3]), 3);
     }
 
-    function testOverflowNewValue() public {
+    function testOverflowNewValue(uint256 value) public {
+        vm.assume(value > type(uint96).max);
+
         vm.expectRevert("SafeCast: value doesn't fit in 96 bits");
-        update(accounts[0], 0, uint256(type(uint128).max));
+        update(accounts[0], 0, value);
     }
 
-    function testOverflowFormerValue() public {
+    function testOverflowFormerValue(uint256 value) public {
+        vm.assume(value > type(uint96).max);
+
         vm.expectRevert("SafeCast: value doesn't fit in 96 bits");
-        update(accounts[0], uint256(type(uint128).max), 0);
+        update(accounts[0], value, 0);
     }
 }

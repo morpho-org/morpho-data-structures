@@ -1,21 +1,21 @@
 help:
 	@echo "usage: two possible munging, either simple DLL of DLL with FIFO"
 
-munged-simple: $(wildcard ../contracts/*.sol) applyHarnessSimple.patch
+munged-simple: $(wildcard ../src/*.sol) applyHarnessSimple.patch
 	@rm -rf munged-simple
-	@cp -r ../contracts munged-simple
+	@cp -r ../src munged-simple
 	@patch -p0 -d munged-simple < applyHarnessSimple.patch
 
 record-simple:
-	diff -ruN ../contracts munged-simple | sed 's+\.\./contracts/++g' | sed 's+munged-simple/++g' > applyHarnessSimple.patch
+	diff -ruN ../contracts munged-simple | sed 's+\.\./src/++g' | sed 's+munged-simple/++g' > applyHarnessSimple.patch
 
-munged-fifo: $(wildcard ../contracts/*.sol) applyHarnessFIFO.patch
+munged-fifo: $(wildcard ../src/*.sol) applyHarnessFIFO.patch
 	@rm -rf munged-fifo
-	@cp -r ../contracts munged-fifo
+	@cp -r ../src munged-fifo
 	@patch -p0 -d munged-fifo < applyHarnessFIFO.patch
 
 record-fifo:
-	diff -ruN ../contracts munged-fifo | sed 's+\.\./contracts/++g' | sed 's+munged-fifo/++g' > applyHarnessFIFO.patch
+	diff -ruN ../src munged-fifo | sed 's+\.\./src/++g' | sed 's+munged-fifo/++g' > applyHarnessFIFO.patch
 
 clean:
 	rm -rf munged-simple munged-fifo

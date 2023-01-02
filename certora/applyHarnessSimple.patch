@@ -133,7 +133,7 @@ diff -ruN MockDLL.sol MockDLL.sol
 +        (ret, ) = linkBetween(_start, _end);
 +    }
 +
-+    function prevFromHead(address _end) public view returns (address last) {
++    function getPreceding(address _end) public view returns (address last) {
 +        (, last) = linkBetween(getHead(), _end);
 +    }
 +
@@ -147,103 +147,3 @@ diff -ruN MockDLL.sol MockDLL.sol
 +        return true;
 +    }
 +}
-diff -ruN test/TestRedBlackBinaryTreeOptimized.sol test/TestRedBlackBinaryTreeOptimized.sol
---- test/TestRedBlackBinaryTreeOptimized.sol	2022-10-25 18:11:24.798784245 +0200
-+++ test/TestRedBlackBinaryTreeOptimized.sol	1970-01-01 01:00:00.000000000 +0100
-@@ -1,42 +0,0 @@
--// SPDX-License-Identifier: UNLICENSED
--pragma solidity ^0.8.0;
--
--import "../RedBlackBinaryTreeOptimized.sol";
--
--contract TestRedBlackBinaryTreeOptimized {
--    using RedBlackBinaryTreeOptimized for RedBlackBinaryTreeOptimized.Tree;
--
--    RedBlackBinaryTreeOptimized.Tree public tree;
--
--    function insert(address _id, uint256 _value) external {
--        tree.insert(_id, _value);
--    }
--
--    function remove(address _id) external {
--        tree.remove(_id);
--    }
--
--    function keyExists(address _id) external view {
--        tree.keyExists(_id);
--    }
--
--    function last() external view {
--        tree.last();
--    }
--
--    function returnLast() external view returns (address) {
--        return tree.last();
--    }
--
--    function first() external view returns (address) {
--        return tree.first();
--    }
--
--    function next(address _key) external view returns (address) {
--        return tree.next(_key);
--    }
--
--    function returnKeyToValue(address _key) external view returns (uint256) {
--        return tree.keyToValue[_key];
--    }
--}
-diff -ruN test/TestRedBlackBinaryTree.sol test/TestRedBlackBinaryTree.sol
---- test/TestRedBlackBinaryTree.sol	2022-10-25 18:11:24.798784245 +0200
-+++ test/TestRedBlackBinaryTree.sol	1970-01-01 01:00:00.000000000 +0100
-@@ -1,50 +0,0 @@
--// SPDX-License-Identifier: UNLICENSED
--pragma solidity ^0.8.0;
--
--import "../RedBlackBinaryTree.sol";
--
--contract TestRedBlackBinaryTree {
--    using RedBlackBinaryTree for RedBlackBinaryTree.Tree;
--
--    RedBlackBinaryTree.Tree public tree;
--
--    function insert(address _id, uint256 _value) external {
--        tree.insert(_id, _value);
--    }
--
--    function remove(address _id) external {
--        tree.remove(_id);
--    }
--
--    function keyExists(address _id) external view {
--        tree.keyExists(_id);
--    }
--
--    function last() external view {
--        tree.last();
--    }
--
--    function returnLast() external view returns (uint256) {
--        return tree.last();
--    }
--
--    function first() external view returns (uint256) {
--        return tree.first();
--    }
--
--    function next(uint256 _value) external view returns (uint256) {
--        return tree.next(_value);
--    }
--
--    function returnKeyToValue(address _key) external view returns (uint256) {
--        return tree.keyToValue[_key];
--    }
--
--    function valueKeyAtIndex(uint256 _value, uint256 _index) external view returns (address) {
--        return tree.valueKeyAtIndex(_value, _index);
--    }
--
--    function getNumberOfKeysAtValue(uint256 _value) external view returns (uint256) {
--        return tree.getNumberOfKeysAtValue(_value);
--    }
--}

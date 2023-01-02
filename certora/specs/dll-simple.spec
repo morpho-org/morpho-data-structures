@@ -9,7 +9,7 @@ methods {
     // added through harness
     getInsertedBefore() returns (address) envfree
     getInsertedAfter() returns (address) envfree
-    prevFromHead(address) returns (address) envfree
+    getPreceding(address) returns (address) envfree
     isForwardLinkedBetween(address, address) returns (bool) envfree
     isDecrSortedFrom(address) returns (bool) envfree
 }
@@ -254,7 +254,7 @@ rule forwardLinkedPreservedInsertSorted(address _id, uint256 _value) {
 rule forwardLinkedPreservedRemove(address _id) {
     address addr; address prev;
 
-    require prev == prevFromHead(_id);
+    require prev == getPreceding(_id);
 
     require isInDLL(addr) => isForwardLinkedBetween(getHead(), addr);
 
