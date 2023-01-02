@@ -1,4 +1,2 @@
-@openzeppelin/=node_modules/@openzeppelin/
-forge-std/=lib/forge-std/src/
 ds-test/=lib/ds-test/src/
-hardhat/=node_modules/hardhat/
+forge-std/=lib/forge-std/src/
