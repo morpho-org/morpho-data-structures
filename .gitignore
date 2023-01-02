@@ -33,3 +33,10 @@ yarn-error.log*
 # test
 /test-ts/output-tree-structure.txt
 *.ansi
+
+#certora
+certora/munged-simple/*
+certora/munged-fifo/*
+.certora*
+last_conf*
+certora_debug_log.txt

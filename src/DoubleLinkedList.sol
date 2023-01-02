@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
+/// @title Double Linked List.
+/// @author Morpho Labs.
+/// @custom:contact security@morpho.xyz
+/// @notice Modified double linked list with capped sorting insertion.
 library DoubleLinkedList {
     /// STRUCTS ///
 
@@ -74,8 +78,8 @@ library DoubleLinkedList {
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal {
-        if (_list.accounts[_id].value == 0) revert AccountDoesNotExist();
         Account memory account = _list.accounts[_id];
+        if (account.value == 0) revert AccountDoesNotExist();
 
         if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
         else _list.head = account.next;
@@ -105,7 +109,7 @@ library DoubleLinkedList {
 
         while (
             numberOfIterations < _maxIterations &&
-            next != _list.tail &&
+            next != address(0) &&
             _list.accounts[next].value >= _value
         ) {
             next = _list.accounts[next].next;
@@ -115,17 +119,18 @@ library DoubleLinkedList {
         }
 
         // Account is not the new tail.
-        if (next != address(0) && _list.accounts[next].value < _value) {
+        if (numberOfIterations < _maxIterations && next != address(0)) {
             // Account is the new head.
             if (next == _list.head) {
-                _list.accounts[_id] = Account(address(0), next, _value);
+                _list.accounts[_id] = Account({prev: address(0), next: next, value: _value});
                 _list.head = _id;
                 _list.accounts[next].prev = _id;
             }
             // Account is not the new head.
             else {
-                _list.accounts[_id] = Account(_list.accounts[next].prev, next, _value);
-                _list.accounts[_list.accounts[next].prev].next = _id;
+                address prev = _list.accounts[next].prev;
+                _list.accounts[_id] = Account({prev: prev, next: next, value: _value});
+                _list.accounts[prev].next = _id;
                 _list.accounts[next].prev = _id;
             }
         }
@@ -133,14 +138,15 @@ library DoubleLinkedList {
         else {
             // Account is the new head.
             if (_list.head == address(0)) {
-                _list.accounts[_id] = Account(address(0), address(0), _value);
+                _list.accounts[_id] = Account({prev: address(0), next: address(0), value: _value});
                 _list.head = _id;
                 _list.tail = _id;
             }
             // Account is not the new head.
             else {
-                _list.accounts[_id] = Account(_list.tail, address(0), _value);
-                _list.accounts[_list.tail].next = _id;
+                address tail = _list.tail;
+                _list.accounts[_id] = Account({prev: tail, next: address(0), value: _value});
+                _list.accounts[tail].next = _id;
                 _list.tail = _id;
             }
         }
