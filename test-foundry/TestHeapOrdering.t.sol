@@ -546,4 +546,9 @@ contract TestHeapOrdering is DSTest {
         hevm.expectRevert("SafeCast: value doesn't fit in 96 bits");
         update(accounts[0], uint256(type(uint128).max), 0);
     }
+
+    function testGetNextUnknown() public {
+        update(accounts[0], 0, 1);
+        assertEq(heap.getNext(address(0xdEaD)), ADDR_ZERO);
+    }
 }
