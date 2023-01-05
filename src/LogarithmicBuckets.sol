@@ -35,20 +35,22 @@ library LogarithmicBuckets {
         uint256 _newValue
     ) internal {
         uint256 formerValue256 = getValueOf(_buckets, _id);
-        uint96 formerValue = SafeCast.toUint96(formerValue256);
         uint96 newValue = SafeCast.toUint96(_newValue);
         uint256 newBucketIndex;
 
-        if (formerValue256 != 0 && _newValue == 0) {
-            remove(_buckets, _id);
-        } else if (
-            (newBucketIndex = computeBucketIndex(_newValue)) == getBucketOf(_buckets, _id) &&
-            formerValue != 0
-        ) {
-            update_value(_buckets, _id, newValue);
-        } else if (formerValue256 != _newValue) {
-            if (formerValue != 0) remove(_buckets, _id);
-            insert(_buckets, _id, newValue, newBucketIndex);
+        if (formerValue256 != 0) {
+            if (_newValue == 0) {
+                remove(_buckets, _id);
+            } else if (
+                (newBucketIndex = computeBucketIndex(_newValue)) == getBucketOf(_buckets, _id)
+            ) {
+                update_value(_buckets, _id, newValue, newBucketIndex);
+            } else {
+                remove(_buckets, _id);
+                insert(_buckets, _id, newValue, newBucketIndex);
+            }
+        } else if (_newValue != 0) {
+            insert(_buckets, _id, newValue, computeBucketIndex(_newValue));
         }
     }
 
@@ -61,10 +63,10 @@ library LogarithmicBuckets {
     function update_value(
         BucketList storage _buckets,
         address _id,
-        uint96 _value
+        uint96 _value,
+        uint256 bucketIndex
     ) private {
-        uint256 index = _buckets.indexOf[_id];
-        _buckets.lists[index].accounts[_id].value = _value;
+        _buckets.lists[bucketIndex].accounts[_id].value = _value;
     }
 
     /// @notice Removes an account in the `_buckets`.
