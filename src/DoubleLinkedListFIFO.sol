@@ -12,8 +12,6 @@ library DoubleLinkedList {
 
     struct List {
         mapping(address => Account) accounts;
-        address head;
-        address tail;
     }
 
     /// ERRORS ///
@@ -44,14 +42,14 @@ library DoubleLinkedList {
     /// @param _list The list to get the head.
     /// @return The address of the head.
     function getHead(List storage _list) internal view returns (address) {
-        return _list.head;
+        return _list.accounts[address(0)].next;
     }
 
     /// @notice Returns the address at the tail of the `_list`.
     /// @param _list The list to get the tail.
     /// @return The address of the tail.
     function getTail(List storage _list) internal view returns (address) {
-        return _list.tail;
+        return _list.accounts[address(0)].prev;
     }
 
     /// @notice Returns the next id address from the current `_id`.
@@ -78,9 +76,9 @@ library DoubleLinkedList {
         Account memory account = _list.accounts[_id];
 
         if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
-        else _list.head = account.next;
+        else _list.accounts[address(0)].next = account.next;
         if (account.next != address(0)) _list.accounts[account.next].prev = account.prev;
-        else _list.tail = account.prev;
+        else _list.accounts[address(0)].prev = account.prev;
 
         delete _list.accounts[_id];
     }
@@ -98,14 +96,14 @@ library DoubleLinkedList {
         if (_id == address(0)) revert AddressIsZero();
         if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
 
-        if (_list.head == address(0)) {
+        if (_list.accounts[address(0)].next == address(0)) {
             _list.accounts[_id] = Account(address(0), address(0), _value);
-            _list.head = _id;
-            _list.tail = _id;
+            _list.accounts[address(0)].next = _id;
+            _list.accounts[address(0)].prev = _id;
         } else {
-            _list.accounts[_id] = Account(_list.tail, address(0), _value);
-            _list.accounts[_list.tail].next = _id;
-            _list.tail = _id;
+            _list.accounts[_id] = Account(_list.accounts[address(0)].prev, address(0), _value);
+            _list.accounts[_list.accounts[address(0)].prev].next = _id;
+            _list.accounts[address(0)].prev = _id;
         }
     }
 }

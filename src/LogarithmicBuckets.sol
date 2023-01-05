@@ -79,7 +79,7 @@ library LogarithmicBuckets {
         delete _buckets.indexOf[_id];
 
         if (index == _buckets.maxIndex) {
-            while (_buckets.lists[index].head == address(0) && index > 0) {
+            while (_buckets.lists[index].getHead() == address(0) && index > 0) {
                 // Safe unchecked because index > 0.
                 unchecked {
                     --index;
@@ -145,20 +145,20 @@ library LogarithmicBuckets {
     /// @return The address of the head.
     function getHead(BucketList storage _buckets, uint96 _value) internal view returns (address) {
         uint256 index = computeBucketIndex(_value);
-        address head = _buckets.lists[index].head;
+        address head = _buckets.lists[index].getHead();
 
         if (_buckets.maxIndex == 0) {
-            head = _buckets.lists[0].head;
+            head = _buckets.lists[0].getHead();
         } else if (index <= _buckets.maxIndex) {
             while (head == address(0)) {
                 index += 1;
-                head = _buckets.lists[index].head;
+                head = _buckets.lists[index].getHead();
             }
         } else {
             index = _buckets.maxIndex + 1;
             while (head == address(0)) {
                 index -= 1;
-                head = _buckets.lists[index].head;
+                head = _buckets.lists[index].getHead();
             }
         }
         return head;
