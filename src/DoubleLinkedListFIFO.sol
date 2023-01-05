@@ -7,7 +7,6 @@ library DoubleLinkedList {
     struct Account {
         address prev;
         address next;
-        uint256 value;
     }
 
     struct List {
@@ -25,18 +24,7 @@ library DoubleLinkedList {
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
 
-    /// @notice Thrown when the value is zero at insertion.
-    error ValueIsZero();
-
     /// INTERNAL ///
-
-    /// @notice Returns the `account` linked to `_id`.
-    /// @param _list The list to search in.
-    /// @param _id The address of the account.
-    /// @return The value of the account.
-    function getValueOf(List storage _list, address _id) internal view returns (uint256) {
-        return _list.accounts[_id].value;
-    }
 
     /// @notice Returns the address at the head of the `_list`.
     /// @param _list The list to get the head.
@@ -72,7 +60,6 @@ library DoubleLinkedList {
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal {
-        if (_list.accounts[_id].value == 0) revert AccountDoesNotExist();
         Account memory account = _list.accounts[_id];
 
         if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
@@ -86,22 +73,15 @@ library DoubleLinkedList {
     /// @notice Inserts an account at the tail of the `_list`.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
-    /// @param _value The value of the account.
-    function insert(
-        List storage _list,
-        address _id,
-        uint256 _value
-    ) internal {
-        if (_value == 0) revert ValueIsZero();
+    function insert(List storage _list, address _id) internal {
         if (_id == address(0)) revert AddressIsZero();
-        if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
 
         if (_list.accounts[address(0)].next == address(0)) {
-            _list.accounts[_id] = Account(address(0), address(0), _value);
+            _list.accounts[_id] = Account(address(0), address(0));
             _list.accounts[address(0)].next = _id;
             _list.accounts[address(0)].prev = _id;
         } else {
-            _list.accounts[_id] = Account(_list.accounts[address(0)].prev, address(0), _value);
+            _list.accounts[_id] = Account(_list.accounts[address(0)].prev, address(0));
             _list.accounts[_list.accounts[address(0)].prev].next = _id;
             _list.accounts[address(0)].prev = _id;
         }
