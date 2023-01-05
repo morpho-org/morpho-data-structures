@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import "lib/morpho-utils/src/math/Math.sol";
 import "./DoubleLinkedListFIFO.sol";
 
@@ -34,23 +33,22 @@ library LogarithmicBuckets {
         address _id,
         uint256 _newValue
     ) internal {
-        uint256 formerValue256 = getValueOf(_buckets, _id);
-        uint96 newValue = SafeCast.toUint96(_newValue);
+        uint256 formerValue = getValueOf(_buckets, _id);
         uint256 newBucketIndex;
 
-        if (formerValue256 != 0) {
+        if (formerValue != 0) {
             if (_newValue == 0) {
                 remove(_buckets, _id);
             } else if (
                 (newBucketIndex = computeBucketIndex(_newValue)) == getBucketOf(_buckets, _id)
             ) {
-                update_value(_buckets, _id, newValue);
+                update_value(_buckets, _id, _newValue);
             } else {
                 remove(_buckets, _id);
-                insert(_buckets, _id, newValue, newBucketIndex);
+                insert(_buckets, _id, _newValue, newBucketIndex);
             }
         } else if (_newValue != 0) {
-            insert(_buckets, _id, newValue, computeBucketIndex(_newValue));
+            insert(_buckets, _id, _newValue, computeBucketIndex(_newValue));
         }
     }
 
@@ -63,7 +61,7 @@ library LogarithmicBuckets {
     function update_value(
         BucketList storage _buckets,
         address _id,
-        uint96 _value
+        uint256 _value
     ) private {
         _buckets.balanceOf[_id] = _value;
     }
@@ -96,7 +94,7 @@ library LogarithmicBuckets {
     function insert(
         BucketList storage _buckets,
         address _id,
-        uint96 _value,
+        uint256 _value,
         uint256 _newBucketIndex
     ) private {
         // `_buckets` cannot contain the 0 address.
@@ -142,7 +140,7 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to get the head.
     /// @param _value The value to match.
     /// @return The address of the head.
-    function getHead(BucketList storage _buckets, uint96 _value) internal view returns (address) {
+    function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
         uint256 index = computeBucketIndex(_value);
         address head = _buckets.lists[index].getHead();
 
