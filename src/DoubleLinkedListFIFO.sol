@@ -62,10 +62,8 @@ library DoubleLinkedList {
     function remove(List storage _list, address _id) internal {
         Account memory account = _list.accounts[_id];
 
-        if (account.prev != address(0)) _list.accounts[account.prev].next = account.next;
-        else _list.accounts[address(0)].next = account.next;
-        if (account.next != address(0)) _list.accounts[account.next].prev = account.prev;
-        else _list.accounts[address(0)].prev = account.prev;
+        _list.accounts[account.prev].next = account.next;
+        _list.accounts[account.next].prev = account.prev;
 
         delete _list.accounts[_id];
     }
@@ -76,14 +74,11 @@ library DoubleLinkedList {
     function insert(List storage _list, address _id) internal {
         if (_id == address(0)) revert AddressIsZero();
 
-        if (_list.accounts[address(0)].next == address(0)) {
-            _list.accounts[_id] = Account(address(0), address(0));
-            _list.accounts[address(0)].next = _id;
-            _list.accounts[address(0)].prev = _id;
-        } else {
-            _list.accounts[_id] = Account(_list.accounts[address(0)].prev, address(0));
-            _list.accounts[_list.accounts[address(0)].prev].next = _id;
-            _list.accounts[address(0)].prev = _id;
-        }
+        address tail = _list.accounts[address(0)].prev;
+
+        _list.accounts[address(0)].prev = _id;
+        _list.accounts[tail].next = _id;
+
+        _list.accounts[_id] = Account(tail, address(0));
     }
 }
