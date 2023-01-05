@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "../RedBlackBinaryTree.sol";
+import "src/RedBlackBinaryTree.sol";
 
-contract TestRedBlackBinaryTree {
+contract RedBlackBinaryTreeMock {
     using RedBlackBinaryTree for RedBlackBinaryTree.Tree;
 
     RedBlackBinaryTree.Tree public tree;

@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "src/ThreeHeapOrdering.sol";
-import "./IConcreteHeapOrdering.sol";
+import "src/HeapOrdering.sol";
+import "../interfaces/IHeapOrdering.sol";
 
-contract ConcreteThreeHeapOrdering is IConcreteHeapOrdering {
-    using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
+contract HeapOrderingMock is IHeapOrdering {
+    using HeapOrdering for HeapOrdering.HeapArray;
 
-    ThreeHeapOrdering.HeapArray internal heap;
+    HeapOrdering.HeapArray internal heap;
 
     function accountsValue(uint256 _index) external view returns (uint256) {
         return heap.accounts[_index].value;
