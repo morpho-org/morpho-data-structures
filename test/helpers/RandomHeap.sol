@@ -2,11 +2,11 @@
 pragma solidity ^0.8.13;
 
 import "./Random.sol";
-import "../interfaces/IHeapOrdering.sol";
+import "../mocks/IHeapOrderingMock.sol";
 import "forge-std/Test.sol";
 
 abstract contract RandomHeap is Test, Random {
-    IHeapOrdering public heap;
+    IHeapOrderingMock public heap;
 
     address[] public ids;
 
