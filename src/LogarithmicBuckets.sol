@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/math/SafeCast.sol";
@@ -39,14 +39,14 @@ library LogarithmicBuckets {
         uint96 newValue = SafeCast.toUint96(_newValue);
         uint256 newBucketIndex;
 
-        if (formerValue != 0 && newValue == 0) {
+        if (formerValue256 != 0 && _newValue == 0) {
             remove(_buckets, _id);
         } else if (
-            (newBucketIndex = computeBucketIndex(newValue)) == getBucketOf(_buckets, _id) &&
+            (newBucketIndex = computeBucketIndex(_newValue)) == getBucketOf(_buckets, _id) &&
             formerValue != 0
         ) {
             update_value(_buckets, _id, newValue);
-        } else if (formerValue != newValue) {
+        } else if (formerValue256 != _newValue) {
             if (formerValue != 0) remove(_buckets, _id);
             insert(_buckets, _id, newValue, newBucketIndex);
         }
@@ -78,7 +78,10 @@ library LogarithmicBuckets {
 
         if (index == _buckets.maxIndex) {
             while (_buckets.lists[index].head == address(0) && index > 0) {
-                --index;
+                // Safe unchecked because index > 0.
+                unchecked {
+                    --index;
+                }
             }
             _buckets.maxIndex = index;
         }
@@ -88,6 +91,7 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _value The new value.
+    /// @param _newBucketIndex The index of the bucket where to insert
     function insert(
         BucketList storage _buckets,
         address _id,
@@ -97,14 +101,14 @@ library LogarithmicBuckets {
         // `_buckets` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
         if (_value == 0) revert ZeroValue();
-        _buckets.lists[_newBucketIndex].insertTail(_id, _value);
+        _buckets.lists[_newBucketIndex].insert(_id, _value);
         _buckets.indexOf[_id] = _newBucketIndex;
         if (_newBucketIndex > _buckets.maxIndex) _buckets.maxIndex = _newBucketIndex;
     }
 
     /// @notice Compute the bucket index.
     /// @param _value The value of the index to compute.
-    function computeBucketIndex(uint96 _value) private pure returns (uint256) {
+    function computeBucketIndex(uint256 _value) private pure returns (uint256) {
         return Math.log2(_value) / LOG2_LOGBASE;
     }
 

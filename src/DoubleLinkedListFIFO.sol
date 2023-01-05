@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
 library DoubleLinkedList {
@@ -89,7 +89,7 @@ library DoubleLinkedList {
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     /// @param _value The value of the account.
-    function insertTail(
+    function insert(
         List storage _list,
         address _id,
         uint256 _value
