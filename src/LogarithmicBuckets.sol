@@ -34,29 +34,27 @@ library LogarithmicBuckets {
         uint256 _newValue
     ) internal {
         uint256 balance = _buckets.balanceOf[_id];
+        _buckets.balanceOf[_id] = _newValue;
 
-        if (balance != 0) {
-            uint256 currentBucket = computeBucket(balance);
-            _buckets.balanceOf[_id] = _newValue;
-
-            if (_newValue == 0) {
-                remove(_buckets, _id, currentBucket);
-                return;
-            }
-
-            uint256 newBucket = computeBucket(_newValue);
-            if (newBucket != currentBucket) {
-                remove(_buckets, _id, currentBucket);
-                insert(_buckets, _id, newBucket);
-                return;
-            }
+        if (balance == 0) {
+            // `_buckets` cannot contain the 0 address.
+            if (_newValue == 0) revert ZeroValue();
+            if (_id == address(0)) revert AddressIsZero();
+            insert(_buckets, _id, computeBucket(_newValue));
+            return;
         }
 
-        // `_buckets` cannot contain the 0 address.
-        if (_id == address(0)) revert AddressIsZero();
-        if (_newValue == 0) revert ZeroValue();
-        _buckets.balanceOf[_id] = _newValue;
-        insert(_buckets, _id, computeBucket(_newValue));
+        uint256 currentBucket = computeBucket(balance);
+        if (_newValue == 0) {
+            remove(_buckets, _id, currentBucket);
+            return;
+        }
+
+        uint256 newBucket = computeBucket(_newValue);
+        if (newBucket != currentBucket) {
+            remove(_buckets, _id, currentBucket);
+            insert(_buckets, _id, newBucket);
+        }
     }
 
     /// PRIVATE ///
