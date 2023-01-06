@@ -78,7 +78,6 @@ library DoubleLinkedList {
 
         _list.accounts[address(0)].prev = _id;
         _list.accounts[tail].next = _id;
-
-        _list.accounts[_id] = Account(tail, address(0));
+        _list.accounts[_id].prev = tail;
     }
 }
