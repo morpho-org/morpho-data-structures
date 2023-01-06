@@ -26,7 +26,7 @@ contract TestLogBuckets is Test {
 
         assertEq(bucketlist.getValueOf(accounts[0]), 1);
         assertEq(bucketlist.getHead(0), accounts[0]);
-        assertEq(bucketlist.getMaxIndex(), 0);
+        assertEq(bucketlist.getMaxBucket(), 0);
         assertEq(bucketlist.getBucketOf(accounts[0]), 0);
     }
 
@@ -59,7 +59,7 @@ contract TestLogBuckets is Test {
 
         assertEq(bucketlist.getValueOf(accounts[0]), 0);
         assertEq(bucketlist.getHead(0), address(0));
-        assertEq(bucketlist.getMaxIndex(), 0);
+        assertEq(bucketlist.getMaxBucket(), 0);
         assertEq(bucketlist.getBucketOf(accounts[0]), 0);
     }
 
@@ -69,7 +69,7 @@ contract TestLogBuckets is Test {
 
         assertEq(bucketlist.getHead(16), accounts[0]);
         assertEq(bucketlist.getHead(4), accounts[1]);
-        assertEq(bucketlist.getMaxIndex(), 2);
+        assertEq(bucketlist.getMaxBucket(), 2);
     }
 
     function testShouldRemoveOneAccountOverTwo() public {
@@ -80,7 +80,7 @@ contract TestLogBuckets is Test {
         assertEq(bucketlist.getHead(4), accounts[1]);
         assertEq(bucketlist.getValueOf(accounts[0]), 0);
         assertEq(bucketlist.getValueOf(accounts[1]), 16);
-        assertEq(bucketlist.getMaxIndex(), 2);
+        assertEq(bucketlist.getMaxBucket(), 2);
     }
 
     function testShouldRemoveBothAccounts() public {
@@ -92,21 +92,21 @@ contract TestLogBuckets is Test {
         assertEq(bucketlist.getHead(4), address(0));
     }
 
-    function testGetMaxIndex() public {
+    function testGetMaxBucket() public {
         bucketlist.update(accounts[0], 1);
-        assertEq(bucketlist.getMaxIndex(), 0);
+        assertEq(bucketlist.getMaxBucket(), 0);
         bucketlist.update(accounts[1], 2);
-        assertEq(bucketlist.getMaxIndex(), 0);
+        assertEq(bucketlist.getMaxBucket(), 0);
         bucketlist.update(accounts[2], 4);
-        assertEq(bucketlist.getMaxIndex(), 1);
+        assertEq(bucketlist.getMaxBucket(), 1);
         bucketlist.update(accounts[3], 16);
-        assertEq(bucketlist.getMaxIndex(), 2);
+        assertEq(bucketlist.getMaxBucket(), 2);
         bucketlist.update(accounts[3], 0);
-        assertEq(bucketlist.getMaxIndex(), 1);
+        assertEq(bucketlist.getMaxBucket(), 1);
         bucketlist.update(accounts[2], 0);
-        assertEq(bucketlist.getMaxIndex(), 0);
+        assertEq(bucketlist.getMaxBucket(), 0);
         bucketlist.update(accounts[1], 0);
-        assertEq(bucketlist.getMaxIndex(), 0);
+        assertEq(bucketlist.getMaxBucket(), 0);
     }
 
     function testGetHead() public {
