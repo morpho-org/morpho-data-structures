@@ -15,12 +15,6 @@ library DoubleLinkedList {
 
     /// ERRORS ///
 
-    /// @notice Thrown when the account is already inserted in the double linked list.
-    error AccountAlreadyInserted();
-
-    /// @notice Thrown when the account to remove does not exist.
-    error AccountDoesNotExist();
-
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
 

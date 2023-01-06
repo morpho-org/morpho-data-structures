@@ -21,13 +21,13 @@ library LogarithmicBuckets {
 
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
+
     /// @notice Thrown when 0 value is inserted.
     error ZeroValue();
 
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_buckets`.
-    /// @dev Only call this function when `_id` is in the `_buckets` with value `_formerValue` or when `_id` is not in the `_buckets` with `_formerValue` equal to 0.
     function update(
         BucketList storage _buckets,
         address _id,
@@ -40,15 +40,15 @@ library LogarithmicBuckets {
             if (_newValue == 0) {
                 remove(_buckets, _id);
             } else if (
-                (newBucketIndex = computeBucketIndex(_newValue)) == getBucketOf(_buckets, _id)
+                (newBucketIndex = computeBucketOf(_newValue)) == getBucketOf(_buckets, _id)
             ) {
-                update_value(_buckets, _id, _newValue);
+                updateValue(_buckets, _id, _newValue);
             } else {
                 remove(_buckets, _id);
                 insert(_buckets, _id, _newValue, newBucketIndex);
             }
         } else if (_newValue != 0) {
-            insert(_buckets, _id, _newValue, computeBucketIndex(_newValue));
+            insert(_buckets, _id, _newValue, computeBucketOf(_newValue));
         }
     }
 
@@ -58,7 +58,7 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _value The new value.
-    function update_value(
+    function updateValue(
         BucketList storage _buckets,
         address _id,
         uint256 _value
@@ -70,7 +70,7 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to remove.
     function remove(BucketList storage _buckets, address _id) private {
-        uint256 index = computeBucketIndex(_buckets.balanceOf[_id]);
+        uint256 index = computeBucketOf(_buckets.balanceOf[_id]);
         // Revert if `_id` does not exist.
         _buckets.lists[index].remove(_id);
         delete _buckets.balanceOf[_id];
@@ -107,7 +107,7 @@ library LogarithmicBuckets {
 
     /// @notice Compute the bucket index.
     /// @param _value The value of the index to compute.
-    function computeBucketIndex(uint256 _value) private pure returns (uint256) {
+    function computeBucketOf(uint256 _value) private pure returns (uint256) {
         return Math.log2(_value) / LOG2_LOGBASE;
     }
 
@@ -126,7 +126,7 @@ library LogarithmicBuckets {
     /// @param _id The address of the account.
     /// @return index The value of the account.
     function getBucketOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
-        return computeBucketIndex(_buckets.balanceOf[_id]);
+        return computeBucketOf(_buckets.balanceOf[_id]);
     }
 
     /// @notice Returns the value of the account linked to `_id`.
@@ -141,24 +141,18 @@ library LogarithmicBuckets {
     /// @param _value The value to match.
     /// @return The address of the head.
     function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
-        uint256 index = computeBucketIndex(_value);
-        address head = _buckets.lists[index].getHead();
+        uint256 index = computeBucketOf(_value);
+        uint256 maxIndex = _buckets.maxIndex;
 
-        if (_buckets.maxIndex == 0) {
-            head = _buckets.lists[0].getHead();
-        } else if (index <= _buckets.maxIndex) {
-            while (head == address(0)) {
-                index += 1;
-                head = _buckets.lists[index].getHead();
+        if (index < maxIndex) {
+            address head;
+            // Safe unchecked because index <= maxIndex.
+            unchecked {
+                while ((head = _buckets.lists[index++].getHead()) == address(0)) {}
             }
-        } else {
-            index = _buckets.maxIndex + 1;
-            while (head == address(0)) {
-                index -= 1;
-                head = _buckets.lists[index].getHead();
-            }
+            return head;
         }
-        return head;
+        return _buckets.lists[maxIndex].getHead();
     }
 
     /// @notice Returns the address of the next account in the bucket of _id.
