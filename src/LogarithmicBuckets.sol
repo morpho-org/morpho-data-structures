@@ -69,18 +69,20 @@ library LogarithmicBuckets {
     /// @param _id The address of the account to remove.
     function remove(BucketList storage _buckets, address _id) private {
         uint256 bucket = computeBucketOf(_buckets.balanceOf[_id]);
+        uint256 maxBucket = _buckets.maxBucket;
+
         // Revert if `_id` does not exist.
         _buckets.lists[bucket].remove(_id);
         delete _buckets.balanceOf[_id];
 
-        if (bucket == _buckets.maxBucket) {
+        if (bucket == maxBucket) {
             while (_buckets.lists[bucket].getHead() == address(0) && bucket > 0) {
                 // Safe unchecked because bucket > 0.
                 unchecked {
                     --bucket;
                 }
             }
-            _buckets.maxBucket = bucket;
+            if (bucket != maxBucket) _buckets.maxBucket = bucket;
         }
     }
 
