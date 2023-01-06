@@ -33,79 +33,73 @@ library LogarithmicBuckets {
         address _id,
         uint256 _newValue
     ) internal {
-        if (_buckets.balanceOf[_id] != 0) {
+        uint256 balance = _buckets.balanceOf[_id];
+
+        if (balance != 0) {
+            uint256 currentBucket = computeBucketOf(balance);
+            _buckets.balanceOf[_id] = _newValue;
+
             if (_newValue == 0) {
-                remove(_buckets, _id);
+                remove(_buckets, _id, currentBucket);
                 return;
             }
 
             uint256 newBucket = computeBucketOf(_newValue);
-            if (newBucket == getBucketOf(_buckets, _id)) {
-                updateValue(_buckets, _id, _newValue);
+            if (newBucket == currentBucket) {
                 return;
             }
 
-            remove(_buckets, _id);
-            insert(_buckets, _id, _newValue, newBucket);
+            remove(_buckets, _id, currentBucket);
+            insert(_buckets, _id, newBucket);
             return;
         }
 
         // `_buckets` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
         if (_newValue == 0) revert ZeroValue();
-        insert(_buckets, _id, _newValue, computeBucketOf(_newValue));
+        _buckets.balanceOf[_id] = _newValue;
+        insert(_buckets, _id, computeBucketOf(_newValue));
     }
 
     /// PRIVATE ///
 
-    /// @notice Updates an account in the `_buckets`.
-    /// @param _buckets The buckets to modify.
-    /// @param _id The address of the account to update.
-    /// @param _value The new value.
-    function updateValue(
-        BucketList storage _buckets,
-        address _id,
-        uint256 _value
-    ) private {
-        _buckets.balanceOf[_id] = _value;
-    }
-
     /// @notice Removes an account in the `_buckets`.
+    /// @dev Does not update the value.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to remove.
-    function remove(BucketList storage _buckets, address _id) private {
-        uint256 bucket = computeBucketOf(_buckets.balanceOf[_id]);
+    function remove(
+        BucketList storage _buckets,
+        address _id,
+        uint256 _bucket
+    ) private {
         uint256 maxBucket = _buckets.maxBucket;
 
         // Revert if `_id` does not exist.
-        _buckets.lists[bucket].remove(_id);
-        delete _buckets.balanceOf[_id];
+        _buckets.lists[_bucket].remove(_id);
 
-        if (bucket == maxBucket) {
-            while (_buckets.lists[bucket].getHead() == address(0) && bucket > 0) {
+        if (_bucket == maxBucket) {
+            while (_buckets.lists[_bucket].getHead() == address(0) && _bucket > 0) {
                 // Safe unchecked because bucket > 0.
                 unchecked {
-                    --bucket;
+                    --_bucket;
                 }
             }
-            if (bucket != maxBucket) _buckets.maxBucket = bucket;
+            if (_bucket != maxBucket) _buckets.maxBucket = _bucket;
         }
     }
 
     /// @notice Inserts an account in the `_buckets`.
     /// @dev Expects that `_id` != 0 and if `_value` != 0.
+    /// @dev Does not update the value.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
-    /// @param _value The new value.
     /// @param _newBucket The bucket where to insert
     function insert(
         BucketList storage _buckets,
         address _id,
-        uint256 _value,
         uint256 _newBucket
     ) private {
         _buckets.lists[_newBucket].insert(_id);
-        _buckets.balanceOf[_id] = _value;
         if (_newBucket > _buckets.maxBucket) _buckets.maxBucket = _newBucket;
     }
 
