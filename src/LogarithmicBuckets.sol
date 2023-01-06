@@ -94,28 +94,6 @@ library LogarithmicBuckets {
         return 1 << (Math.log2(_value) / LOG2_LOGBASE);
     }
 
-    /// @notice Get the next bucket.
-    /// @param _bucketMap .
-    /// @param _bucket .
-    function nextBucket(uint256 _bucketMap, uint256 _bucket) private pure returns (uint256) {
-        if (_bucketMap == 0) {
-            return 0;
-        }
-
-        // There is a non-empty bucket higher than _bucket.
-        if (_bucketMap >= _bucket) {
-            while (_bucket & _bucketMap == 0) {
-                _bucket <<= 1;
-            }
-            return _bucket;
-        }
-
-        while (_bucket & _bucketMap == 0) {
-            _bucket >>= 1;
-        }
-        return _bucket;
-    }
-
     /// GETTERS ///
 
     /// @notice Returns the value of the account linked to `_id`.
@@ -147,7 +125,26 @@ library LogarithmicBuckets {
     /// @return The address of the head.
     function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
         uint256 bucket = computeBucket(_value);
-        return _buckets.lists[nextBucket(_buckets.bucketsMap, bucket)].getHead();
+        uint256 bucketMap = _buckets.bucketsMap;
+
+        // There is no non-empty bucket.
+        if (bucketMap == 0) {
+            return _buckets.lists[0].getHead();
+        }
+
+        // There is a non-empty bucket higher than `bucket`.
+        if (bucketMap >= bucket) {
+            while (bucket & bucketMap == 0) {
+                bucket <<= 1;
+            }
+            return _buckets.lists[bucket].getHead();
+        }
+
+        // There is a non-empty bucket lower than `bucket`.
+        while (bucket & bucketMap == 0) {
+            bucket >>= 1;
+        }
+        return _buckets.lists[bucket].getHead();
     }
 
     /// @notice Returns the address of the next account in the bucket of _id.
