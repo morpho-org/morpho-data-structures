@@ -30,9 +30,9 @@ contract TestLogBuckets is Test {
         assertEq(bucketlist.getBucketOf(accounts[0]), 0);
     }
 
-    function testUpdatingFromZeroToZeroShouldNotInsert() public {
+    function testUpdatingFromZeroToZeroShouldRevert() public {
+        vm.expectRevert(abi.encodeWithSignature("ZeroValue()"));
         bucketlist.update(accounts[0], 0);
-        assertEq(bucketlist.getHead(0), address(0));
     }
 
     function testShouldNotInsertZeroAddress() public {

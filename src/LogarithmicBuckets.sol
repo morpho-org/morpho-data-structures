@@ -33,21 +33,27 @@ library LogarithmicBuckets {
         address _id,
         uint256 _newValue
     ) internal {
-        uint256 formerValue = getValueOf(_buckets, _id);
-        uint256 newBucket;
-
-        if (formerValue != 0) {
+        if (_buckets.balanceOf[_id] != 0) {
             if (_newValue == 0) {
                 remove(_buckets, _id);
-            } else if ((newBucket = computeBucketOf(_newValue)) == getBucketOf(_buckets, _id)) {
-                updateValue(_buckets, _id, _newValue);
-            } else {
-                remove(_buckets, _id);
-                insert(_buckets, _id, _newValue, newBucket);
+                return;
             }
-        } else if (_newValue != 0) {
-            insert(_buckets, _id, _newValue, computeBucketOf(_newValue));
+
+            uint256 newBucket = computeBucketOf(_newValue);
+            if (newBucket == getBucketOf(_buckets, _id)) {
+                updateValue(_buckets, _id, _newValue);
+                return;
+            }
+
+            remove(_buckets, _id);
+            insert(_buckets, _id, _newValue, newBucket);
+            return;
         }
+
+        // `_buckets` cannot contain the 0 address.
+        if (_id == address(0)) revert AddressIsZero();
+        if (_newValue == 0) revert ZeroValue();
+        insert(_buckets, _id, _newValue, computeBucketOf(_newValue));
     }
 
     /// PRIVATE ///
@@ -87,6 +93,7 @@ library LogarithmicBuckets {
     }
 
     /// @notice Inserts an account in the `_buckets`.
+    /// @dev Expects that `_id` != 0 and if `_value` != 0.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _value The new value.
@@ -97,9 +104,6 @@ library LogarithmicBuckets {
         uint256 _value,
         uint256 _newBucket
     ) private {
-        // `_buckets` cannot contain the 0 address.
-        if (_id == address(0)) revert AddressIsZero();
-        if (_value == 0) revert ZeroValue();
         _buckets.lists[_newBucket].insert(_id);
         _buckets.balanceOf[_id] = _value;
         if (_newBucket > _buckets.maxBucket) _buckets.maxBucket = _newBucket;
@@ -146,9 +150,11 @@ library LogarithmicBuckets {
 
         if (bucket < maxBucket) {
             address head;
-            // Safe unchecked because bucket <= maxBucket.
-            unchecked {
-                while ((head = _buckets.lists[bucket++].getHead()) == address(0)) {}
+            while ((head = _buckets.lists[bucket].getHead()) == address(0)) {
+                // Safe unchecked because bucket <= maxBucket.
+                unchecked {
+                    ++bucket;
+                }
             }
             return head;
         }
