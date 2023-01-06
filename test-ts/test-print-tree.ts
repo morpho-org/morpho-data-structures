@@ -11,12 +11,12 @@ describe('Test RedBlackBinaryTree Library', () => {
     redBlackBinaryTree = await RedBlackBinaryTree.deploy();
     await redBlackBinaryTree.deployed();
 
-    const TestRedBlackBinaryTree = await ethers.getContractFactory('TestRedBlackBinaryTree', {
+    const RedBlackBinaryTreeMock = await ethers.getContractFactory('RedBlackBinaryTreeMock', {
       libraries: {
         RedBlackBinaryTree: redBlackBinaryTree.address,
       },
     });
-    testRedBlackBinaryTree = await TestRedBlackBinaryTree.deploy();
+    testRedBlackBinaryTree = await RedBlackBinaryTreeMock.deploy();
     await testRedBlackBinaryTree.deployed();
   });
 
