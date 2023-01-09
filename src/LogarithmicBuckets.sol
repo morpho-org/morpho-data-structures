@@ -144,12 +144,7 @@ library LogarithmicBuckets {
 
         if (bucket < maxBucket) {
             address head;
-            while ((head = _buckets.lists[bucket].getHead()) == address(0)) {
-                // Safe unchecked because bucket <= maxBucket.
-                unchecked {
-                    ++bucket;
-                }
-            }
+            while ((head = _buckets.lists[bucket++].getHead()) == address(0)) {}
             return head;
         }
         return _buckets.lists[maxBucket].getHead();
