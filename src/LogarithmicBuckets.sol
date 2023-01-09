@@ -36,18 +36,17 @@ library LogarithmicBuckets {
             // `_buckets` cannot contain the 0 address.
             if (_newValue == 0) revert ZeroValue();
             if (_id == address(0)) revert AddressIsZero();
-            (, uint256 bucket) = computeBucket(_newValue);
-            insert(_buckets, _id, bucket);
+            insert(_buckets, _id, computeBucket(_newValue));
             return;
         }
 
-        (, uint256 currentBucket) = computeBucket(balance);
+        uint256 currentBucket = computeBucket(balance);
         if (_newValue == 0) {
             remove(_buckets, _id, currentBucket);
             return;
         }
 
-        (, uint256 newBucket) = computeBucket(_newValue);
+        uint256 newBucket = computeBucket(_newValue);
         if (newBucket != currentBucket) {
             remove(_buckets, _id, currentBucket);
             insert(_buckets, _id, newBucket);
@@ -98,12 +97,8 @@ library LogarithmicBuckets {
 
     /// @notice Compute the bucket bucket.
     /// @param _value The value of the bucket to compute.
-    function computeBucket(uint256 _value)
-        internal
-        pure
-        returns (uint256 lowerMask, uint256 bucket)
-    {
-        lowerMask = _roundUpBeforePowerOf2(_value);
+    function computeBucket(uint256 _value) internal pure returns (uint256 bucket) {
+        uint256 lowerMask = _roundUpBeforePowerOf2(_value);
         bucket = lowerMask ^ (lowerMask >> 1);
     }
 
@@ -146,13 +141,13 @@ library LogarithmicBuckets {
         view
         returns (uint256 bucket)
     {
-        (, bucket) = computeBucket(_buckets.balanceOf[_id]);
+        bucket = computeBucket(_buckets.balanceOf[_id]);
     }
 
     /// @notice Returns the value of the account linked to `_id`.
     /// @param _buckets The buckets to search in.
     function getMaxBucket(BucketList storage _buckets) internal view returns (uint256 maxBucket) {
-        (, maxBucket) = computeBucket(_buckets.bucketsMap);
+        maxBucket = computeBucket(_buckets.bucketsMap);
     }
 
     /// @notice Returns the address at the head of the `_buckets` for matching the value  `_value`.
@@ -160,7 +155,7 @@ library LogarithmicBuckets {
     /// @param _value The value to match.
     /// @return The address of the head.
     function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
-        (uint256 lowerMask, ) = computeBucket(_value);
+        uint256 lowerMask = _roundUpBeforePowerOf2(_value);
 
         uint256 fullMask = _buckets.bucketsMap;
         uint256 next = nextBucket(lowerMask, fullMask);
@@ -178,7 +173,7 @@ library LogarithmicBuckets {
     /// @param _id current address.
     /// @return The address of the head.
     function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
-        (, uint256 bucket) = computeBucket(_buckets.balanceOf[_id]);
+        uint256 bucket = computeBucket(_buckets.balanceOf[_id]);
         return _buckets.lists[bucket].getNext(_id);
     }
 }
