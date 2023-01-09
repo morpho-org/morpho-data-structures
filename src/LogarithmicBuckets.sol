@@ -36,7 +36,7 @@ library LogarithmicBuckets {
         uint256 balance = _buckets.balanceOf[_id];
 
         if (balance != 0) {
-            uint256 currentBucket = computeBucketOf(balance);
+            uint256 currentBucket = computeBucket(balance);
             _buckets.balanceOf[_id] = _newValue;
 
             if (_newValue == 0) {
@@ -44,7 +44,7 @@ library LogarithmicBuckets {
                 return;
             }
 
-            uint256 newBucket = computeBucketOf(_newValue);
+            uint256 newBucket = computeBucket(_newValue);
             if (newBucket == currentBucket) {
                 return;
             }
@@ -58,7 +58,7 @@ library LogarithmicBuckets {
         if (_id == address(0)) revert AddressIsZero();
         if (_newValue == 0) revert ZeroValue();
         _buckets.balanceOf[_id] = _newValue;
-        insert(_buckets, _id, computeBucketOf(_newValue));
+        insert(_buckets, _id, computeBucket(_newValue));
     }
 
     /// PRIVATE ///
@@ -105,7 +105,7 @@ library LogarithmicBuckets {
 
     /// @notice Compute the bucket bucket.
     /// @param _value The value of the bucket to compute.
-    function computeBucketOf(uint256 _value) private pure returns (uint256) {
+    function computeBucket(uint256 _value) private pure returns (uint256) {
         return Math.log2(_value) / LOG2_LOGBASE;
     }
 
@@ -124,7 +124,7 @@ library LogarithmicBuckets {
     /// @param _id The address of the account.
     /// @return bucket The value of the account.
     function getBucketOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
-        return computeBucketOf(_buckets.balanceOf[_id]);
+        return computeBucket(_buckets.balanceOf[_id]);
     }
 
     /// @notice Returns the value of the account linked to `_id`.
@@ -139,7 +139,7 @@ library LogarithmicBuckets {
     /// @param _value The value to match.
     /// @return The address of the head.
     function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
-        uint256 bucket = computeBucketOf(_value);
+        uint256 bucket = computeBucket(_value);
         uint256 maxBucket = _buckets.maxBucket;
 
         if (bucket < maxBucket) {
