@@ -8,9 +8,9 @@ library LogarithmicBuckets {
     using DoubleLinkedList for DoubleLinkedList.List;
 
     struct BucketList {
-        mapping(uint256 => DoubleLinkedList.List) lists; // All the accounts.
+        mapping(uint256 => DoubleLinkedList.List) lists;
         mapping(address => uint256) balanceOf;
-        uint256 maxBucket;
+        uint256 bucketsMap;
     }
 
     /// CONSTANTS ///
@@ -34,31 +34,27 @@ library LogarithmicBuckets {
         uint256 _newValue
     ) internal {
         uint256 balance = _buckets.balanceOf[_id];
+        _buckets.balanceOf[_id] = _newValue;
 
-        if (balance != 0) {
-            uint256 currentBucket = computeBucket(balance);
-            _buckets.balanceOf[_id] = _newValue;
-
-            if (_newValue == 0) {
-                remove(_buckets, _id, currentBucket);
-                return;
-            }
-
-            uint256 newBucket = computeBucket(_newValue);
-            if (newBucket == currentBucket) {
-                return;
-            }
-
-            remove(_buckets, _id, currentBucket);
-            insert(_buckets, _id, newBucket);
+        if (balance == 0) {
+            // `_buckets` cannot contain the 0 address.
+            if (_newValue == 0) revert ZeroValue();
+            if (_id == address(0)) revert AddressIsZero();
+            insert(_buckets, _id, computeBucket(_newValue));
             return;
         }
 
-        // `_buckets` cannot contain the 0 address.
-        if (_id == address(0)) revert AddressIsZero();
-        if (_newValue == 0) revert ZeroValue();
-        _buckets.balanceOf[_id] = _newValue;
-        insert(_buckets, _id, computeBucket(_newValue));
+        uint256 currentBucket = computeBucket(balance);
+        if (_newValue == 0) {
+            remove(_buckets, _id, currentBucket);
+            return;
+        }
+
+        uint256 newBucket = computeBucket(_newValue);
+        if (newBucket != currentBucket) {
+            remove(_buckets, _id, currentBucket);
+            insert(_buckets, _id, newBucket);
+        }
     }
 
     /// PRIVATE ///
@@ -67,25 +63,13 @@ library LogarithmicBuckets {
     /// @dev Does not update the value.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to remove.
+    /// @param _bucket The mask of the bucket where to remove.
     function remove(
         BucketList storage _buckets,
         address _id,
         uint256 _bucket
     ) private {
-        uint256 maxBucket = _buckets.maxBucket;
-
-        // Revert if `_id` does not exist.
-        _buckets.lists[_bucket].remove(_id);
-
-        if (_bucket == maxBucket) {
-            while (_buckets.lists[_bucket].getHead() == address(0) && _bucket > 0) {
-                // Safe unchecked because bucket > 0.
-                unchecked {
-                    --_bucket;
-                }
-            }
-            if (_bucket != maxBucket) _buckets.maxBucket = _bucket;
-        }
+        if (_buckets.lists[_bucket].remove(_id)) _buckets.bucketsMap &= _bucket ^ type(uint256).max;
     }
 
     /// @notice Inserts an account in the `_buckets`.
@@ -93,20 +77,19 @@ library LogarithmicBuckets {
     /// @dev Does not update the value.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
-    /// @param _newBucket The bucket where to insert
+    /// @param _bucket The mask of the bucket where to insert.
     function insert(
         BucketList storage _buckets,
         address _id,
-        uint256 _newBucket
+        uint256 _bucket
     ) private {
-        _buckets.lists[_newBucket].insert(_id);
-        if (_newBucket > _buckets.maxBucket) _buckets.maxBucket = _newBucket;
+        if (_buckets.lists[_bucket].insert(_id)) _buckets.bucketsMap |= _bucket;
     }
 
     /// @notice Compute the bucket bucket.
     /// @param _value The value of the bucket to compute.
     function computeBucket(uint256 _value) private pure returns (uint256) {
-        return Math.log2(_value) / LOG2_LOGBASE;
+        return 1 << (Math.log2(_value) / LOG2_LOGBASE);
     }
 
     /// GETTERS ///
@@ -124,14 +107,14 @@ library LogarithmicBuckets {
     /// @param _id The address of the account.
     /// @return bucket The value of the account.
     function getBucketOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
-        return computeBucket(_buckets.balanceOf[_id]);
+        return Math.log2(_buckets.balanceOf[_id]) / LOG2_LOGBASE;
     }
 
     /// @notice Returns the value of the account linked to `_id`.
     /// @param _buckets The buckets to search in.
     /// @return value The value of the account.
     function getMaxBucket(BucketList storage _buckets) internal view returns (uint256) {
-        return _buckets.maxBucket;
+        return Math.log2(_buckets.bucketsMap);
     }
 
     /// @notice Returns the address at the head of the `_buckets` for matching the value  `_value`.
@@ -140,14 +123,26 @@ library LogarithmicBuckets {
     /// @return The address of the head.
     function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
         uint256 bucket = computeBucket(_value);
-        uint256 maxBucket = _buckets.maxBucket;
+        uint256 bucketMap = _buckets.bucketsMap;
 
-        if (bucket < maxBucket) {
-            address head;
-            while ((head = _buckets.lists[bucket++].getHead()) == address(0)) {}
-            return head;
+        // There is no non-empty bucket.
+        if (bucketMap == 0) {
+            return _buckets.lists[0].getHead();
         }
-        return _buckets.lists[maxBucket].getHead();
+
+        // There is a non-empty bucket higher than `bucket`.
+        if (bucketMap >= bucket) {
+            while (bucket & bucketMap == 0) {
+                bucket <<= 1;
+            }
+            return _buckets.lists[bucket].getHead();
+        }
+
+        // There is a non-empty bucket lower than `bucket`.
+        while (bucket & bucketMap == 0) {
+            bucket >>= 1;
+        }
+        return _buckets.lists[bucket].getHead();
     }
 
     /// @notice Returns the address of the next account in the bucket of _id.
@@ -155,7 +150,7 @@ library LogarithmicBuckets {
     /// @param _id current address.
     /// @return The address of the head.
     function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
-        uint256 bucket = getBucketOf(_buckets, _id);
-        return _buckets.lists[bucket].accounts[_id].next;
+        uint256 bucket = computeBucket(_buckets.balanceOf[_id]);
+        return _buckets.lists[bucket].getNext(_id);
     }
 }
