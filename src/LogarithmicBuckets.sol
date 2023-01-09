@@ -82,13 +82,14 @@ library LogarithmicBuckets {
         if (_buckets.lists[_bucket].insert(_id)) _buckets.bucketsMask |= _bucket;
     }
 
-    /// @notice Compute the bucket where would fall the given value.
-    /// @param _value The value of the bucket to compute.
-    function _computeBucket(uint256 _value) internal pure returns (uint256) {
+    /// @notice Returns the bucket in which the given value would fall.
+    function _computeBucket(uint256 _value) private pure returns (uint256) {
         uint256 lowerMask = _setLowerBits(_value);
         return lowerMask ^ (lowerMask >> 1);
     }
 
+    /// @notice Sets all the bit lower than the highest bit set in the input.
+    /// @dev This is the same as rounding the input the nearest upper value of the form `2 ** n - 1`.
     function _setLowerBits(uint256 x) private pure returns (uint256 y) {
         assembly {
             x := or(x, shr(1, x))
@@ -102,6 +103,8 @@ library LogarithmicBuckets {
         }
     }
 
+    /// @notice Returns the following bucket which contains greater values.
+    /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
     function _nextBucket(uint256 lowerMask, uint256 bucketsMask)
         private
         pure
@@ -113,6 +116,8 @@ library LogarithmicBuckets {
         }
     }
 
+    /// @notice Returns the preceding bucket which contains smaller values.
+    /// @dev The bucket returned is the highest that is in both `bucketsMask` and `lowerMask`.
     function _prevBucket(uint256 lowerMask, uint256 bucketsMask) private pure returns (uint256) {
         uint256 lowerFullMask = _setLowerBits(lowerMask & bucketsMask);
         return lowerFullMask ^ (lowerFullMask >> 1);
@@ -123,7 +128,6 @@ library LogarithmicBuckets {
     /// @notice Returns the value of the account linked to `_id`.
     /// @param _buckets The buckets to search in.
     /// @param _id The address of the account.
-    /// @return value The value of the account.
     function getValueOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
         return _buckets.balanceOf[_id];
     }
@@ -131,7 +135,6 @@ library LogarithmicBuckets {
     /// @notice Returns the bucket of the bucket linked to `_id`.
     /// @param _buckets The buckets to search in.
     /// @param _id The address of the account.
-    /// @return bucket The value of the account.
     function getBucketOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
         return _computeBucket(_buckets.balanceOf[_id]);
     }
@@ -161,9 +164,9 @@ library LogarithmicBuckets {
     }
 
     /// @notice Returns the address of the next account in the bucket of _id.
-    /// @param _buckets The buckets to get the head.
+    /// @param _buckets The buckets to get the next account.
     /// @param _id current address.
-    /// @return The address of the head.
+    /// @return The address of the next account.
     function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
         uint256 bucket = _computeBucket(_buckets.balanceOf[_id]);
         return _buckets.lists[bucket].getNext(_id);
