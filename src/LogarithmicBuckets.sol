@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "lib/morpho-utils/src/math/Math.sol";
 import "./DoubleLinkedListFIFO.sol";
 
 library LogarithmicBuckets {
