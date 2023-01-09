@@ -88,7 +88,7 @@ library LogarithmicBuckets {
         return lowerMask ^ (lowerMask >> 1);
     }
 
-    /// @notice Sets all the bit lower than the highest bit set in the input.
+    /// @notice Sets all the bits lower than the highest bit set in the input.
     /// @dev This is the same as rounding the input the nearest upper value of the form `2 ** n - 1`.
     function _setLowerBits(uint256 x) private pure returns (uint256 y) {
         assembly {
