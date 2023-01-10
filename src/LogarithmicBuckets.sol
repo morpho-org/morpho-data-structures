@@ -28,13 +28,12 @@ library LogarithmicBuckets {
         address _id,
         uint256 _newValue
     ) internal {
+        if (_id == address(0)) revert AddressIsZero();
         uint256 value = _buckets.valueOf[_id];
         _buckets.valueOf[_id] = _newValue;
 
         if (value == 0) {
-            // `_buckets` cannot contain the 0 address.
             if (_newValue == 0) revert ZeroValue();
-            if (_id == address(0)) revert AddressIsZero();
             _insert(_buckets, _id, _computeBucket(_newValue));
             return;
         }

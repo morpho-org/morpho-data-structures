@@ -13,11 +13,6 @@ library UnsortedDLL {
         mapping(address => Account) accounts;
     }
 
-    /// ERRORS ///
-
-    /// @notice Thrown when the address is zero at insertion.
-    error AddressIsZero();
-
     /// INTERNAL ///
 
     /// @notice Returns the address at the head of the `_list`.
@@ -49,6 +44,7 @@ library UnsortedDLL {
     }
 
     /// @notice Removes an account of the `_list`.
+    /// @notice This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal returns (bool empty) {
@@ -65,11 +61,10 @@ library UnsortedDLL {
     }
 
     /// @notice Inserts an account at the tail of the `_list`.
+    /// @notice This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function insert(List storage _list, address _id) internal returns (bool empty) {
-        if (_id == address(0)) revert AddressIsZero();
-
         address tail = _list.accounts[address(0)].prev;
         empty = tail == address(0);
 
