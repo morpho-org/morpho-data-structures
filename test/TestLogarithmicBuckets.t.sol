@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "src/LogarithmicBuckets.sol";
 
-contract TestLogBuckets is Test {
+contract TestLogarithmicBuckets is Test {
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;
 
     uint256 public NDS = 50;
@@ -25,7 +25,7 @@ contract TestLogBuckets is Test {
         bucketlist.update(accounts[0], 1);
 
         assertEq(bucketlist.getValueOf(accounts[0]), 1);
-        assertEq(bucketlist.getHead(0), accounts[0]);
+        assertEq(bucketlist.getAccount(0, true), accounts[0]);
         assertEq(bucketlist.getMaxBucket(), 1);
         assertEq(bucketlist.getBucketOf(accounts[0]), 1);
     }
@@ -45,7 +45,7 @@ contract TestLogBuckets is Test {
         bucketlist.update(accounts[1], 16);
         bucketlist.update(accounts[2], 16);
 
-        address head = bucketlist.getHead(16);
+        address head = bucketlist.getAccount(16, true);
         address next1 = bucketlist.getNext(head);
         address next2 = bucketlist.getNext(next1);
         assertEq(head, accounts[0]);
@@ -58,7 +58,7 @@ contract TestLogBuckets is Test {
         bucketlist.update(accounts[0], 0);
 
         assertEq(bucketlist.getValueOf(accounts[0]), 0);
-        assertEq(bucketlist.getHead(0), address(0));
+        assertEq(bucketlist.getAccount(0, true), address(0));
         assertEq(bucketlist.getMaxBucket(), 0);
         assertEq(bucketlist.getBucketOf(accounts[0]), 0);
     }
@@ -67,8 +67,8 @@ contract TestLogBuckets is Test {
         bucketlist.update(accounts[0], 16);
         bucketlist.update(accounts[1], 4);
 
-        assertEq(bucketlist.getHead(16), accounts[0]);
-        assertEq(bucketlist.getHead(2), accounts[1]);
+        assertEq(bucketlist.getAccount(16, true), accounts[0]);
+        assertEq(bucketlist.getAccount(2, true), accounts[1]);
         assertEq(bucketlist.getMaxBucket(), 1 << 4);
     }
 
@@ -77,7 +77,7 @@ contract TestLogBuckets is Test {
         bucketlist.update(accounts[1], 16);
         bucketlist.update(accounts[0], 0);
 
-        assertEq(bucketlist.getHead(4), accounts[1]);
+        assertEq(bucketlist.getAccount(4, true), accounts[1]);
         assertEq(bucketlist.getValueOf(accounts[0]), 0);
         assertEq(bucketlist.getValueOf(accounts[1]), 16);
         assertEq(bucketlist.getMaxBucket(), 1 << 4);
@@ -89,7 +89,7 @@ contract TestLogBuckets is Test {
         bucketlist.update(accounts[0], 0);
         bucketlist.update(accounts[1], 0);
 
-        assertEq(bucketlist.getHead(4), address(0));
+        assertEq(bucketlist.getAccount(4, true), address(0));
     }
 
     function testGetMaxBucket() public {
@@ -110,12 +110,12 @@ contract TestLogBuckets is Test {
     }
 
     function testGetHead() public {
-        assertEq(bucketlist.getHead(0), address(0));
-        assertEq(bucketlist.getHead(1000), address(0));
+        assertEq(bucketlist.getAccount(0, true), address(0));
+        assertEq(bucketlist.getAccount(1000, true), address(0));
 
         bucketlist.update(accounts[0], 16);
-        assertEq(bucketlist.getHead(1), accounts[0], "head before");
-        assertEq(bucketlist.getHead(16), accounts[0], "head equal");
-        assertEq(bucketlist.getHead(32), accounts[0], "head above");
+        assertEq(bucketlist.getAccount(1, true), accounts[0], "head before");
+        assertEq(bucketlist.getAccount(16, true), accounts[0], "head equal");
+        assertEq(bucketlist.getAccount(32, true), accounts[0], "head above");
     }
 }

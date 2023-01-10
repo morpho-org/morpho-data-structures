@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "./DoubleLinkedListFIFO.sol";
+import "./UnsortedDLL.sol";
 
 library LogarithmicBuckets {
-    using DoubleLinkedList for DoubleLinkedList.List;
+    using UnsortedDLL for UnsortedDLL.List;
 
     struct BucketList {
-        mapping(uint256 => DoubleLinkedList.List) lists;
+        mapping(uint256 => UnsortedDLL.List) lists;
         mapping(address => uint256) valueOf;
         uint256 bucketsMask;
     }
@@ -145,21 +145,26 @@ library LogarithmicBuckets {
         return _computeBucket(_buckets.bucketsMask);
     }
 
-    /// @notice Returns the address at the head of the `_buckets` for matching the value `_value`.
+    /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
     /// @param _buckets The buckets to get the head.
     /// @param _value The value to match.
+    /// @param _fifo Whether to treat the underlying data-structure as a FIFO (as opposed to a LIFO).
     /// @return The address of the head.
-    function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
+    function getAccount(
+        BucketList storage _buckets,
+        uint256 _value,
+        bool _fifo
+    ) internal view returns (address) {
         uint256 lowerMask = _setLowerBits(_value);
 
         uint256 bucketsMask = _buckets.bucketsMask;
         uint256 next = _nextBucket(lowerMask, bucketsMask);
 
-        if (next != 0) return _buckets.lists[next].getHead();
+        if (next != 0) return _buckets.lists[next].getFirst(_fifo);
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
 
-        if (prev != 0) return _buckets.lists[prev].getHead();
+        if (prev != 0) return _buckets.lists[prev].getFirst(_fifo);
         else return address(0);
     }
 
@@ -169,6 +174,6 @@ library LogarithmicBuckets {
     /// @return The address of the next account.
     function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
         uint256 bucket = _computeBucket(_buckets.valueOf[_id]);
-        return _buckets.lists[bucket].getNext(_id);
+        return _buckets.lists[bucket].getFollowing(_id, true);
     }
 }
