@@ -20,25 +20,31 @@ library UnsortedDLL {
 
     /// INTERNAL ///
 
-    /// @notice Returns the address at the head or at the tail of the `_list`.
-    /// @param _list The list from which to get the first address.
-    /// @param _fifo Whether to treat the data-structure as a FIFO (as opposed to a LIFO).
-    function getFirst(List storage _list, bool _fifo) internal view returns (address) {
-        if (_fifo) return _list.accounts[address(0)].next;
+    /// @notice Returns the address at the head of the `_list`.
+    /// @param _list The list from which to get the head.
+    function getHead(List storage _list) internal view returns (address) {
+        return _list.accounts[address(0)].next;
+    }
+
+    /// @notice Returns the address at the tail of the `_list`.
+    /// @param _list The list from which to get the tail.
+    function getTail(List storage _list) internal view returns (address) {
         return _list.accounts[address(0)].prev;
     }
 
-    /// @notice Returns the following id address from the current `_id`.
+    /// @notice Returns the next id address from the current `_id`.
     /// @param _list The list to search in.
-    /// @param _id The address of the account.
-    /// @param _fifo Whether to treat the data-structure as a FIFO (as opposed to a LIFO).
-    /// @return The address of the following account.
-    function getFollowing(
-        List storage _list,
-        address _id,
-        bool _fifo
-    ) internal view returns (address) {
-        if (_fifo) return _list.accounts[_id].next;
+    /// @param _id The address of the current account.
+    /// @return The address of the next account.
+    function getNext(List storage _list, address _id) internal view returns (address) {
+        return _list.accounts[_id].next;
+    }
+
+    /// @notice Returns the previous id address from the current `_id`.
+    /// @param _list The list to search in.
+    /// @param _id The address of the current account.
+    /// @return The address of the previous account.
+    function getPrev(List storage _list, address _id) internal view returns (address) {
         return _list.accounts[_id].prev;
     }
 
