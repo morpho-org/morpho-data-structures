@@ -68,7 +68,7 @@ library LogarithmicBuckets {
     }
 
     /// @notice Inserts an account in the `_buckets`.
-    /// @dev Expects that `_id` != 0 and if `_value` != 0.
+    /// @dev Expects that `_id` != 0 and `_value` != 0.
     /// @dev Does not update the value.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
@@ -132,7 +132,7 @@ library LogarithmicBuckets {
 
     /// GETTERS ///
 
-    /// @notice Returns the value of the account linked to `_id`.
+    /// @notice Returns the value of `_id`.
     /// @param _buckets The buckets to search in.
     /// @param _id The address of the account.
     function getValueOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
