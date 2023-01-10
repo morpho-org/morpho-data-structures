@@ -52,8 +52,8 @@ library UnsortedDLL {
 
         empty = (prev == address(0) && next == address(0));
 
-        _list.accounts[account.prev].next = next;
-        _list.accounts[account.next].prev = prev;
+        _list.accounts[prev].next = next;
+        _list.accounts[next].prev = prev;
 
         delete _list.accounts[_id];
     }
