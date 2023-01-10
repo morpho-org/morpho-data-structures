@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "src/UnsortedDLL.sol";
+import "src/BucketDLL.sol";
 import "src/LogarithmicBuckets.sol";
 
 contract TestLogarithmicBuckets is Test {
-    using UnsortedDLL for UnsortedDLL.List;
+    using BucketDLL for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;
 
     uint256 public NDS = 50;
@@ -47,7 +47,7 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[1], 16);
         bucketList.update(accounts[2], 16);
 
-        UnsortedDLL.List storage list = bucketList.getBucketOf(16);
+        BucketDLL.List storage list = bucketList.getBucketOf(16);
         address head = list.getNext(address(0));
         address next1 = list.getNext(head);
         address next2 = list.getNext(next1);
