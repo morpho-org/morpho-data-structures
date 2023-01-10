@@ -30,8 +30,6 @@ contract TestLogarithmicBuckets is Test {
         assertEq(bucketList.getMatch(0, true), accounts[0]);
         assertEq(bucketList.getBucketOf(3).getHead(), accounts[0]);
         assertEq(bucketList.getBucketOf(2).getHead(), accounts[0]);
-        assertEq(bucketList.getMaxBucket().getHead(), accounts[0]);
-        assertEq(bucketList.getMaxBucket().getTail(), accounts[0]);
     }
 
     function testUpdatingFromZeroToZeroShouldRevert() public {
@@ -65,7 +63,6 @@ contract TestLogarithmicBuckets is Test {
         assertEq(bucketList.getValueOf(accounts[0]), 0);
         assertEq(bucketList.getMatch(0, true), address(0));
         assertEq(bucketList.getBucketOf(1).getHead(), address(0));
-        assertEq(bucketList.getMaxBucket().getHead(), address(0));
     }
 
     function testShouldInsertTwoAccounts() public {
@@ -75,7 +72,6 @@ contract TestLogarithmicBuckets is Test {
         assertEq(bucketList.getMatch(16, true), accounts[0]);
         assertEq(bucketList.getMatch(2, true), accounts[1]);
         assertEq(bucketList.getBucketOf(4).getHead(), accounts[1]);
-        assertEq(bucketList.getMaxBucket().getHead(), accounts[0]);
     }
 
     function testShouldRemoveOneAccountOverTwo() public {
@@ -88,8 +84,6 @@ contract TestLogarithmicBuckets is Test {
         assertEq(bucketList.getValueOf(accounts[1]), 16);
         assertEq(bucketList.getBucketOf(16).getHead(), accounts[1]);
         assertEq(bucketList.getBucketOf(4).getHead(), address(0));
-        assertEq(bucketList.getMaxBucket().getHead(), accounts[1]);
-        assertEq(bucketList.getMaxBucket().getTail(), accounts[1]);
     }
 
     function testShouldRemoveBothAccounts() public {

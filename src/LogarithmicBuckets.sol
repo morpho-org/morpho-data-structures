@@ -156,17 +156,6 @@ library LogarithmicBuckets {
         return _buckets.lists[bucket];
     }
 
-    /// @notice Returns the highest non-empty bucket.
-    /// @param _buckets The buckets to search in.
-    function getMaxBucket(BucketList storage _buckets)
-        internal
-        view
-        returns (UnsortedDLL.List storage)
-    {
-        uint256 bucket = _computeBucket(_buckets.bucketsMask);
-        return _buckets.lists[bucket];
-    }
-
     /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
     /// @param _buckets The buckets to get the head.
     /// @param _value The value to match.
