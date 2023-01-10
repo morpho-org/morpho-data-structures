@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "./UnsortedDLL.sol";
+import "./BucketDLL.sol";
 
 library LogarithmicBuckets {
-    using UnsortedDLL for UnsortedDLL.List;
+    using BucketDLL for BucketDLL.List;
 
     struct BucketList {
-        mapping(uint256 => UnsortedDLL.List) lists;
+        mapping(uint256 => BucketDLL.List) lists;
         mapping(address => uint256) valueOf;
         uint256 bucketsMask;
     }
@@ -28,13 +28,12 @@ library LogarithmicBuckets {
         address _id,
         uint256 _newValue
     ) internal {
+        if (_id == address(0)) revert AddressIsZero();
         uint256 value = _buckets.valueOf[_id];
         _buckets.valueOf[_id] = _newValue;
 
         if (value == 0) {
-            // `_buckets` cannot contain the 0 address.
             if (_newValue == 0) revert ZeroValue();
-            if (_id == address(0)) revert AddressIsZero();
             _insert(_buckets, _id, _computeBucket(_newValue));
             return;
         }
@@ -126,11 +125,7 @@ library LogarithmicBuckets {
     /// @notice Returns the address at the head or at the tail of the double linked list.
     /// @param _list The list from which to get the first address.
     /// @param _getHead True to return the head, false to return the tail.
-    function _getFirst(UnsortedDLL.List storage _list, bool _getHead)
-        private
-        view
-        returns (address)
-    {
+    function _getFirst(BucketDLL.List storage _list, bool _getHead) private view returns (address) {
         if (_getHead) return _list.getHead();
         return _list.getTail();
     }
@@ -150,7 +145,7 @@ library LogarithmicBuckets {
     function getBucketOf(BucketList storage _buckets, uint256 _value)
         internal
         view
-        returns (UnsortedDLL.List storage)
+        returns (BucketDLL.List storage)
     {
         uint256 bucket = _computeBucket(_value);
         return _buckets.lists[bucket];

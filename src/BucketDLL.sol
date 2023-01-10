@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-library UnsortedDLL {
+library BucketDLL {
     /// STRUCTS ///
 
     struct Account {
@@ -12,11 +12,6 @@ library UnsortedDLL {
     struct List {
         mapping(address => Account) accounts;
     }
-
-    /// ERRORS ///
-
-    /// @notice Thrown when the address is zero at insertion.
-    error AddressIsZero();
 
     /// INTERNAL ///
 
@@ -49,6 +44,7 @@ library UnsortedDLL {
     }
 
     /// @notice Removes an account of the `_list`.
+    /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal returns (bool empty) {
@@ -65,11 +61,10 @@ library UnsortedDLL {
     }
 
     /// @notice Inserts an account at the tail of the `_list`.
+    /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function insert(List storage _list, address _id) internal returns (bool empty) {
-        if (_id == address(0)) revert AddressIsZero();
-
         address tail = _list.accounts[address(0)].prev;
         empty = tail == address(0);
 
