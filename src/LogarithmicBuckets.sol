@@ -165,7 +165,8 @@ library LogarithmicBuckets {
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
 
         if (prev != 0) return _buckets.lists[prev].getFirst(_fifo);
-        else return address(0);
+
+        return address(0);
     }
 
     /// @notice Returns the address of the next account in the bucket of _id.

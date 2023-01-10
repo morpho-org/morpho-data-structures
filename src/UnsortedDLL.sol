@@ -25,7 +25,7 @@ library UnsortedDLL {
     /// @param _fifo Whether to treat the data-structure as a FIFO (as opposed to a LIFO).
     function getFirst(List storage _list, bool _fifo) internal view returns (address) {
         if (_fifo) return _list.accounts[address(0)].next;
-        else return _list.accounts[address(0)].prev;
+        return _list.accounts[address(0)].prev;
     }
 
     /// @notice Returns the following id address from the current `_id`.
@@ -39,7 +39,7 @@ library UnsortedDLL {
         bool _fifo
     ) internal view returns (address) {
         if (_fifo) return _list.accounts[_id].next;
-        else return _list.accounts[_id].prev;
+        return _list.accounts[_id].prev;
     }
 
     /// @notice Removes an account of the `_list`.
