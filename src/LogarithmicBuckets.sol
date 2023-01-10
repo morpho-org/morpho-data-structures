@@ -150,7 +150,7 @@ library LogarithmicBuckets {
     /// @param _value The value to match.
     /// @param _fifo Whether to treat the underlying data-structure as a FIFO (as opposed to a LIFO).
     /// @return The address of the head.
-    function getAccount(
+    function getMatch(
         BucketList storage _buckets,
         uint256 _value,
         bool _fifo

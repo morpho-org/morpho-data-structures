@@ -25,7 +25,7 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[0], 1);
 
         assertEq(bucketList.getValueOf(accounts[0]), 1);
-        assertEq(bucketList.getAccount(0, true), accounts[0]);
+        assertEq(bucketList.getMatch(0, true), accounts[0]);
         assertEq(bucketList.getMaxBucket(), 1);
         assertEq(bucketList.getBucketOf(accounts[0]), 1);
     }
@@ -45,7 +45,7 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[1], 16);
         bucketList.update(accounts[2], 16);
 
-        address head = bucketList.getAccount(16, true);
+        address head = bucketList.getMatch(16, true);
         address next1 = bucketList.getNext(head);
         address next2 = bucketList.getNext(next1);
         assertEq(head, accounts[0]);
@@ -58,7 +58,7 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[0], 0);
 
         assertEq(bucketList.getValueOf(accounts[0]), 0);
-        assertEq(bucketList.getAccount(0, true), address(0));
+        assertEq(bucketList.getMatch(0, true), address(0));
         assertEq(bucketList.getMaxBucket(), 0);
         assertEq(bucketList.getBucketOf(accounts[0]), 0);
     }
@@ -67,8 +67,8 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[0], 16);
         bucketList.update(accounts[1], 4);
 
-        assertEq(bucketList.getAccount(16, true), accounts[0]);
-        assertEq(bucketList.getAccount(2, true), accounts[1]);
+        assertEq(bucketList.getMatch(16, true), accounts[0]);
+        assertEq(bucketList.getMatch(2, true), accounts[1]);
         assertEq(bucketList.getMaxBucket(), 1 << 4);
     }
 
@@ -77,7 +77,7 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[1], 16);
         bucketList.update(accounts[0], 0);
 
-        assertEq(bucketList.getAccount(4, true), accounts[1]);
+        assertEq(bucketList.getMatch(4, true), accounts[1]);
         assertEq(bucketList.getValueOf(accounts[0]), 0);
         assertEq(bucketList.getValueOf(accounts[1]), 16);
         assertEq(bucketList.getMaxBucket(), 1 << 4);
@@ -89,7 +89,7 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[0], 0);
         bucketList.update(accounts[1], 0);
 
-        assertEq(bucketList.getAccount(4, true), address(0));
+        assertEq(bucketList.getMatch(4, true), address(0));
     }
 
     function testGetMaxBucket() public {
@@ -110,13 +110,13 @@ contract TestLogarithmicBuckets is Test {
     }
 
     function testGetHead() public {
-        assertEq(bucketList.getAccount(0, true), address(0));
-        assertEq(bucketList.getAccount(1000, true), address(0));
+        assertEq(bucketList.getMatch(0, true), address(0));
+        assertEq(bucketList.getMatch(1000, true), address(0));
 
         bucketList.update(accounts[0], 16);
-        assertEq(bucketList.getAccount(1, true), accounts[0], "head before");
-        assertEq(bucketList.getAccount(16, true), accounts[0], "head equal");
-        assertEq(bucketList.getAccount(32, true), accounts[0], "head above");
+        assertEq(bucketList.getMatch(1, true), accounts[0], "head before");
+        assertEq(bucketList.getMatch(16, true), accounts[0], "head equal");
+        assertEq(bucketList.getMatch(32, true), accounts[0], "head above");
     }
 
     function testGetNext() public {
