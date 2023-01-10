@@ -173,7 +173,16 @@ library LogarithmicBuckets {
     /// @param _id current address.
     /// @return The address of the next account.
     function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
-        uint256 bucket = _computeBucket(_buckets.valueOf[_id]);
-        return _buckets.lists[bucket].getFollowing(_id, true);
+        uint256 value = _buckets.valueOf[_id];
+        uint256 bucket = _computeBucket(value);
+        address next = _buckets.lists[bucket].getFollowing(_id, true);
+
+        if (next != address(0)) return next;
+
+        uint256 lowerMask = _setLowerBits(value);
+        uint256 bucketsMask = _buckets.bucketsMask;
+        uint256 nextBucket = _nextBucket(lowerMask, bucketsMask);
+
+        return _buckets.lists[nextBucket].getFirst(true);
     }
 }
