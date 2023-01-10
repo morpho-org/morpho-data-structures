@@ -123,6 +123,18 @@ library LogarithmicBuckets {
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 
+    /// @notice Returns the address at the head or at the tail of the double linked list.
+    /// @param _list The list from which to get the first address.
+    /// @param _getHead True to return the head, false to return the tail.
+    function _getFirst(UnsortedDLL.List storage _list, bool _getHead)
+        private
+        view
+        returns (address)
+    {
+        if (_getHead) return _list.getHead();
+        return _list.getTail();
+    }
+
     /// GETTERS ///
 
     /// @notice Returns the value of the account linked to `_id`.
@@ -132,17 +144,27 @@ library LogarithmicBuckets {
         return _buckets.valueOf[_id];
     }
 
-    /// @notice Returns the bucket of the bucket linked to `_id`.
+    /// @notice Returns the bucket in which to look for `_value`.
     /// @param _buckets The buckets to search in.
-    /// @param _id The address of the account.
-    function getBucketOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
-        return _computeBucket(_buckets.valueOf[_id]);
+    /// @param _value The value to look for.
+    function getBucketOf(BucketList storage _buckets, uint256 _value)
+        internal
+        view
+        returns (UnsortedDLL.List storage)
+    {
+        uint256 bucket = _computeBucket(_value);
+        return _buckets.lists[bucket];
     }
 
-    /// @notice Returns the value of the account linked to `_id`.
+    /// @notice Returns the highest non-empty bucket.
     /// @param _buckets The buckets to search in.
-    function getMaxBucket(BucketList storage _buckets) internal view returns (uint256) {
-        return _computeBucket(_buckets.bucketsMask);
+    function getMaxBucket(BucketList storage _buckets)
+        internal
+        view
+        returns (UnsortedDLL.List storage)
+    {
+        uint256 bucket = _computeBucket(_buckets.bucketsMask);
+        return _buckets.lists[bucket];
     }
 
     /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
@@ -160,41 +182,12 @@ library LogarithmicBuckets {
         uint256 bucketsMask = _buckets.bucketsMask;
         uint256 next = _nextBucket(lowerMask, bucketsMask);
 
-        if (next != 0) return _buckets.lists[next].getFirst(_fifo);
+        if (next != 0) return _getFirst(_buckets.lists[next], _fifo);
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
 
-        if (prev != 0) return _buckets.lists[prev].getFirst(_fifo);
+        if (prev != 0) return _getFirst(_buckets.lists[prev], _fifo);
 
         return address(0);
-    }
-
-    /// @notice Returns the account following `_id` in `_buckets`.
-    /// @param _buckets The buckets to get the following account.
-    /// @param _id The current address.
-    /// @param _increasing True if starting from the lower buckets and going up to the higher buckets.
-    /// @return The address of the next account.
-    function getFollowing(
-        BucketList storage _buckets,
-        address _id,
-        bool _increasing
-    ) internal view returns (address) {
-        uint256 value = _buckets.valueOf[_id];
-        if (!_increasing && value == 0) value = type(uint256).max;
-        uint256 bucket = _computeBucket(value);
-        address following = _buckets.lists[bucket].getFollowing(_id, _increasing);
-
-        if (following != address(0)) return following;
-
-        uint256 bucketsMask = _buckets.bucketsMask;
-        uint256 lowerMask = _setLowerBits(value);
-        uint256 followingBucket;
-        if (_increasing) followingBucket = _nextBucket(lowerMask, bucketsMask);
-        else {
-            lowerMask >>= 1;
-            followingBucket = _prevBucket(lowerMask, bucketsMask);
-        }
-
-        return _buckets.lists[followingBucket].getFirst(_increasing);
     }
 }
