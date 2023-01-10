@@ -46,8 +46,8 @@ contract TestLogarithmicBuckets is Test {
         bucketList.update(accounts[2], 16);
 
         address head = bucketList.getMatch(16, true);
-        address next1 = bucketList.getNext(head);
-        address next2 = bucketList.getNext(next1);
+        address next1 = bucketList.getFollowing(head, true);
+        address next2 = bucketList.getFollowing(next1, true);
         assertEq(head, accounts[0]);
         assertEq(next1, accounts[1]);
         assertEq(next2, accounts[2]);
@@ -119,25 +119,42 @@ contract TestLogarithmicBuckets is Test {
         assertEq(bucketList.getMatch(32, true), accounts[0], "head above");
     }
 
-    function testGetNext() public {
+    function testGetFollowing() public {
         bucketList.update(accounts[0], 2);
         bucketList.update(accounts[1], 4);
         bucketList.update(accounts[2], 6);
         bucketList.update(accounts[3], 16);
 
-        address out1 = bucketList.getNext(address(0));
-        assertEq(out1, accounts[0], "out1");
+        // test get next
+        address next1 = bucketList.getFollowing(address(0), true);
+        assertEq(next1, accounts[0], "next1");
 
-        address out2 = bucketList.getNext(out1);
-        assertEq(out2, accounts[1], "out2");
+        address next2 = bucketList.getFollowing(next1, true);
+        assertEq(next2, accounts[1], "next2");
 
-        address out3 = bucketList.getNext(out2);
-        assertEq(out3, accounts[2], "out3");
+        address next3 = bucketList.getFollowing(next2, true);
+        assertEq(next3, accounts[2], "next3");
 
-        address out4 = bucketList.getNext(out3);
-        assertEq(out4, accounts[3], "out4");
+        address next4 = bucketList.getFollowing(next3, true);
+        assertEq(next4, accounts[3], "next4");
 
-        address out5 = bucketList.getNext(out4);
-        assertEq(out5, address(0), "out5");
+        address next5 = bucketList.getFollowing(next4, true);
+        assertEq(next5, address(0), "next5");
+
+        // test get prev
+        address prev1 = bucketList.getFollowing(address(0), false);
+        assertEq(prev1, accounts[3], "prev1");
+
+        address prev2 = bucketList.getFollowing(prev1, false);
+        assertEq(prev2, accounts[2], "prev2");
+
+        address prev3 = bucketList.getFollowing(prev2, false);
+        assertEq(prev3, accounts[1], "prev3");
+
+        address prev4 = bucketList.getFollowing(prev3, false);
+        assertEq(prev4, accounts[0], "prev4");
+
+        address prev5 = bucketList.getFollowing(prev4, false);
+        assertEq(prev5, address(0), "prev5");
     }
 }

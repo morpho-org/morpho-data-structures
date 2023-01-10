@@ -169,21 +169,32 @@ library LogarithmicBuckets {
         return address(0);
     }
 
-    /// @notice Returns the address of the next account in the bucket of _id.
-    /// @param _buckets The buckets to get the next account.
-    /// @param _id current address.
+    /// @notice Returns the account following `_id` in `_buckets`.
+    /// @param _buckets The buckets to get the following account.
+    /// @param _id The current address.
+    /// @param _increasing True if starting from the lower buckets and going up to the higher buckets.
     /// @return The address of the next account.
-    function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
+    function getFollowing(
+        BucketList storage _buckets,
+        address _id,
+        bool _increasing
+    ) internal view returns (address) {
         uint256 value = _buckets.valueOf[_id];
+        if (!_increasing && value == 0) value = type(uint256).max;
         uint256 bucket = _computeBucket(value);
-        address next = _buckets.lists[bucket].getFollowing(_id, true);
+        address following = _buckets.lists[bucket].getFollowing(_id, _increasing);
 
-        if (next != address(0)) return next;
+        if (following != address(0)) return following;
 
-        uint256 lowerMask = _setLowerBits(value);
         uint256 bucketsMask = _buckets.bucketsMask;
-        uint256 nextBucket = _nextBucket(lowerMask, bucketsMask);
+        uint256 lowerMask = _setLowerBits(value);
+        uint256 followingBucket;
+        if (_increasing) followingBucket = _nextBucket(lowerMask, bucketsMask);
+        else {
+            lowerMask >>= 1;
+            followingBucket = _prevBucket(lowerMask, bucketsMask);
+        }
 
-        return _buckets.lists[nextBucket].getFirst(true);
+        return _buckets.lists[followingBucket].getFirst(_increasing);
     }
 }
