@@ -44,7 +44,7 @@ library BucketDLL {
     }
 
     /// @notice Removes an account of the `_list`.
-    /// @notice This function should not be called with `_id` equal to address 0.
+    /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function remove(List storage _list, address _id) internal returns (bool empty) {
@@ -61,7 +61,7 @@ library BucketDLL {
     }
 
     /// @notice Inserts an account at the tail of the `_list`.
-    /// @notice This function should not be called with `_id` equal to address 0.
+    /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     function insert(List storage _list, address _id) internal returns (bool empty) {
