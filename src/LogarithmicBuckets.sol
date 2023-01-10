@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "./DoubleLinkedListFIFO.sol";
+import "./UnsortedDLL.sol";
 
 library LogarithmicBuckets {
-    using DoubleLinkedList for DoubleLinkedList.List;
+    using UnsortedDLL for UnsortedDLL.List;
 
     struct BucketList {
-        mapping(uint256 => DoubleLinkedList.List) lists;
+        mapping(uint256 => UnsortedDLL.List) lists;
         mapping(address => uint256) valueOf;
         uint256 bucketsMask;
     }
@@ -123,6 +123,18 @@ library LogarithmicBuckets {
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 
+    /// @notice Returns the address at the head or at the tail of the double linked list.
+    /// @param _list The list from which to get the first address.
+    /// @param _getHead True to return the head, false to return the tail.
+    function _getFirst(UnsortedDLL.List storage _list, bool _getHead)
+        private
+        view
+        returns (address)
+    {
+        if (_getHead) return _list.getHead();
+        return _list.getTail();
+    }
+
     /// GETTERS ///
 
     /// @notice Returns the value of the account linked to `_id`.
@@ -132,43 +144,39 @@ library LogarithmicBuckets {
         return _buckets.valueOf[_id];
     }
 
-    /// @notice Returns the bucket of the bucket linked to `_id`.
+    /// @notice Returns the bucket in which to look for `_value`.
     /// @param _buckets The buckets to search in.
-    /// @param _id The address of the account.
-    function getBucketOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
-        return _computeBucket(_buckets.valueOf[_id]);
+    /// @param _value The value to look for.
+    function getBucketOf(BucketList storage _buckets, uint256 _value)
+        internal
+        view
+        returns (UnsortedDLL.List storage)
+    {
+        uint256 bucket = _computeBucket(_value);
+        return _buckets.lists[bucket];
     }
 
-    /// @notice Returns the value of the account linked to `_id`.
-    /// @param _buckets The buckets to search in.
-    function getMaxBucket(BucketList storage _buckets) internal view returns (uint256) {
-        return _computeBucket(_buckets.bucketsMask);
-    }
-
-    /// @notice Returns the address at the head of the `_buckets` for matching the value `_value`.
+    /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
     /// @param _buckets The buckets to get the head.
     /// @param _value The value to match.
+    /// @param _fifo Whether to treat the underlying data-structure as a FIFO (as opposed to a LIFO).
     /// @return The address of the head.
-    function getHead(BucketList storage _buckets, uint256 _value) internal view returns (address) {
+    function getMatch(
+        BucketList storage _buckets,
+        uint256 _value,
+        bool _fifo
+    ) internal view returns (address) {
         uint256 lowerMask = _setLowerBits(_value);
 
         uint256 bucketsMask = _buckets.bucketsMask;
         uint256 next = _nextBucket(lowerMask, bucketsMask);
 
-        if (next != 0) return _buckets.lists[next].getHead();
+        if (next != 0) return _getFirst(_buckets.lists[next], _fifo);
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
 
-        if (prev != 0) return _buckets.lists[prev].getHead();
-        else return address(0);
-    }
+        if (prev != 0) return _getFirst(_buckets.lists[prev], _fifo);
 
-    /// @notice Returns the address of the next account in the bucket of _id.
-    /// @param _buckets The buckets to get the next account.
-    /// @param _id current address.
-    /// @return The address of the next account.
-    function getNext(BucketList storage _buckets, address _id) internal view returns (address) {
-        uint256 bucket = _computeBucket(_buckets.valueOf[_id]);
-        return _buckets.lists[bucket].getNext(_id);
+        return address(0);
     }
 }
