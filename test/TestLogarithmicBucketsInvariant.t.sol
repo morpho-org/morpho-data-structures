@@ -35,3 +35,55 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
         assertTrue(!notEmpty || buckets.getMatch(value, false) != address(0));
     }
 }
+
+contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
+    using BucketDLL for BucketDLL.List;
+    using LogarithmicBuckets for LogarithmicBuckets.BucketList;
+
+    address[] public seen;
+    mapping(address => bool) public isSeen;
+
+    function seenLength() public view returns (uint256) {
+        return seen.length;
+    }
+
+    function update(address _id, uint256 _newValue) public override {
+        if (!isSeen[_id]) {
+            isSeen[_id] = true;
+            seen.push(_id);
+        }
+
+        super.update(_id, _newValue);
+    }
+
+    function getPrev(uint256 _value, address _id) public view returns (address) {
+        BucketDLL.List storage bucket = bucketList.getBucketOf(_value);
+        return bucket.getPrev(_id);
+    }
+
+    function getNext(uint256 _value, address _id) public view returns (address) {
+        BucketDLL.List storage bucket = bucketList.getBucketOf(_value);
+        return bucket.getNext(_id);
+    }
+}
+
+contract TestLogarithmicBucketsSeenInvariant is Test, Random {
+    LogarithmicBucketsSeenMock public buckets;
+
+    function setUp() public {
+        buckets = new LogarithmicBucketsSeenMock();
+    }
+
+    function invariantNotZeroInserted() public {
+        for (uint256 i; i < buckets.seenLength(); i++) {
+            address user = buckets.seen(i);
+            uint256 value = buckets.getValueOf(user);
+            if (value != 0) {
+                address next = buckets.getNext(value, user);
+                address prev = buckets.getPrev(value, user);
+                assertEq(buckets.getNext(value, prev), user);
+                assertEq(buckets.getPrev(value, next), user);
+            }
+        }
+    }
+}

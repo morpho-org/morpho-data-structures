@@ -9,7 +9,7 @@ contract LogarithmicBucketsMock {
 
     LogarithmicBuckets.BucketList public bucketList;
 
-    function update(address _id, uint256 _newValue) public {
+    function update(address _id, uint256 _newValue) public virtual {
         bucketList.update(_id, _newValue);
     }
 
