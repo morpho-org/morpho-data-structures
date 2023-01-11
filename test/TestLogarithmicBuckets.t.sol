@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "./mocks/LogarithmicBucketsMock.sol";
 
-contract TestLogarithmicBuckets is LogarithmicBucketsMock {
+contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     using BucketDLL for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;
 

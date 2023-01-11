@@ -14,7 +14,7 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
 
     // Check that the structure of the log buckets is preserved.
     function invariantStructure() public {
-        buckets.verifyStructure();
+        assertTrue(buckets.verifyStructure());
     }
 
     // Check that the address 0 is never inserted in the buckets.

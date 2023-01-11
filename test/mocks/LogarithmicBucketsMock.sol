@@ -2,9 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "src/LogarithmicBuckets.sol";
-import "forge-std/Test.sol";
 
-contract LogarithmicBucketsMock is Test {
+contract LogarithmicBucketsMock {
     using BucketDLL for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;
 
@@ -40,7 +39,7 @@ contract LogarithmicBucketsMock is Test {
         return bucketList.getMatch(_value, _fifo);
     }
 
-    function verifyStructure() public {
+    function verifyStructure() public view returns (bool) {
         for (uint256 i; i < 256; i++) {
             uint256 lowerValue = 2**i;
             uint256 higherValue;
@@ -52,8 +51,9 @@ contract LogarithmicBucketsMock is Test {
 
             for (address id = list.getHead(); id != address(0); id = list.getNext(id)) {
                 uint256 value = bucketList.getValueOf(id);
-                assertTrue(lowerValue <= value && value <= higherValue);
+                if (value < lowerValue || value > higherValue) return false;
             }
         }
+        return true;
     }
 }
