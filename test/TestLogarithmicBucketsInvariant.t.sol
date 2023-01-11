@@ -23,10 +23,15 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
     }
 
     // Check that if the buckets are not all empty, then matching returns some non zero address.
-    function invariantGetMatch() public {
+    function invariantGetMatchFIFO() public {
         bool notEmpty = buckets.maxBucket() != 0;
         uint256 value = randomUint256();
-        bool fifo = value % 2 == 0;
-        assertTrue(!notEmpty || buckets.getMatch(value, fifo) != address(0));
+        assertTrue(!notEmpty || buckets.getMatch(value, true) != address(0));
+    }
+
+    function invariantGetMatchLIFO() public {
+        bool notEmpty = buckets.maxBucket() != 0;
+        uint256 value = randomUint256();
+        assertTrue(!notEmpty || buckets.getMatch(value, false) != address(0));
     }
 }
