@@ -2,16 +2,16 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "src/UnsortedDLL.sol";
+import "src/BucketDLL.sol";
 
 contract TestDoubleLinkedList is Test {
-    using UnsortedDLL for UnsortedDLL.List;
+    using BucketDLL for BucketDLL.List;
 
     uint256 public NDS = 50;
     address[] public accounts;
     address public ADDR_ZERO = address(0);
 
-    UnsortedDLL.List internal list;
+    BucketDLL.List internal list;
 
     function setUp() public {
         accounts = new address[](NDS);
@@ -28,11 +28,6 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getTail(), accounts[0]);
         assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
         assertEq(list.getNext(accounts[0]), ADDR_ZERO);
-    }
-
-    function testShouldNotInsertZeroAddress() public {
-        vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        list.insert(address(0));
     }
 
     function testShouldHaveTheRightOrder() public {
