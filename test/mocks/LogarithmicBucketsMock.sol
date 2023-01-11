@@ -14,6 +14,32 @@ contract LogarithmicBucketsMock is Test {
         bucketList.update(_id, _newValue);
     }
 
+    function getValueOf(address _id) public view returns (uint256) {
+        return bucketList.getValueOf(_id);
+    }
+
+    function _setLowerBits(uint256 x) private pure returns (uint256 y) {
+        assembly {
+            x := or(x, shr(1, x))
+            x := or(x, shr(2, x))
+            x := or(x, shr(4, x))
+            x := or(x, shr(8, x))
+            x := or(x, shr(16, x))
+            x := or(x, shr(32, x))
+            x := or(x, shr(64, x))
+            y := or(x, shr(128, x))
+        }
+    }
+
+    function maxBucket() public view returns (uint256) {
+        uint256 lowerMask = _setLowerBits(bucketList.bucketsMask);
+        return lowerMask ^ (lowerMask >> 1);
+    }
+
+    function getMatch(uint256 _value, bool _fifo) public view returns (address) {
+        return bucketList.getMatch(_value, _fifo);
+    }
+
     function verifyStructure() public {
         for (uint256 i; i < 256; i++) {
             uint256 lowerValue = 2**i;
@@ -26,20 +52,7 @@ contract LogarithmicBucketsMock is Test {
 
             for (address id = list.getHead(); id != address(0); id = list.getNext(id)) {
                 uint256 value = bucketList.getValueOf(id);
-                assertTrue(
-                    lowerValue <= value,
-                    string.concat(
-                        vm.toString(lowerValue),
-                        string.concat(" should be lower than ", vm.toString(value))
-                    )
-                );
-                assertTrue(
-                    value <= higherValue,
-                    string.concat(
-                        vm.toString(value),
-                        string.concat(" should be lower than ", vm.toString(higherValue))
-                    )
-                );
+                assertTrue(lowerValue <= value && value <= higherValue);
             }
         }
     }
