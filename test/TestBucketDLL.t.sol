@@ -20,11 +20,12 @@ contract TestDoubleLinkedList is Test {
         }
     }
 
-    function testInsertOneSingleAccount() public {
-        list.insert(accounts[0]);
-
-        assertEq(list.getHead(), accounts[0]);
-        assertEq(list.getTail(), accounts[0]);
+    function testInsertOneSingleAccount(address _account) public {
+        vm.assume(_account != address(0));
+        
+        list.insert(_account);
+        assertEq(list.getHead(), _account);
+        assertEq(list.getTail(), _account);
         assertEq(list.getPrev(accounts[0]), address(0));
         assertEq(list.getNext(accounts[0]), address(0));
     }
