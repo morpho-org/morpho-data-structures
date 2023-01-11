@@ -14,7 +14,7 @@ contract TestDoubleLinkedList is Test {
 
     function setUp() public {
         accounts = new address[](numberOfAccounts);
-        accounts[0]= address(1);
+        accounts[0] = address(1);
         for (uint256 i = 1; i < numberOfAccounts; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
@@ -22,7 +22,7 @@ contract TestDoubleLinkedList is Test {
 
     function testInsertOneSingleAccount(address _account) public {
         vm.assume(_account != address(0));
-        
+
         list.insert(_account);
         assertEq(list.getHead(), _account);
         assertEq(list.getTail(), _account);
@@ -42,10 +42,10 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getNext(_account), address(0));
     }
 
-    function testShouldInsertTwoAccounts(address _account0 ,address _account1) public {
+    function testShouldInsertTwoAccounts(address _account0, address _account1) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
-        
+
         list.insert(_account0);
         list.insert(_account1);
 
@@ -57,9 +57,13 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getNext(_account1), address(0));
     }
 
-    function testShouldInsertThreeAccounts(address _account0, address _account1, address _account2) public {
+    function testShouldInsertThreeAccounts(
+        address _account0,
+        address _account1,
+        address _account2
+    ) public {
         vm.assume(_account0 != address(0) && _account1 != address(0) && _account2 != address(0));
-        vm.assume(_account0 != _account1  && _account1 != _account2  && _account2 != _account0);
+        vm.assume(_account0 != _account1 && _account1 != _account2 && _account2 != _account0);
 
         list.insert(_account0);
         list.insert(_account1);
@@ -75,7 +79,7 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getNext(_account2), address(0));
     }
 
-    function testShouldRemoveOneAccountOverTwo(address _account0 ,address _account1) public {
+    function testShouldRemoveOneAccountOverTwo(address _account0, address _account1) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
@@ -89,7 +93,7 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getNext(_account1), address(0));
     }
 
-    function testShouldRemoveBothAccounts(address _account0 ,address _account1) public {
+    function testShouldRemoveBothAccounts(address _account0, address _account1) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
@@ -102,9 +106,13 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getTail(), address(0));
     }
 
-    function testShouldInsertThreeAccountsAndRemoveThem(address _account0, address _account1, address _account2) public {
+    function testShouldInsertThreeAccountsAndRemoveThem(
+        address _account0,
+        address _account1,
+        address _account2
+    ) public {
         vm.assume(_account0 != address(0) && _account1 != address(0) && _account2 != address(0));
-        vm.assume(_account0 != _account1  && _account1 != _account2  && _account2 != _account0);
+        vm.assume(_account0 != _account1 && _account1 != _account2 && _account2 != _account0);
 
         list.insert(_account0);
         list.insert(_account1);
@@ -169,5 +177,4 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getHead(), address(0));
         assertEq(list.getTail(), address(0));
     }
-
 }
