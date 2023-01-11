@@ -7,16 +7,15 @@ import "src/BucketDLL.sol";
 contract TestDoubleLinkedList is Test {
     using BucketDLL for BucketDLL.List;
 
-    uint256 public NDS = 50;
+    uint256 internal numberOfAccounts = 50;
     address[] public accounts;
-    address public ADDR_ZERO = address(0);
 
     BucketDLL.List internal list;
 
     function setUp() public {
-        accounts = new address[](NDS);
-        accounts[0] = address(this);
-        for (uint256 i = 1; i < NDS; i++) {
+        accounts = new address[](numberOfAccounts);
+        accounts[0] = address(1);
+        for (uint256 i = 1; i < numberOfAccounts; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
     }
@@ -26,25 +25,18 @@ contract TestDoubleLinkedList is Test {
 
         assertEq(list.getHead(), accounts[0]);
         assertEq(list.getTail(), accounts[0]);
-        assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
-        assertEq(list.getNext(accounts[0]), ADDR_ZERO);
-    }
-
-    function testShouldHaveTheRightOrder() public {
-        list.insert(accounts[0]);
-        list.insert(accounts[1]);
-        assertEq(list.getHead(), accounts[0]);
-        assertEq(list.getTail(), accounts[1]);
+        assertEq(list.getPrev(accounts[0]), address(0));
+        assertEq(list.getNext(accounts[0]), address(0));
     }
 
     function testShouldRemoveOneSingleAccount() public {
         list.insert(accounts[0]);
         list.remove(accounts[0]);
 
-        assertEq(list.getHead(), ADDR_ZERO);
-        assertEq(list.getTail(), ADDR_ZERO);
-        assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
-        assertEq(list.getNext(accounts[0]), ADDR_ZERO);
+        assertEq(list.getHead(), address(0));
+        assertEq(list.getTail(), address(0));
+        assertEq(list.getPrev(accounts[0]), address(0));
+        assertEq(list.getNext(accounts[0]), address(0));
     }
 
     function testShouldInsertTwoAccounts() public {
@@ -53,10 +45,10 @@ contract TestDoubleLinkedList is Test {
 
         assertEq(list.getHead(), accounts[0]);
         assertEq(list.getTail(), accounts[1]);
-        assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
+        assertEq(list.getPrev(accounts[0]), address(0));
         assertEq(list.getNext(accounts[0]), accounts[1]);
         assertEq(list.getPrev(accounts[1]), accounts[0]);
-        assertEq(list.getNext(accounts[1]), ADDR_ZERO);
+        assertEq(list.getNext(accounts[1]), address(0));
     }
 
     function testShouldInsertThreeAccounts() public {
@@ -66,12 +58,12 @@ contract TestDoubleLinkedList is Test {
 
         assertEq(list.getHead(), accounts[0]);
         assertEq(list.getTail(), accounts[2]);
-        assertEq(list.getPrev(accounts[0]), ADDR_ZERO);
+        assertEq(list.getPrev(accounts[0]), address(0));
         assertEq(list.getNext(accounts[0]), accounts[1]);
         assertEq(list.getPrev(accounts[1]), accounts[0]);
         assertEq(list.getNext(accounts[1]), accounts[2]);
         assertEq(list.getPrev(accounts[2]), accounts[1]);
-        assertEq(list.getNext(accounts[2]), ADDR_ZERO);
+        assertEq(list.getNext(accounts[2]), address(0));
     }
 
     function testShouldRemoveOneAccountOverTwo() public {
@@ -81,8 +73,8 @@ contract TestDoubleLinkedList is Test {
 
         assertEq(list.getHead(), accounts[1]);
         assertEq(list.getTail(), accounts[1]);
-        assertEq(list.getPrev(accounts[1]), ADDR_ZERO);
-        assertEq(list.getNext(accounts[1]), ADDR_ZERO);
+        assertEq(list.getPrev(accounts[1]), address(0));
+        assertEq(list.getNext(accounts[1]), address(0));
     }
 
     function testShouldRemoveBothAccounts() public {
@@ -91,8 +83,8 @@ contract TestDoubleLinkedList is Test {
         list.remove(accounts[0]);
         list.remove(accounts[1]);
 
-        assertEq(list.getHead(), ADDR_ZERO);
-        assertEq(list.getTail(), ADDR_ZERO);
+        assertEq(list.getHead(), address(0));
+        assertEq(list.getTail(), address(0));
     }
 
     function testShouldInsertThreeAccountsAndRemoveThem() public {
@@ -103,27 +95,27 @@ contract TestDoubleLinkedList is Test {
         assertEq(list.getHead(), accounts[0]);
         assertEq(list.getTail(), accounts[2]);
 
-        // Remove account 0.
-        list.remove(accounts[0]);
-        assertEq(list.getHead(), accounts[1]);
-        assertEq(list.getTail(), accounts[2]);
-        assertEq(list.getPrev(accounts[1]), ADDR_ZERO);
-        assertEq(list.getNext(accounts[1]), accounts[2]);
-
-        assertEq(list.getPrev(accounts[2]), accounts[1]);
-        assertEq(list.getNext(accounts[2]), ADDR_ZERO);
-
         // Remove account 1.
         list.remove(accounts[1]);
+        assertEq(list.getHead(), accounts[0]);
+        assertEq(list.getTail(), accounts[2]);
+        assertEq(list.getPrev(accounts[0]), address(0));
+        assertEq(list.getNext(accounts[0]), accounts[2]);
+
+        assertEq(list.getPrev(accounts[2]), accounts[0]);
+        assertEq(list.getNext(accounts[2]), address(0));
+
+        // Remove account 0.
+        list.remove(accounts[0]);
         assertEq(list.getHead(), accounts[2]);
         assertEq(list.getTail(), accounts[2]);
-        assertEq(list.getPrev(accounts[2]), ADDR_ZERO);
-        assertEq(list.getNext(accounts[2]), ADDR_ZERO);
+        assertEq(list.getPrev(accounts[2]), address(0));
+        assertEq(list.getNext(accounts[2]), address(0));
 
         // Remove account 2.
         list.remove(accounts[2]);
-        assertEq(list.getHead(), ADDR_ZERO);
-        assertEq(list.getTail(), ADDR_ZERO);
+        assertEq(list.getHead(), address(0));
+        assertEq(list.getTail(), address(0));
     }
 
     function testShouldInsertAccountsInFIFOOrder() public {
@@ -141,9 +133,9 @@ contract TestDoubleLinkedList is Test {
         }
 
         address prevAccount = accounts[accounts.length - 1];
-        for (uint256 i = 0; i < accounts.length - 1; i++) {
+        for (uint256 i = accounts.length - 2; i > 0; i--) {
             prevAccount = list.getPrev(prevAccount);
-            assertEq(prevAccount, accounts[accounts.length - i - 2]);
+            assertEq(prevAccount, accounts[i]);
         }
     }
 
@@ -156,8 +148,8 @@ contract TestDoubleLinkedList is Test {
             list.remove(accounts[i]);
         }
 
-        assertEq(list.getHead(), ADDR_ZERO);
-        assertEq(list.getTail(), ADDR_ZERO);
+        assertEq(list.getHead(), address(0));
+        assertEq(list.getTail(), address(0));
     }
 
 }
