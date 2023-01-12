@@ -20,10 +20,10 @@ contract TestBucketDLL is Test {
         }
     }
 
-    function testInsertOneSingleAccount(address _account, bool _lifo) public {
+    function testInsertOneSingleAccount(address _account, bool _head) public {
         vm.assume(_account != address(0));
 
-        list.insert(_account, _lifo);
+        list.insert(_account, _head);
         assertEq(list.getHead(), _account);
         assertEq(list.getTail(), _account);
         assertEq(list.getPrev(_account), address(0));
@@ -45,15 +45,15 @@ contract TestBucketDLL is Test {
     function testShouldInsertTwoAccounts(
         address _account0,
         address _account1,
-        bool _lifo
+        bool _head
     ) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
         list.insert(_account0, false);
-        list.insert(_account1, _lifo);
+        list.insert(_account1, _head);
 
-        if (_lifo) {
+        if (_head) {
             assertEq(list.getHead(), _account1);
             assertEq(list.getTail(), _account0);
             assertEq(list.getPrev(_account1), address(0));
@@ -131,14 +131,14 @@ contract TestBucketDLL is Test {
     function testShouldRemoveBothAccounts(
         address _account0,
         address _account1,
-        bool _lifo1,
-        bool _lifo2
+        bool _head1,
+        bool _head2
     ) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
-        list.insert(_account0, _lifo1);
-        list.insert(_account1, _lifo2);
+        list.insert(_account0, _head1);
+        list.insert(_account1, _head2);
         list.remove(_account0);
         list.remove(_account1);
 

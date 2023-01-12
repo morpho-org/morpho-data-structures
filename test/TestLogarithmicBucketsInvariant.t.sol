@@ -41,13 +41,17 @@ contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
         return seen.length;
     }
 
-    function update(address _id, uint256 _newValue, bool _lifo) public override {
+    function update(
+        address _id,
+        uint256 _newValue,
+        bool _head
+    ) public override {
         if (!isSeen[_id]) {
             isSeen[_id] = true;
             seen.push(_id);
         }
 
-        super.update(_id, _newValue, _lifo);
+        super.update(_id, _newValue, _head);
     }
 
     function getPrev(uint256 _value, address _id) public view returns (address) {

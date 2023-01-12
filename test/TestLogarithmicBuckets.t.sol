@@ -20,12 +20,8 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
-    function testEmpty(uint256 _value, bool _fifo) public {
-        assertEq(bucketList.getMatch(_value, _fifo), address(0));
-    }
-
-    function testInsertOneSingleAccount(bool _fifo) public {
-        bucketList.update(accounts[0], 3, _fifo);
+    function testInsertOneSingleAccount(bool _head) public {
+        bucketList.update(accounts[0], 3, _head);
 
         assertEq(bucketList.getValueOf(accounts[0]), 3);
         assertEq(bucketList.getMatch(0), accounts[0]);
@@ -33,14 +29,14 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(bucketList.getBucketOf(2).getHead(), accounts[0]);
     }
 
-    function testUpdatingFromZeroToZeroShouldRevert(bool _lifo) public {
+    function testUpdatingFromZeroToZeroShouldRevert(bool _head) public {
         vm.expectRevert(abi.encodeWithSignature("ZeroValue()"));
-        bucketList.update(accounts[0], 0, _lifo);
+        bucketList.update(accounts[0], 0, _head);
     }
 
-    function testShouldNotInsertZeroAddress(bool _lifo) public {
+    function testShouldNotInsertZeroAddress(bool _head) public {
         vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        bucketList.update(address(0), 10, _lifo);
+        bucketList.update(address(0), 10, _head);
     }
 
     function testShouldHaveTheRightOrderWithinABucketFIFO() public {
@@ -71,18 +67,18 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(next2, accounts[0]);
     }
 
-    function testInsertRemoveOneSingleAccount(bool _lifo1, bool _lifo2) public {
-        bucketList.update(accounts[0], 1, _lifo1);
-        bucketList.update(accounts[0], 0, _lifo2);
+    function testInsertRemoveOneSingleAccount(bool _head1, bool _head2) public {
+        bucketList.update(accounts[0], 1, _head1);
+        bucketList.update(accounts[0], 0, _head2);
 
         assertEq(bucketList.getValueOf(accounts[0]), 0);
         assertEq(bucketList.getMatch(0), address(0));
         assertEq(bucketList.getBucketOf(1).getHead(), address(0));
     }
 
-    function testShouldInsertTwoAccounts(bool _lifo1, bool _lifo2) public {
-        bucketList.update(accounts[0], 16, _lifo1);
-        bucketList.update(accounts[1], 4, _lifo2);
+    function testShouldInsertTwoAccounts(bool _head1, bool _head2) public {
+        bucketList.update(accounts[0], 16, _head1);
+        bucketList.update(accounts[1], 4, _head2);
 
         assertEq(bucketList.getMatch(16), accounts[0]);
         assertEq(bucketList.getMatch(2), accounts[1]);
