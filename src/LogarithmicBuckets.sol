@@ -26,7 +26,8 @@ library LogarithmicBuckets {
     function update(
         BucketList storage _buckets,
         address _id,
-        uint256 _newValue
+        uint256 _newValue,
+        bool _head
     ) internal {
         if (_id == address(0)) revert AddressIsZero();
         uint256 value = _buckets.valueOf[_id];
@@ -34,7 +35,7 @@ library LogarithmicBuckets {
 
         if (value == 0) {
             if (_newValue == 0) revert ZeroValue();
-            _insert(_buckets, _id, _computeBucket(_newValue));
+            _insert(_buckets, _id, _computeBucket(_newValue), _head);
             return;
         }
 
@@ -47,7 +48,7 @@ library LogarithmicBuckets {
         uint256 newBucket = _computeBucket(_newValue);
         if (newBucket != currentBucket) {
             _remove(_buckets, _id, currentBucket);
-            _insert(_buckets, _id, newBucket);
+            _insert(_buckets, _id, newBucket, _head);
         }
     }
 
@@ -76,9 +77,10 @@ library LogarithmicBuckets {
     function _insert(
         BucketList storage _buckets,
         address _id,
-        uint256 _bucket
+        uint256 _bucket,
+        bool _head
     ) private {
-        if (_buckets.lists[_bucket].insert(_id)) _buckets.bucketsMask |= _bucket;
+        if (_buckets.lists[_bucket].insert(_id, _head)) _buckets.bucketsMask |= _bucket;
     }
 
     /// @notice Returns the bucket in which the given value would fall.
