@@ -16,8 +16,8 @@ contract TestLogarithmicBucketsGas is Test {
     uint256 internal updateValueCount;
     uint256 internal removeCost;
     uint256 internal removeCount;
-    uint256 internal getHeadCost;
-    uint256 internal getHeadCount;
+    uint256 internal getMatchCost;
+    uint256 internal getMatchCount;
 
     function testGasUsage() public noGasMetering {
         for (uint256 i; i <= 10000; i++) {
@@ -55,8 +55,8 @@ contract TestLogarithmicBucketsGas is Test {
                 // Measure getMatch.
                 startGasMetering();
                 address toUpdate = bucketList.getMatch(amount, true);
-                getHeadCost += stopGasMetering();
-                getHeadCount++;
+                getMatchCost += stopGasMetering();
+                getMatchCount++;
 
                 if (toUpdate != address(0)) {
                     // Measure remove.
@@ -69,9 +69,9 @@ contract TestLogarithmicBucketsGas is Test {
         }
 
         // Print average cost of insert, updateValue, remove and getMatch.
-        console.log(insertCost / insertCount);
-        console.log(updateValueCost / updateValueCount);
-        console.log(removeCost / removeCount);
-        console.log(getHeadCost / getHeadCount);
+        console.log("insert average cost:", insertCost / insertCount);
+        console.log("update average cost:", updateValueCost / updateValueCount);
+        console.log("remove average cost:", removeCost / removeCount);
+        console.log("match average cost: ", getMatchCost / getMatchCount);
     }
 }
