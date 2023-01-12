@@ -33,19 +33,19 @@ contract TestLogarithmicBucketsGas is Test {
             if (amount % 4 < 2) {
                 // Measure insert.
                 startGasMetering();
-                bucketList.update(address(uint160(amount)), amount);
+                bucketList.update(address(uint160(amount)), amount, true);
                 insertCost += stopGasMetering();
                 insertCount++;
             }
             // Update value in same bucket (p=1/4).
             else if (amount % 4 == 2) {
                 // Get an account to update its value.
-                address toUpdate = bucketList.getMatch(amount, true);
+                address toUpdate = bucketList.getMatch(amount);
 
                 if (toUpdate != address(0)) {
                     // Measure updateValue.
                     startGasMetering();
-                    bucketList.update(toUpdate, amount);
+                    bucketList.update(toUpdate, amount, true);
                     updateValueCost += stopGasMetering();
                     updateValueCount++;
                 }
@@ -54,14 +54,14 @@ contract TestLogarithmicBucketsGas is Test {
             else {
                 // Measure getMatch.
                 startGasMetering();
-                address toUpdate = bucketList.getMatch(amount, true);
+                address toUpdate = bucketList.getMatch(amount);
                 getMatchCost += stopGasMetering();
                 getMatchCount++;
 
                 if (toUpdate != address(0)) {
                     // Measure remove.
                     startGasMetering();
-                    bucketList.update(bucketList.getMatch(amount, true), 0);
+                    bucketList.update(bucketList.getMatch(amount), 0, true);
                     removeCost += stopGasMetering();
                     removeCount++;
                 }
