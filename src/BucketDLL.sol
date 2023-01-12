@@ -70,15 +70,15 @@ library BucketDLL {
         empty = tail == address(0);
 
         if (!_lifo) {
-            _list.accounts[address(0)].prev = _id;
-            _list.accounts[tail].next = _id;
-            _list.accounts[_id].prev = tail;
-        }
-        else {
             address head = _list.accounts[address(0)].next;
             _list.accounts[address(0)].next = _id;
             _list.accounts[head].prev = _id;
             _list.accounts[_id].next = head;
+        }
+        else {
+            _list.accounts[address(0)].prev = _id;
+            _list.accounts[tail].next = _id;
+            _list.accounts[_id].prev = tail;
         }
     }
 }

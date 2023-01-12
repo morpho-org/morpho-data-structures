@@ -23,6 +23,7 @@ library LogarithmicBuckets {
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_buckets`.
+    /// @param _lifo Tells whether the bucket stack should be treated as a LIFO or a FIFO.
     function update(
         BucketList storage _buckets,
         address _id,
@@ -125,12 +126,6 @@ library LogarithmicBuckets {
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 
-    /// @notice Returns the address at the head of the double linked list.
-    /// @param _list The list from which to get the first address.
-    function _getHead(BucketDLL.List storage _list) private view returns (address) {
-        return _list.getHead();
-    }
-
     /// GETTERS ///
 
     /// @notice Returns the value of `_id`.
@@ -172,11 +167,11 @@ library LogarithmicBuckets {
         return _getFirst(_buckets.lists[prev], _fifo);
 =======
 
-        if (next != 0) return _getHead(_buckets.lists[next]);
+        if (next != 0) return _buckets.lists[next].getHead();
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
 
-        if (prev != 0) return _getHead(_buckets.lists[prev]);
+        if (prev != 0) return _buckets.lists[prev].getHead();
 
         return address(0);
 >>>>>>> 0131301 (feat: keep only one getter for matching)
