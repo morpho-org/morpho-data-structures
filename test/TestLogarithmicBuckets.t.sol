@@ -28,7 +28,7 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         bucketList.update(accounts[0], 3, false);
 
         assertEq(bucketList.getValueOf(accounts[0]), 3);
-        assertEq(bucketList.getMatch(0, true), accounts[0]);
+        assertEq(bucketList.getMatch(0), accounts[0]);
         assertEq(bucketList.getBucketOf(3).getHead(), accounts[0]);
         assertEq(bucketList.getBucketOf(2).getHead(), accounts[0]);
     }
@@ -62,7 +62,7 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         bucketList.update(accounts[0], 0, false);
 
         assertEq(bucketList.getValueOf(accounts[0]), 0);
-        assertEq(bucketList.getMatch(0, true), address(0));
+        assertEq(bucketList.getMatch(0), address(0));
         assertEq(bucketList.getBucketOf(1).getHead(), address(0));
     }
 
@@ -70,8 +70,8 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         bucketList.update(accounts[0], 16, false);
         bucketList.update(accounts[1], 4, false);
 
-        assertEq(bucketList.getMatch(16, true), accounts[0]);
-        assertEq(bucketList.getMatch(2, true), accounts[1]);
+        assertEq(bucketList.getMatch(16), accounts[0]);
+        assertEq(bucketList.getMatch(2), accounts[1]);
         assertEq(bucketList.getBucketOf(4).getHead(), accounts[1]);
     }
 
@@ -80,7 +80,7 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         bucketList.update(accounts[1], 16, false);
         bucketList.update(accounts[0], 0, false);
 
-        assertEq(bucketList.getMatch(4, true), accounts[1]);
+        assertEq(bucketList.getMatch(4), accounts[1]);
         assertEq(bucketList.getValueOf(accounts[0]), 0);
         assertEq(bucketList.getValueOf(accounts[1]), 16);
         assertEq(bucketList.getBucketOf(16).getHead(), accounts[1]);
@@ -93,16 +93,16 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         bucketList.update(accounts[0], 0, false);
         bucketList.update(accounts[1], 0, false);
 
-        assertEq(bucketList.getMatch(4, true), address(0));
+        assertEq(bucketList.getMatch(4), address(0));
     }
 
     function testGetMatch() public {
-        assertEq(bucketList.getMatch(0, true), address(0));
-        assertEq(bucketList.getMatch(1000, true), address(0));
+        assertEq(bucketList.getMatch(0), address(0));
+        assertEq(bucketList.getMatch(1000), address(0));
 
         bucketList.update(accounts[0], 16, false);
-        assertEq(bucketList.getMatch(1, true), accounts[0], "head before");
-        assertEq(bucketList.getMatch(16, true), accounts[0], "head equal");
-        assertEq(bucketList.getMatch(32, true), accounts[0], "head above");
+        assertEq(bucketList.getMatch(1), accounts[0], "head before");
+        assertEq(bucketList.getMatch(16), accounts[0], "head equal");
+        assertEq(bucketList.getMatch(32), accounts[0], "head above");
     }
 }

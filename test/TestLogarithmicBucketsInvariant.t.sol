@@ -23,16 +23,10 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
     }
 
     // Check that if the buckets are not all empty, then matching returns some non zero address.
-    function invariantGetMatchFIFO() public {
+    function invariantGetMatch() public {
         bool notEmpty = buckets.maxBucket() != 0;
         uint256 value = randomUint256();
-        assertTrue(!notEmpty || buckets.getMatch(value, true) != address(0));
-    }
-
-    function invariantGetMatchLIFO() public {
-        bool notEmpty = buckets.maxBucket() != 0;
-        uint256 value = randomUint256();
-        assertTrue(!notEmpty || buckets.getMatch(value, false) != address(0));
+        assertTrue(!notEmpty || buckets.getMatch(value) != address(0));
     }
 }
 
@@ -47,13 +41,13 @@ contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
         return seen.length;
     }
 
-    function update(address _id, uint256 _newValue) public override {
+    function update(address _id, uint256 _newValue, bool _lifo) public override {
         if (!isSeen[_id]) {
             isSeen[_id] = true;
             seen.push(_id);
         }
 
-        super.update(_id, _newValue);
+        super.update(_id, _newValue, _lifo);
     }
 
     function getPrev(uint256 _value, address _id) public view returns (address) {

@@ -9,8 +9,8 @@ contract LogarithmicBucketsMock {
 
     LogarithmicBuckets.BucketList public bucketList;
 
-    function update(address _id, uint256 _newValue) public virtual {
-        bucketList.update(_id, _newValue);
+    function update(address _id, uint256 _newValue, bool _lifo) public virtual {
+        bucketList.update(_id, _newValue, _lifo);
     }
 
     function getValueOf(address _id) public view returns (uint256) {
@@ -35,8 +35,8 @@ contract LogarithmicBucketsMock {
         return lowerMask ^ (lowerMask >> 1);
     }
 
-    function getMatch(uint256 _value, bool _fifo) public view returns (address) {
-        return bucketList.getMatch(_value, _fifo);
+    function getMatch(uint256 _value) public view returns (address) {
+        return bucketList.getMatch(_value);
     }
 
     function verifyStructure() public view returns (bool) {
