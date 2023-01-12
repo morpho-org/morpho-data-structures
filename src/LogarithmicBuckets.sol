@@ -23,7 +23,7 @@ library LogarithmicBuckets {
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_buckets`.
-    /// @param _lifo Tells whether the bucket stack should be treated as a LIFO or a FIFO.
+    /// @param _lifo Indicates whether the bucket stack should be treated as a LIFO or a FIFO.
     function update(
         BucketList storage _buckets,
         address _id,

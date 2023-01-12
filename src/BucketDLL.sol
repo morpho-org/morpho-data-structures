@@ -69,7 +69,7 @@ library BucketDLL {
         address tail = _list.accounts[address(0)].prev;
         empty = tail == address(0);
 
-        if (!_lifo) {
+        if (_lifo) {
             address head = _list.accounts[address(0)].next;
             _list.accounts[address(0)].next = _id;
             _list.accounts[head].prev = _id;
