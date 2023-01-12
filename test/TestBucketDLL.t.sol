@@ -23,7 +23,7 @@ contract TestBucketDLL is Test {
     function testInsertOneSingleAccount(address _account) public {
         vm.assume(_account != address(0));
 
-        list.insert(_account);
+        list.insert(_account, false);
         assertEq(list.getHead(), _account);
         assertEq(list.getTail(), _account);
         assertEq(list.getPrev(_account), address(0));
@@ -33,7 +33,7 @@ contract TestBucketDLL is Test {
     function testShouldRemoveOneSingleAccount(address _account) public {
         vm.assume(_account != address(0));
 
-        list.insert(_account);
+        list.insert(_account, false);
         list.remove(_account);
 
         assertEq(list.getHead(), address(0));
@@ -46,8 +46,8 @@ contract TestBucketDLL is Test {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
-        list.insert(_account0);
-        list.insert(_account1);
+        list.insert(_account0, false);
+        list.insert(_account1, false);
 
         assertEq(list.getHead(), _account0);
         assertEq(list.getTail(), _account1);
@@ -65,9 +65,9 @@ contract TestBucketDLL is Test {
         vm.assume(_account0 != address(0) && _account1 != address(0) && _account2 != address(0));
         vm.assume(_account0 != _account1 && _account1 != _account2 && _account2 != _account0);
 
-        list.insert(_account0);
-        list.insert(_account1);
-        list.insert(_account2);
+        list.insert(_account0, false);
+        list.insert(_account1, false);
+        list.insert(_account2, false);
 
         assertEq(list.getHead(), _account0);
         assertEq(list.getTail(), _account2);
@@ -83,8 +83,8 @@ contract TestBucketDLL is Test {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
-        list.insert(_account0);
-        list.insert(_account1);
+        list.insert(_account0, false);
+        list.insert(_account1, false);
         list.remove(_account0);
 
         assertEq(list.getHead(), _account1);
@@ -99,8 +99,8 @@ contract TestBucketDLL is Test {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
-        list.insert(_account0);
-        list.insert(_account1);
+        list.insert(_account0, false);
+        list.insert(_account1, false);
         list.remove(_account0);
         list.remove(_account1);
 
@@ -116,9 +116,9 @@ contract TestBucketDLL is Test {
         vm.assume(_account0 != address(0) && _account1 != address(0) && _account2 != address(0));
         vm.assume(_account0 != _account1 && _account1 != _account2 && _account2 != _account0);
 
-        list.insert(_account0);
-        list.insert(_account1);
-        list.insert(_account2);
+        list.insert(_account0, false);
+        list.insert(_account1, false);
+        list.insert(_account2, false);
 
         assertEq(list.getHead(), _account0);
         assertEq(list.getTail(), _account2);
@@ -148,7 +148,7 @@ contract TestBucketDLL is Test {
 
     function testShouldInsertAccountsInFIFOOrder() public {
         for (uint256 i = 0; i < accounts.length; i++) {
-            list.insert(accounts[i]);
+            list.insert(accounts[i], false);
         }
 
         assertEq(list.getHead(), accounts[0]);
@@ -169,7 +169,7 @@ contract TestBucketDLL is Test {
 
     function testShouldRemoveAllAccounts() public {
         for (uint256 i = 0; i < accounts.length; i++) {
-            list.insert(accounts[i]);
+            list.insert(accounts[i], false);
         }
 
         for (uint256 i = 0; i < accounts.length; i++) {
