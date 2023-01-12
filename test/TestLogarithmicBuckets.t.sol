@@ -2,18 +2,15 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "src/BucketDLL.sol";
-import "src/LogarithmicBuckets.sol";
+import "./mocks/LogarithmicBucketsMock.sol";
 
-contract TestLogarithmicBuckets is Test {
+contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     using BucketDLL for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;
 
     uint256 public NDS = 50;
     address[] public accounts;
     address public ADDR_ZERO = address(0);
-
-    LogarithmicBuckets.BucketList internal bucketList;
 
     function setUp() public {
         accounts = new address[](NDS);
