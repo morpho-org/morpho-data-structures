@@ -49,31 +49,31 @@ library BucketDLL {
     /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
-    /// @return empty Whether the bucket is empty after removal.
-    function remove(List storage _list, address _id) internal returns (bool empty) {
+    /// @return Whether the bucket is empty after removal.
+    function remove(List storage _list, address _id) internal returns (bool) {
         Account memory account = _list.accounts[_id];
         address prev = account.prev;
         address next = account.next;
-
-        empty = (prev == address(0) && next == address(0));
 
         _list.accounts[prev].next = next;
         _list.accounts[next].prev = prev;
 
         delete _list.accounts[_id];
+
+        return (prev == address(0) && next == address(0));
     }
 
     /// @notice Inserts an account at the tail of the `_list`.
     /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
-    /// @param _head Tells whether to insert at the head or at the tail of the stack.
-    /// @return empty Whether the bucket was empty before insertion.
+    /// @param _head Tells whether to insert at the head or at the tail of the list.
+    /// @return Whether the bucket was empty before insertion.
     function insert(
         List storage _list,
         address _id,
         bool _head
-    ) internal returns (bool empty) {
+    ) internal returns (bool) {
         if (_head) {
             address head = _list.accounts[address(0)].next;
             _list.accounts[address(0)].next = _id;
