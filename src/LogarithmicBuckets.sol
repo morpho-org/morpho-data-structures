@@ -161,17 +161,14 @@ library LogarithmicBuckets {
         uint256 _value,
         bool _fifo
     ) internal view returns (address) {
+        uint256 bucketsMask = _buckets.bucketsMask;
+        if (bucketsMask == 0) return address(0);
         uint256 lowerMask = _setLowerBits(_value);
 
-        uint256 bucketsMask = _buckets.bucketsMask;
         uint256 next = _nextBucket(lowerMask, bucketsMask);
-
         if (next != 0) return _getFirst(_buckets.lists[next], _fifo);
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
-
-        if (prev != 0) return _getFirst(_buckets.lists[prev], _fifo);
-
-        return address(0);
+        return _getFirst(_buckets.lists[prev], _fifo);
     }
 }
