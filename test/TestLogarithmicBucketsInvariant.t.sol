@@ -18,7 +18,7 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
     }
 
     // Check that the address 0 is never inserted in the buckets.
-    function invariantZeroNotInserted() public {
+    function invariantZeroAccountIsNotInserted() public {
         assertEq(buckets.getValueOf(address(0)), 0);
     }
 
@@ -74,7 +74,7 @@ contract TestLogarithmicBucketsSeenInvariant is Test, Random {
         buckets = new LogarithmicBucketsSeenMock();
     }
 
-    function invariantNotZeroInserted() public {
+    function invariantNotZeroAccountIsInserted() public {
         for (uint256 i; i < buckets.seenLength(); i++) {
             address user = buckets.seen(i);
             uint256 value = buckets.getValueOf(user);
