@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "src/BucketDLL.sol";
 
-contract TestDoubleLinkedList is Test {
+contract TestBucketDLL is Test {
     using BucketDLL for BucketDLL.List;
 
     uint256 internal numberOfAccounts = 50;
@@ -14,7 +14,7 @@ contract TestDoubleLinkedList is Test {
 
     function setUp() public {
         accounts = new address[](numberOfAccounts);
-        accounts[0] = address(1);
+        accounts[0] = address(bytes20(keccak256("TestBucketDLL.accounts")));
         for (uint256 i = 1; i < numberOfAccounts; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
@@ -89,6 +89,8 @@ contract TestDoubleLinkedList is Test {
 
         assertEq(list.getHead(), _account1);
         assertEq(list.getTail(), _account1);
+        assertEq(list.getPrev(_account0), address(0));
+        assertEq(list.getNext(_account0), address(0));
         assertEq(list.getPrev(_account1), address(0));
         assertEq(list.getNext(_account1), address(0));
     }
