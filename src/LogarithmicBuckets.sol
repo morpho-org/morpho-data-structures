@@ -75,7 +75,7 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _bucket The mask of the bucket where to insert.
-    /// @param _head insert as lifo or fifo.
+    /// @param _head insert at the head or at the tail of the list.
     function _insert(
         BucketList storage _buckets,
         address _id,
@@ -151,25 +151,12 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to get the head.
     /// @param _value The value to match.
     /// @return The address of the head.
-<<<<<<< HEAD
-    function getMatch(
-        BucketList storage _buckets,
-        uint256 _value
-    ) internal view returns (address) {
+    function getMatch(BucketList storage _buckets, uint256 _value) internal view returns (address) {
         uint256 bucketsMask = _buckets.bucketsMask;
         if (bucketsMask == 0) return address(0);
-=======
-    function getMatch(BucketList storage _buckets, uint256 _value) internal view returns (address) {
->>>>>>> f5a1e1e (fix: improve readability _fifo -> _head)
         uint256 lowerMask = _setLowerBits(_value);
 
         uint256 next = _nextBucket(lowerMask, bucketsMask);
-<<<<<<< HEAD
-        if (next != 0) return _getFirst(_buckets.lists[next], _fifo);
-
-        uint256 prev = _prevBucket(lowerMask, bucketsMask);
-        return _getFirst(_buckets.lists[prev], _fifo);
-=======
 
         if (next != 0) return _buckets.lists[next].getHead();
 
@@ -178,6 +165,5 @@ library LogarithmicBuckets {
         if (prev != 0) return _buckets.lists[prev].getHead();
 
         return address(0);
->>>>>>> 0131301 (feat: keep only one getter for matching)
     }
 }
