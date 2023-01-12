@@ -20,6 +20,10 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
+    function testEmpty(uint256 _value, bool _fifo) public {
+        assertEq(bucketList.getMatch(_value, _fifo), address(0));
+    }
+
     function testInsertOneSingleAccount() public {
         bucketList.update(accounts[0], 3);
 
