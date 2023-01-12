@@ -66,19 +66,18 @@ library BucketDLL {
     /// @param _id The address of the account.
     /// @param _lifo insert as lifo or fifo.
     function insert(List storage _list, address _id, bool _lifo) internal returns (bool empty) {
-        address tail = _list.accounts[address(0)].prev;
-        empty = tail == address(0);
-
         if (_lifo) {
             address head = _list.accounts[address(0)].next;
             _list.accounts[address(0)].next = _id;
             _list.accounts[head].prev = _id;
             _list.accounts[_id].next = head;
-        }
-        else {
+            return head == address(0);
+        } else {
+            address tail = _list.accounts[address(0)].prev;
             _list.accounts[address(0)].prev = _id;
             _list.accounts[tail].next = _id;
             _list.accounts[_id].prev = tail;
+            return tail == address(0);
         }
     }
 }

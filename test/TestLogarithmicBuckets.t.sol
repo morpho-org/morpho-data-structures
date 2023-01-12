@@ -24,8 +24,8 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(bucketList.getMatch(_value, _fifo), address(0));
     }
 
-    function testInsertOneSingleAccount() public {
-        bucketList.update(accounts[0], 3, false);
+    function testInsertOneSingleAccount(bool _fifo) public {
+        bucketList.update(accounts[0], 3, _fifo);
 
         assertEq(bucketList.getValueOf(accounts[0]), 3);
         assertEq(bucketList.getMatch(0), accounts[0]);
@@ -33,17 +33,17 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(bucketList.getBucketOf(2).getHead(), accounts[0]);
     }
 
-    function testUpdatingFromZeroToZeroShouldRevert() public {
+    function testUpdatingFromZeroToZeroShouldRevert(bool _lifo) public {
         vm.expectRevert(abi.encodeWithSignature("ZeroValue()"));
-        bucketList.update(accounts[0], 0, false);
+        bucketList.update(accounts[0], 0, _lifo);
     }
 
-    function testShouldNotInsertZeroAddress() public {
+    function testShouldNotInsertZeroAddress(bool _lifo) public {
         vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        bucketList.update(address(0), 10, false);
+        bucketList.update(address(0), 10, _lifo);
     }
 
-    function testShouldHaveTheRightOrderWithinABucket() public {
+    function testShouldHaveTheRightOrderWithinABucketFIFO() public {
         bucketList.update(accounts[0], 16, false);
         bucketList.update(accounts[1], 16, false);
         bucketList.update(accounts[2], 16, false);
@@ -57,18 +57,32 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(next2, accounts[2]);
     }
 
-    function testInsertRemoveOneSingleAccount() public {
-        bucketList.update(accounts[0], 1, false);
-        bucketList.update(accounts[0], 0, false);
+    function testShouldHaveTheRightOrderWithinABucketLIFO() public {
+        bucketList.update(accounts[0], 16, true);
+        bucketList.update(accounts[1], 16, true);
+        bucketList.update(accounts[2], 16, true);
+
+        BucketDLL.List storage list = bucketList.getBucketOf(16);
+        address head = list.getNext(address(0));
+        address next1 = list.getNext(head);
+        address next2 = list.getNext(next1);
+        assertEq(head, accounts[2]);
+        assertEq(next1, accounts[1]);
+        assertEq(next2, accounts[0]);
+    }
+
+    function testInsertRemoveOneSingleAccount(bool _lifo1, bool _lifo2) public {
+        bucketList.update(accounts[0], 1, _lifo1);
+        bucketList.update(accounts[0], 0, _lifo2);
 
         assertEq(bucketList.getValueOf(accounts[0]), 0);
         assertEq(bucketList.getMatch(0), address(0));
         assertEq(bucketList.getBucketOf(1).getHead(), address(0));
     }
 
-    function testShouldInsertTwoAccounts() public {
-        bucketList.update(accounts[0], 16, false);
-        bucketList.update(accounts[1], 4, false);
+    function testShouldInsertTwoAccounts(bool _lifo1, bool _lifo2) public {
+        bucketList.update(accounts[0], 16, _lifo1);
+        bucketList.update(accounts[1], 4, _lifo2);
 
         assertEq(bucketList.getMatch(16), accounts[0]);
         assertEq(bucketList.getMatch(2), accounts[1]);
@@ -88,10 +102,10 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testShouldRemoveBothAccounts() public {
-        bucketList.update(accounts[0], 4, false);
-        bucketList.update(accounts[1], 4, false);
-        bucketList.update(accounts[0], 0, false);
-        bucketList.update(accounts[1], 0, false);
+        bucketList.update(accounts[0], 4, true);
+        bucketList.update(accounts[1], 4, true);
+        bucketList.update(accounts[0], 0, true);
+        bucketList.update(accounts[1], 0, true);
 
         assertEq(bucketList.getMatch(4), address(0));
     }
