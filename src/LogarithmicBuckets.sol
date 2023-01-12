@@ -169,8 +169,6 @@ library LogarithmicBuckets {
         if (next != 0) return _getFirst(_buckets.lists[next], _fifo);
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
-        if (prev != 0) return _getFirst(_buckets.lists[prev], _fifo);
-
-        return address(0);
+        return _getFirst(_buckets.lists[prev], _fifo);
     }
 }
