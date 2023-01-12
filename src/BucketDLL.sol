@@ -64,11 +64,12 @@ library BucketDLL {
     /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
-    function insert(List storage _list, address _id, bool _head) internal returns (bool empty) {
+    /// @param _lifo insert as lifo or fifo.
+    function insert(List storage _list, address _id, bool _lifo) internal returns (bool empty) {
         address tail = _list.accounts[address(0)].prev;
         empty = tail == address(0);
 
-        if (!_head) {
+        if (!_lifo) {
             _list.accounts[address(0)].prev = _id;
             _list.accounts[tail].next = _id;
             _list.accounts[_id].prev = tail;
