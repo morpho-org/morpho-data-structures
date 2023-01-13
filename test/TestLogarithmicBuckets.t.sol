@@ -8,14 +8,14 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     using BucketDLL for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.BucketList;
 
-    uint256 public NDS = 50;
+    uint256 public accountsLength = 50;
     address[] public accounts;
     address public ADDR_ZERO = address(0);
 
     function setUp() public {
-        accounts = new address[](NDS);
+        accounts = new address[](accountsLength);
         accounts[0] = address(bytes20(keccak256("TestLogarithmicBuckets.accounts")));
-        for (uint256 i = 1; i < NDS; i++) {
+        for (uint256 i = 1; i < accountsLength; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
     }
@@ -35,7 +35,7 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testShouldNotInsertZeroAddress(bool _head) public {
-        vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
+        vm.expectRevert(abi.encodeWithSignature("ZeroAddress()"));
         bucketList.update(address(0), 10, _head);
     }
 

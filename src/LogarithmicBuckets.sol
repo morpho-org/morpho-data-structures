@@ -15,7 +15,7 @@ library LogarithmicBuckets {
     /// ERRORS ///
 
     /// @notice Thrown when the address is zero at insertion.
-    error AddressIsZero();
+    error ZeroAddress();
 
     /// @notice Thrown when 0 value is inserted.
     error ZeroValue();
@@ -30,7 +30,7 @@ library LogarithmicBuckets {
         uint256 _newValue,
         bool _head
     ) internal {
-        if (_id == address(0)) revert AddressIsZero();
+        if (_id == address(0)) revert ZeroAddress();
         uint256 value = _buckets.valueOf[_id];
         _buckets.valueOf[_id] = _newValue;
 
@@ -51,6 +51,43 @@ library LogarithmicBuckets {
             _remove(_buckets, _id, currentBucket);
             _insert(_buckets, _id, newBucket, _head);
         }
+    }
+
+    /// @notice Returns the value of `_id`.
+    /// @param _buckets The buckets to search in.
+    /// @param _id The address of the account.
+    function getValueOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
+        return _buckets.valueOf[_id];
+    }
+
+    /// @notice Returns the bucket in which to look for `_value`.
+    /// @param _buckets The buckets to search in.
+    /// @param _value The value to look for.
+    function getBucketOf(BucketList storage _buckets, uint256 _value)
+        internal
+        view
+        returns (BucketDLL.List storage)
+    {
+        uint256 bucket = _computeBucket(_value);
+        return _buckets.lists[bucket];
+    }
+
+    /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
+    /// @param _buckets The buckets to get the head.
+    /// @param _value The value to match.
+    /// @return The address of the head.
+    function getMatch(BucketList storage _buckets, uint256 _value) internal view returns (address) {
+        uint256 bucketsMask = _buckets.bucketsMask;
+        if (bucketsMask == 0) return address(0);
+        uint256 lowerMask = _setLowerBits(_value);
+
+        uint256 next = _nextBucket(lowerMask, bucketsMask);
+
+        if (next != 0) return _buckets.lists[next].getHead();
+
+        uint256 prev = _prevBucket(lowerMask, bucketsMask);
+
+        return _buckets.lists[prev].getHead();
     }
 
     /// PRIVATE ///
@@ -124,44 +161,5 @@ library LogarithmicBuckets {
     function _prevBucket(uint256 lowerMask, uint256 bucketsMask) private pure returns (uint256) {
         uint256 lowerBucketsMask = _setLowerBits(lowerMask & bucketsMask);
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
-    }
-
-    /// GETTERS ///
-
-    /// @notice Returns the value of `_id`.
-    /// @param _buckets The buckets to search in.
-    /// @param _id The address of the account.
-    function getValueOf(BucketList storage _buckets, address _id) internal view returns (uint256) {
-        return _buckets.valueOf[_id];
-    }
-
-    /// @notice Returns the bucket in which to look for `_value`.
-    /// @param _buckets The buckets to search in.
-    /// @param _value The value to look for.
-    function getBucketOf(BucketList storage _buckets, uint256 _value)
-        internal
-        view
-        returns (BucketDLL.List storage)
-    {
-        uint256 bucket = _computeBucket(_value);
-        return _buckets.lists[bucket];
-    }
-
-    /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
-    /// @param _buckets The buckets to get the head.
-    /// @param _value The value to match.
-    /// @return The address of the head.
-    function getMatch(BucketList storage _buckets, uint256 _value) internal view returns (address) {
-        uint256 bucketsMask = _buckets.bucketsMask;
-        if (bucketsMask == 0) return address(0);
-        uint256 lowerMask = _setLowerBits(_value);
-
-        uint256 next = _nextBucket(lowerMask, bucketsMask);
-
-        if (next != 0) return _buckets.lists[next].getHead();
-
-        uint256 prev = _prevBucket(lowerMask, bucketsMask);
-
-        return _buckets.lists[prev].getHead();
     }
 }
