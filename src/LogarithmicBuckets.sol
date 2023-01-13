@@ -75,7 +75,7 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _bucket The mask of the bucket where to insert.
-    /// @param _head insert at the head or at the tail of the list.
+    /// @param _head Whether to insert at the head or at the tail of the list.
     function _insert(
         BucketList storage _buckets,
         address _id,
