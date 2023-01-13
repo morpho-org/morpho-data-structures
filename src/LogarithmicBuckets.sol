@@ -23,10 +23,12 @@ library LogarithmicBuckets {
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_buckets`.
+    /// @param _head Indicates whether to insert the new values at the head or at the tail of the buckets list.
     function update(
         BucketList storage _buckets,
         address _id,
-        uint256 _newValue
+        uint256 _newValue,
+        bool _head
     ) internal {
         if (_id == address(0)) revert AddressIsZero();
         uint256 value = _buckets.valueOf[_id];
@@ -34,7 +36,7 @@ library LogarithmicBuckets {
 
         if (value == 0) {
             if (_newValue == 0) revert ZeroValue();
-            _insert(_buckets, _id, _computeBucket(_newValue));
+            _insert(_buckets, _id, _computeBucket(_newValue), _head);
             return;
         }
 
@@ -47,7 +49,7 @@ library LogarithmicBuckets {
         uint256 newBucket = _computeBucket(_newValue);
         if (newBucket != currentBucket) {
             _remove(_buckets, _id, currentBucket);
-            _insert(_buckets, _id, newBucket);
+            _insert(_buckets, _id, newBucket, _head);
         }
     }
 
@@ -73,12 +75,14 @@ library LogarithmicBuckets {
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
     /// @param _bucket The mask of the bucket where to insert.
+    /// @param _head Whether to insert at the head or at the tail of the list.
     function _insert(
         BucketList storage _buckets,
         address _id,
-        uint256 _bucket
+        uint256 _bucket,
+        bool _head
     ) private {
-        if (_buckets.lists[_bucket].insert(_id)) _buckets.bucketsMask |= _bucket;
+        if (_buckets.lists[_bucket].insert(_id, _head)) _buckets.bucketsMask |= _bucket;
     }
 
     /// @notice Returns the bucket in which the given value would fall.
@@ -122,14 +126,6 @@ library LogarithmicBuckets {
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 
-    /// @notice Returns the address at the head or at the tail of the double linked list.
-    /// @param _list The list from which to get the first address.
-    /// @param _getHead True to return the head, false to return the tail.
-    function _getFirst(BucketDLL.List storage _list, bool _getHead) private view returns (address) {
-        if (_getHead) return _list.getHead();
-        return _list.getTail();
-    }
-
     /// GETTERS ///
 
     /// @notice Returns the value of `_id`.
@@ -154,21 +150,18 @@ library LogarithmicBuckets {
     /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
     /// @param _buckets The buckets to get the head.
     /// @param _value The value to match.
-    /// @param _fifo Whether to treat the underlying data-structure as a FIFO (as opposed to a LIFO).
     /// @return The address of the head.
-    function getMatch(
-        BucketList storage _buckets,
-        uint256 _value,
-        bool _fifo
-    ) internal view returns (address) {
+    function getMatch(BucketList storage _buckets, uint256 _value) internal view returns (address) {
         uint256 bucketsMask = _buckets.bucketsMask;
         if (bucketsMask == 0) return address(0);
         uint256 lowerMask = _setLowerBits(_value);
 
         uint256 next = _nextBucket(lowerMask, bucketsMask);
-        if (next != 0) return _getFirst(_buckets.lists[next], _fifo);
+
+        if (next != 0) return _buckets.lists[next].getHead();
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
-        return _getFirst(_buckets.lists[prev], _fifo);
+
+        return _buckets.lists[prev].getHead();
     }
 }
