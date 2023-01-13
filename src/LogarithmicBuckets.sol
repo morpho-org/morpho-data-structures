@@ -162,8 +162,6 @@ library LogarithmicBuckets {
 
         uint256 prev = _prevBucket(lowerMask, bucketsMask);
 
-        if (prev != 0) return _buckets.lists[prev].getHead();
-
-        return address(0);
+        return _buckets.lists[prev].getHead();
     }
 }
