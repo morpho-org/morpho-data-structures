@@ -63,7 +63,7 @@ library BucketDLL {
         return (prev == address(0) && next == address(0));
     }
 
-    /// @notice Inserts an account at the tail of the `_list`.
+    /// @notice Inserts an account in the `_list`.
     /// @dev This function should not be called with `_id` equal to address 0.
     /// @param _list The list to search in.
     /// @param _id The address of the account.

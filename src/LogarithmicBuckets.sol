@@ -107,7 +107,7 @@ library LogarithmicBuckets {
     }
 
     /// @notice Inserts an account in the `_buckets`.
-    /// @dev Expects that `_id` != 0 and `_value` != 0.
+    /// @dev Expects that `_id` != 0.
     /// @dev Does not update the value.
     /// @param _buckets The buckets to modify.
     /// @param _id The address of the account to update.
