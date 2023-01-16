@@ -20,7 +20,7 @@ abstract contract TestCommonHeapOrdering is RandomHeap {
 
     function setUp() public {
         accounts = new address[](NB_ACCOUNTS);
-        accounts[0] = address(this);
+        accounts[0] = address(bytes20(keccak256("TestCommonHeapOrdering.accounts")));
         for (uint256 i = 1; i < NB_ACCOUNTS; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
