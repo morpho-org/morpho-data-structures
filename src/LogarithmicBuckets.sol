@@ -23,6 +23,9 @@ library LogarithmicBuckets {
     /// INTERNAL ///
 
     /// @notice Updates an account in the `_buckets`.
+    /// @param _buckets The buckets to update.
+    /// @param _id The address of the account.
+    /// @param _newValue The new value of the account.
     /// @param _head Indicates whether to insert the new values at the head or at the tail of the buckets list.
     function update(
         BucketList storage _buckets,
