@@ -126,14 +126,14 @@ library LogarithmicBuckets {
     }
 
     /// @notice Returns the bucket in which the given value would fall.
-    function _computeBucket(uint256 _value) private pure returns (uint256) {
+    function _computeBucket(uint256 _value) internal pure returns (uint256) {
         uint256 lowerMask = _setLowerBits(_value);
         return lowerMask ^ (lowerMask >> 1);
     }
 
     /// @notice Sets all the bits lower than (or equal to) the highest bit in the input.
     /// @dev This is the same as rounding the input the nearest upper value of the form `2 ** n - 1`.
-    function _setLowerBits(uint256 x) private pure returns (uint256 y) {
+    function _setLowerBits(uint256 x) internal pure returns (uint256 y) {
         assembly {
             x := or(x, shr(1, x))
             x := or(x, shr(2, x))
@@ -149,7 +149,7 @@ library LogarithmicBuckets {
     /// @notice Returns the following bucket which contains greater values.
     /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
     function _nextBucket(uint256 lowerMask, uint256 bucketsMask)
-        private
+        internal
         pure
         returns (uint256 bucket)
     {
@@ -161,7 +161,7 @@ library LogarithmicBuckets {
 
     /// @notice Returns the preceding bucket which contains smaller values.
     /// @dev The bucket returned is the highest that is in both `bucketsMask` and `lowerMask`.
-    function _prevBucket(uint256 lowerMask, uint256 bucketsMask) private pure returns (uint256) {
+    function _prevBucket(uint256 lowerMask, uint256 bucketsMask) internal pure returns (uint256) {
         uint256 lowerBucketsMask = _setLowerBits(lowerMask & bucketsMask);
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }

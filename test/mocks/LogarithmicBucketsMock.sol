@@ -60,4 +60,16 @@ contract LogarithmicBucketsMock {
         }
         return true;
     }
+
+    function nextBucket(uint256 _value) internal view returns (uint256) {
+        uint256 bucketsMask = bucketList.bucketsMask;
+        uint256 lowerMask = LogarithmicBuckets._setLowerBits(_value);
+        return LogarithmicBuckets._nextBucket(lowerMask, bucketsMask);
+    }
+
+    function prevBucket(uint256 _value) internal view returns (uint256) {
+        uint256 bucketsMask = bucketList.bucketsMask;
+        uint256 lowerMask = LogarithmicBuckets._setLowerBits(_value);
+        return LogarithmicBuckets._prevBucket(lowerMask, bucketsMask);
+    }
 }

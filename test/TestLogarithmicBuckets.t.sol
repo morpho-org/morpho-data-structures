@@ -115,4 +115,45 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(bucketList.getMatch(16), accounts[0], "head equal");
         assertEq(bucketList.getMatch(32), accounts[0], "head above");
     }
+
+    function isPowerOfTwo(uint256 x) public pure returns (bool) {
+        unchecked {
+            return x != 0 && (x & (x - 1)) == 0;
+        }
+    }
+
+    function testProveComputeBucket(uint256 _value) public {
+        uint256 bucket = LogarithmicBuckets._computeBucket(_value); // 2^{floor(log_2 _value)} (if _value > 0)
+        unchecked {
+            assertTrue(bucket == 0 || isPowerOfTwo(bucket));
+            assertTrue(bucket <= _value);
+            assertTrue(_value <= 2 * bucket - 1); // overflow if bucket == 2**255
+        }
+    }
+
+    function testProveNextBucket(uint256 _value) public {
+        uint256 curr = LogarithmicBuckets._computeBucket(_value);
+        uint256 next = nextBucket(_value);
+        uint256 bucketsMask = bucketList.bucketsMask;
+        assertTrue(next == 0 || isPowerOfTwo(next));
+        assertTrue(next == 0 || next > curr);
+        unchecked {
+            for (uint256 i = curr << 1; i != next; i <<= 1) {
+                assertTrue(bucketsMask & i == 0);
+            }
+        }
+    }
+
+    function testProvePrevBucket(uint256 _value) public {
+        uint256 curr = LogarithmicBuckets._computeBucket(_value);
+        uint256 prev = prevBucket(_value);
+        uint256 bucketsMask = bucketList.bucketsMask;
+        assertTrue(prev == 0 || isPowerOfTwo(prev));
+        assertTrue(prev <= curr);
+        unchecked {
+            for (uint256 i = curr; i > prev; i >>= 1) {
+                assertTrue(bucketsMask & i == 0);
+            }
+        }
+    }
 }
