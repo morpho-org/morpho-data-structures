@@ -37,3 +37,9 @@ jobs:
 
       - name: Run tests
         run: forge test
+
+      - name: Install symtest
+        run: python3 -m pip install --upgrade symtest
+
+      - name: Run symtest
+        run: symtest --function testProve --loop 4

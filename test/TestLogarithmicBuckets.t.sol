@@ -115,4 +115,54 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(bucketList.getMatch(16), accounts[0], "head equal");
         assertEq(bucketList.getMatch(32), accounts[0], "head above");
     }
+
+    function isPowerOfTwo(uint256 x) public pure returns (bool) {
+        unchecked {
+            return x != 0 && (x & (x - 1)) == 0;
+        }
+    }
+
+    function testProveComputeBucket(uint256 _value) public {
+        uint256 bucket = LogarithmicBuckets.computeBucket(_value);
+        unchecked {
+            // cross-check that bucket == 2^{floor(log_2 value)}, or 0 if value == 0
+            assertTrue(bucket == 0 || isPowerOfTwo(bucket));
+            assertTrue(bucket <= _value);
+            assertTrue(_value <= 2 * bucket - 1); // abusing overflow when bucket == 2**255
+        }
+    }
+
+    function testProveNextBucket(uint256 _value) public {
+        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+        uint256 next = nextBucket(_value);
+        uint256 bucketsMask = bucketList.bucketsMask;
+        // check that `next` is a strictly higer non-empty bucket, or zero
+        assertTrue(next == 0 || isPowerOfTwo(next));
+        assertTrue(next == 0 || next > curr);
+        assertTrue(next == 0 || bucketsMask & next != 0);
+        unchecked {
+            // check that `next` is the lowest one among such higher non-empty buckets, if exist
+            // note: this also checks that all the higher buckets are empty when `next` == 0
+            for (uint256 i = curr << 1; i != next; i <<= 1) {
+                assertTrue(bucketsMask & i == 0);
+            }
+        }
+    }
+
+    function testProvePrevBucket(uint256 _value) public {
+        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+        uint256 prev = prevBucket(_value);
+        uint256 bucketsMask = bucketList.bucketsMask;
+        // check that `prev` is a non-empty bucket that is lower than or equal to `curr`; or zero
+        assertTrue(prev == 0 || isPowerOfTwo(prev));
+        assertTrue(prev <= curr);
+        assertTrue(prev == 0 || bucketsMask & prev != 0);
+        unchecked {
+            // check that `prev` is the highest one among such lower non-empty buckets, if exist
+            // note: this also checks that all the lower buckets are empty when `prev` == 0
+            for (uint256 i = curr; i > prev; i >>= 1) {
+                assertTrue(bucketsMask & i == 0);
+            }
+        }
+    }
 }

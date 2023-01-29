@@ -39,17 +39,17 @@ library LogarithmicBuckets {
 
         if (value == 0) {
             if (_newValue == 0) revert ZeroValue();
-            _insert(_buckets, _id, _computeBucket(_newValue), _head);
+            _insert(_buckets, _id, computeBucket(_newValue), _head);
             return;
         }
 
-        uint256 currentBucket = _computeBucket(value);
+        uint256 currentBucket = computeBucket(value);
         if (_newValue == 0) {
             _remove(_buckets, _id, currentBucket);
             return;
         }
 
-        uint256 newBucket = _computeBucket(_newValue);
+        uint256 newBucket = computeBucket(_newValue);
         if (newBucket != currentBucket) {
             _remove(_buckets, _id, currentBucket);
             _insert(_buckets, _id, newBucket, _head);
@@ -71,7 +71,7 @@ library LogarithmicBuckets {
         view
         returns (BucketDLL.List storage)
     {
-        uint256 bucket = _computeBucket(_value);
+        uint256 bucket = computeBucket(_value);
         return _buckets.lists[bucket];
     }
 
@@ -82,13 +82,13 @@ library LogarithmicBuckets {
     function getMatch(BucketList storage _buckets, uint256 _value) internal view returns (address) {
         uint256 bucketsMask = _buckets.bucketsMask;
         if (bucketsMask == 0) return address(0);
-        uint256 lowerMask = _setLowerBits(_value);
+        uint256 lowerMask = setLowerBits(_value);
 
-        uint256 next = _nextBucket(lowerMask, bucketsMask);
+        uint256 next = nextBucket(lowerMask, bucketsMask);
 
         if (next != 0) return _buckets.lists[next].getHead();
 
-        uint256 prev = _prevBucket(lowerMask, bucketsMask);
+        uint256 prev = prevBucket(lowerMask, bucketsMask);
 
         return _buckets.lists[prev].getHead();
     }
@@ -126,14 +126,14 @@ library LogarithmicBuckets {
     }
 
     /// @notice Returns the bucket in which the given value would fall.
-    function _computeBucket(uint256 _value) private pure returns (uint256) {
-        uint256 lowerMask = _setLowerBits(_value);
+    function computeBucket(uint256 _value) internal pure returns (uint256) {
+        uint256 lowerMask = setLowerBits(_value);
         return lowerMask ^ (lowerMask >> 1);
     }
 
     /// @notice Sets all the bits lower than (or equal to) the highest bit in the input.
     /// @dev This is the same as rounding the input the nearest upper value of the form `2 ** n - 1`.
-    function _setLowerBits(uint256 x) private pure returns (uint256 y) {
+    function setLowerBits(uint256 x) internal pure returns (uint256 y) {
         assembly {
             x := or(x, shr(1, x))
             x := or(x, shr(2, x))
@@ -148,8 +148,8 @@ library LogarithmicBuckets {
 
     /// @notice Returns the following bucket which contains greater values.
     /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
-    function _nextBucket(uint256 lowerMask, uint256 bucketsMask)
-        private
+    function nextBucket(uint256 lowerMask, uint256 bucketsMask)
+        internal
         pure
         returns (uint256 bucket)
     {
@@ -161,8 +161,8 @@ library LogarithmicBuckets {
 
     /// @notice Returns the preceding bucket which contains smaller values.
     /// @dev The bucket returned is the highest that is in both `bucketsMask` and `lowerMask`.
-    function _prevBucket(uint256 lowerMask, uint256 bucketsMask) private pure returns (uint256) {
-        uint256 lowerBucketsMask = _setLowerBits(lowerMask & bucketsMask);
+    function prevBucket(uint256 lowerMask, uint256 bucketsMask) internal pure returns (uint256) {
+        uint256 lowerBucketsMask = setLowerBits(lowerMask & bucketsMask);
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 }

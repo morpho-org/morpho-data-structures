@@ -21,21 +21,8 @@ contract LogarithmicBucketsMock {
         return bucketList.getValueOf(_id);
     }
 
-    function _setLowerBits(uint256 x) private pure returns (uint256 y) {
-        assembly {
-            x := or(x, shr(1, x))
-            x := or(x, shr(2, x))
-            x := or(x, shr(4, x))
-            x := or(x, shr(8, x))
-            x := or(x, shr(16, x))
-            x := or(x, shr(32, x))
-            x := or(x, shr(64, x))
-            y := or(x, shr(128, x))
-        }
-    }
-
     function maxBucket() public view returns (uint256) {
-        uint256 lowerMask = _setLowerBits(bucketList.bucketsMask);
+        uint256 lowerMask = LogarithmicBuckets.setLowerBits(bucketList.bucketsMask);
         return lowerMask ^ (lowerMask >> 1);
     }
 
@@ -59,5 +46,17 @@ contract LogarithmicBucketsMock {
             }
         }
         return true;
+    }
+
+    function nextBucket(uint256 _value) internal view returns (uint256) {
+        uint256 bucketsMask = bucketList.bucketsMask;
+        uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
+        return LogarithmicBuckets.nextBucket(lowerMask, bucketsMask);
+    }
+
+    function prevBucket(uint256 _value) internal view returns (uint256) {
+        uint256 bucketsMask = bucketList.bucketsMask;
+        uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
+        return LogarithmicBuckets.prevBucket(lowerMask, bucketsMask);
     }
 }
