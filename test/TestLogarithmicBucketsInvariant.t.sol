@@ -32,7 +32,7 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
 
 contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
     using BucketDLL for BucketDLL.List;
-    using LogarithmicBuckets for LogarithmicBuckets.BucketList;
+    using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     address[] public seen;
     mapping(address => bool) public isSeen;
@@ -54,14 +54,12 @@ contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
         super.update(_id, _newValue, _head);
     }
 
-    function getPrev(uint256 _value, address _id) public view returns (address) {
-        BucketDLL.List storage bucket = bucketList.getBucketOf(_value);
-        return bucket.getPrev(_id);
+    function getPrev(uint256 _bucket, address _id) public view returns (address) {
+        return buckets.buckets[_bucket].getPrev(_id);
     }
 
-    function getNext(uint256 _value, address _id) public view returns (address) {
-        BucketDLL.List storage bucket = bucketList.getBucketOf(_value);
-        return bucket.getNext(_id);
+    function getNext(uint256 _bucket, address _id) public view returns (address) {
+        return buckets.buckets[_bucket].getNext(_id);
     }
 }
 
@@ -77,10 +75,11 @@ contract TestLogarithmicBucketsSeenInvariant is Test, Random {
             address user = buckets.seen(i);
             uint256 value = buckets.getValueOf(user);
             if (value != 0) {
-                address next = buckets.getNext(value, user);
-                address prev = buckets.getPrev(value, user);
-                assertEq(buckets.getNext(value, prev), user);
-                assertEq(buckets.getPrev(value, next), user);
+                uint256 bucket = LogarithmicBuckets.computeBucket(value);
+                address next = buckets.getNext(bucket, user);
+                address prev = buckets.getPrev(bucket, user);
+                assertEq(buckets.getNext(bucket, prev), user);
+                assertEq(buckets.getPrev(bucket, next), user);
             }
         }
     }

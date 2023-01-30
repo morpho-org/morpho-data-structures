@@ -5,9 +5,9 @@ import "forge-std/Test.sol";
 import "src/LogarithmicBuckets.sol";
 
 contract TestLogarithmicBucketsGas is Test {
-    using LogarithmicBuckets for LogarithmicBuckets.BucketList;
+    using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
-    LogarithmicBuckets.BucketList internal bucketList;
+    LogarithmicBuckets.Buckets internal buckets;
 
     // Gas accounting.
     uint256 internal insertCost;
@@ -33,19 +33,19 @@ contract TestLogarithmicBucketsGas is Test {
             if (amount % 4 < 2) {
                 // Measure insert.
                 startGasMetering();
-                bucketList.update(address(uint160(amount)), amount, true);
+                buckets.update(address(uint160(amount)), amount, true);
                 insertCost += stopGasMetering();
                 insertCount++;
             }
             // Update value in same bucket (p=1/4).
             else if (amount % 4 == 2) {
                 // Get an account to update its value.
-                address toUpdate = bucketList.getMatch(amount);
+                address toUpdate = buckets.getMatch(amount);
 
                 if (toUpdate != address(0)) {
                     // Measure updateValue.
                     startGasMetering();
-                    bucketList.update(toUpdate, amount, true);
+                    buckets.update(toUpdate, amount, true);
                     updateValueCost += stopGasMetering();
                     updateValueCount++;
                 }
@@ -54,14 +54,14 @@ contract TestLogarithmicBucketsGas is Test {
             else {
                 // Measure getMatch.
                 startGasMetering();
-                address toUpdate = bucketList.getMatch(amount);
+                address toUpdate = buckets.getMatch(amount);
                 getMatchCost += stopGasMetering();
                 getMatchCount++;
 
                 if (toUpdate != address(0)) {
                     // Measure remove.
                     startGasMetering();
-                    bucketList.update(bucketList.getMatch(amount), 0, true);
+                    buckets.update(buckets.getMatch(amount), 0, true);
                     removeCost += stopGasMetering();
                     removeCount++;
                 }
