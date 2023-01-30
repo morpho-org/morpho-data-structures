@@ -106,6 +106,8 @@ library LogarithmicBuckets {
         if (_buckets.buckets[_bucket].insert(_id, _head)) _buckets.bucketsMask |= _bucket;
     }
 
+    /// PURE HELPERS ///
+
     /// @notice Returns the bucket in which the given value would fall.
     function computeBucket(uint256 _value) internal pure returns (uint256) {
         uint256 lowerMask = setLowerBits(_value);

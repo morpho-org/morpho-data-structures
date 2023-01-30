@@ -48,13 +48,13 @@ contract LogarithmicBucketsMock {
         return true;
     }
 
-    function nextBucket(uint256 _value) internal view returns (uint256) {
+    function nextBucketValue(uint256 _value) internal view returns (uint256) {
         uint256 bucketsMask = buckets.bucketsMask;
         uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
         return LogarithmicBuckets.nextBucket(lowerMask, bucketsMask);
     }
 
-    function prevBucket(uint256 _value) internal view returns (uint256) {
+    function prevBucketValue(uint256 _value) internal view returns (uint256) {
         uint256 bucketsMask = buckets.bucketsMask;
         uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
         return LogarithmicBuckets.prevBucket(lowerMask, bucketsMask);
