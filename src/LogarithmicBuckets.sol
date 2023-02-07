@@ -86,8 +86,7 @@ library LogarithmicBuckets {
         address _id,
         uint256 _bucket
     ) private {
-        if (_buckets.buckets[_bucket].remove(_id))
-            _buckets.bucketsMask &= _bucket ^ type(uint256).max;
+        if (_buckets.buckets[_bucket].remove(_id)) _buckets.bucketsMask &= ~_bucket;
     }
 
     /// @notice Inserts an account in the `_buckets`.
