@@ -115,7 +115,9 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(buckets.getMatch(16), accounts[0], "head equal");
         assertEq(buckets.getMatch(32), accounts[0], "head above");
     }
+}
 
+contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
     function isPowerOfTwo(uint256 x) public pure returns (bool) {
         unchecked {
             return x != 0 && (x & (x - 1)) == 0;
