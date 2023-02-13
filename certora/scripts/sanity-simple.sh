@@ -8,6 +8,5 @@ certoraRun \
     --loop_iter 7 \
     --optimistic_loop \
     --send_only \
-    --staging \
     --msg "Simple DLL sanity" \
     $@
