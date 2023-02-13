@@ -7,6 +7,5 @@ certoraRun \
     --verify MockDLL:certora/specs/dll-fifo.spec \
     --loop_iter 4 \
     --optimistic_loop \
-    --send_only \
     --msg "FIFO DLL verification" \
     $@
