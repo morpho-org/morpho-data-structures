@@ -54,9 +54,7 @@ contract LogarithmicBucketsMock {
         return LogarithmicBuckets.nextBucket(lowerMask, bucketsMask);
     }
 
-    function prevBucketValue(uint256 _value) internal view returns (uint256) {
-        uint256 bucketsMask = buckets.bucketsMask;
-        uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
-        return LogarithmicBuckets.prevBucket(lowerMask, bucketsMask);
+    function highestBucketValue() internal view returns (uint256) {
+        return LogarithmicBuckets.highestBucket(buckets.bucketsMask);
     }
 }

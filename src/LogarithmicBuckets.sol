@@ -69,7 +69,7 @@ library LogarithmicBuckets {
 
         if (next != 0) return _buckets.buckets[next].getHead();
 
-        uint256 prev = prevBucket(lowerMask, bucketsMask);
+        uint256 prev = highestBucket(bucketsMask);
 
         return _buckets.buckets[prev].getHead();
     }
@@ -128,7 +128,7 @@ library LogarithmicBuckets {
         }
     }
 
-    /// @notice Returns the following bucket which contains greater values.
+    /// @notice Returns the following non-empty bucket.
     /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
     function nextBucket(uint256 lowerMask, uint256 bucketsMask)
         internal
@@ -141,10 +141,9 @@ library LogarithmicBuckets {
         }
     }
 
-    /// @notice Returns the preceding bucket which contains smaller values.
-    /// @dev The bucket returned is the highest that is in both `bucketsMask` and `lowerMask`.
-    function prevBucket(uint256 lowerMask, uint256 bucketsMask) internal pure returns (uint256) {
-        uint256 lowerBucketsMask = setLowerBits(lowerMask & bucketsMask);
+    /// @notice Returns the highest non-empty bucket.
+    function highestBucket(uint256 bucketsMask) internal pure returns (uint256) {
+        uint256 lowerBucketsMask = setLowerBits(bucketsMask);
         return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 }
