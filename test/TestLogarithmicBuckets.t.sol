@@ -167,4 +167,15 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
             }
         }
     }
+
+    function testProveHighestPrevEquivalence(uint256 _value) public {
+        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+        uint256 next = nextBucketValue(_value);
+
+        if (next == 0) {
+            uint256 highest = highestBucketValue();
+            // check that in this case, `highest` is smaller than `curr`.
+            assertTrue(highest <= curr);
+        }
+    }
 }
