@@ -138,9 +138,9 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
         uint256 curr = LogarithmicBuckets.computeBucket(_value);
         uint256 next = nextBucketValue(_value);
         uint256 bucketsMask = buckets.bucketsMask;
-        // check that `next` is a power of two or zero.
+        // Check that `next` is a power of two or zero.
         assertTrue(next == 0 || isPowerOfTwo(next));
-        // check that `next` is a strictly higher non-empty bucket, or zero
+        // Check that `next` is a strictly higher non-empty bucket, or zero.
         assertTrue(next == 0 || next > curr);
         assertTrue(next == 0 || bucketsMask & next != 0);
         unchecked {
