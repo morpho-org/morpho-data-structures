@@ -138,8 +138,9 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
         uint256 curr = LogarithmicBuckets.computeBucket(_value);
         uint256 next = nextBucketValue(_value);
         uint256 bucketsMask = buckets.bucketsMask;
-        // check that `next` is a strictly higer non-empty bucket, or zero
+        // check that `next` is a power of two or zero.
         assertTrue(next == 0 || isPowerOfTwo(next));
+        // check that `next` is a strictly higher non-empty bucket, or zero
         assertTrue(next == 0 || next > curr);
         assertTrue(next == 0 || bucketsMask & next != 0);
         unchecked {
@@ -151,18 +152,17 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
-    function testProveHighestBucket(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+    function testProveHighestBucket() public {
         uint256 highest = highestBucketValue();
         uint256 bucketsMask = buckets.bucketsMask;
-        // check that `highest` is a non-empty bucket that is lower than or equal to `curr`; or zero
+        // check that `highest` is a power of two or zero.
         assertTrue(highest == 0 || isPowerOfTwo(highest));
-        assertTrue(highest <= curr);
+        // check that `highest` is a non-empty bucket or zero.
         assertTrue(highest == 0 || bucketsMask & highest != 0);
         unchecked {
-            // check that `highest` is the highest one among such lower non-empty buckets, if exist
+            // check that `highest` is the highest non-empty bucket, if exists.
             // note: this also checks that all the lower buckets are empty when `highest` == 0
-            for (uint256 i = curr; i > highest; i >>= 1) {
+            for (uint256 i = 1 >> 256; i > highest; i >>= 1) {
                 assertTrue(bucketsMask & i == 0);
             }
         }
