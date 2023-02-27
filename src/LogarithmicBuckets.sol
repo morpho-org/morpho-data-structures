@@ -66,16 +66,13 @@ library LogarithmicBuckets {
     function getMatch(Buckets storage _buckets, uint256 _value) internal view returns (address) {
         uint256 bucketsMask = _buckets.bucketsMask;
         if (bucketsMask == 0) return address(0);
-        uint256 lowerMask = setLowerBits(_value);
 
-        uint256 next = nextBucket(lowerMask, bucketsMask);
-
+        uint256 next = nextBucket(_value, bucketsMask);
         if (next != 0) return _buckets.buckets[next].getHead();
 
         // `highestSetBit` is used to compute the highest non-empty bucket.
         // Knowing that `next` == 0, it is also the highest previous non-empty bucket.
         uint256 prev = highestSetBit(bucketsMask);
-
         return _buckets.buckets[prev].getHead();
     }
 
@@ -137,11 +134,8 @@ library LogarithmicBuckets {
 
     /// @notice Returns the following non-empty bucket.
     /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
-    function nextBucket(uint256 lowerMask, uint256 bucketsMask)
-        internal
-        pure
-        returns (uint256 bucket)
-    {
+    function nextBucket(uint256 value, uint256 bucketsMask) internal pure returns (uint256 bucket) {
+        uint256 lowerMask = setLowerBits(value);
         assembly {
             let higherBucketsMask := and(not(lowerMask), bucketsMask)
             bucket := and(higherBucketsMask, add(not(higherBucketsMask), 1))
