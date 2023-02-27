@@ -39,19 +39,19 @@ library LogarithmicBuckets {
 
         if (value == 0) {
             if (_newValue == 0) revert ZeroValue();
-            // `highestSetBit` is used to computed the bucket associated with `_newValue`.
+            // `highestSetBit` is used to compute the bucket associated with `_newValue`.
             _insert(_buckets, _id, highestSetBit(_newValue), _head);
             return;
         }
 
-        // `highestSetBit` is used to computed the bucket associated with `value`.
+        // `highestSetBit` is used to compute the bucket associated with `value`.
         uint256 currentBucket = highestSetBit(value);
         if (_newValue == 0) {
             _remove(_buckets, _id, currentBucket);
             return;
         }
 
-        // `highestSetBit` is used to computed the bucket associated with `_newValue`.
+        // `highestSetBit` is used to compute the bucket associated with `_newValue`.
         uint256 newBucket = highestSetBit(_newValue);
         if (newBucket != currentBucket) {
             _remove(_buckets, _id, currentBucket);
