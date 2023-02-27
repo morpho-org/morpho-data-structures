@@ -22,89 +22,89 @@ library LogarithmicBuckets {
 
     /// INTERNAL ///
 
-    /// @notice Updates an account in the `_buckets`.
-    /// @param _buckets The buckets to update.
-    /// @param _id The address of the account.
-    /// @param _newValue The new value of the account.
-    /// @param _head Indicates whether to insert the new values at the head or at the tail of the buckets list.
+    /// @notice Updates an account in the `buckets`.
+    /// @param buckets The buckets to update.
+    /// @param id The address of the account.
+    /// @param newValue The new value of the account.
+    /// @param head Indicates whether to insert the new values at the head or at the tail of the buckets list.
     function update(
-        Buckets storage _buckets,
-        address _id,
-        uint256 _newValue,
-        bool _head
+        Buckets storage buckets,
+        address id,
+        uint256 newValue,
+        bool head
     ) internal {
-        if (_id == address(0)) revert ZeroAddress();
-        uint256 value = _buckets.valueOf[_id];
-        _buckets.valueOf[_id] = _newValue;
+        if (id == address(0)) revert ZeroAddress();
+        uint256 value = buckets.valueOf[id];
+        buckets.valueOf[id] = newValue;
 
         if (value == 0) {
-            if (_newValue == 0) revert ZeroValue();
-            // `highestSetBit` is used to compute the bucket associated with `_newValue`.
-            _insert(_buckets, _id, highestSetBit(_newValue), _head);
+            if (newValue == 0) revert ZeroValue();
+            // `highestSetBit` is used to compute the bucket associated with `newValue`.
+            insert(buckets, id, highestSetBit(newValue), head);
             return;
         }
 
         // `highestSetBit` is used to compute the bucket associated with `value`.
         uint256 currentBucket = highestSetBit(value);
-        if (_newValue == 0) {
-            _remove(_buckets, _id, currentBucket);
+        if (newValue == 0) {
+            remove(buckets, id, currentBucket);
             return;
         }
 
-        // `highestSetBit` is used to compute the bucket associated with `_newValue`.
-        uint256 newBucket = highestSetBit(_newValue);
+        // `highestSetBit` is used to compute the bucket associated with `newValue`.
+        uint256 newBucket = highestSetBit(newValue);
         if (newBucket != currentBucket) {
-            _remove(_buckets, _id, currentBucket);
-            _insert(_buckets, _id, newBucket, _head);
+            remove(buckets, id, currentBucket);
+            insert(buckets, id, newBucket, head);
         }
     }
 
-    /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
-    /// @param _buckets The buckets to get the head.
-    /// @param _value The value to match.
+    /// @notice Returns the address in `buckets` that is a candidate for matching the value `value`.
+    /// @param buckets The buckets to get the head.
+    /// @param value The value to match.
     /// @return The address of the head.
-    function getMatch(Buckets storage _buckets, uint256 _value) internal view returns (address) {
-        uint256 bucketsMask = _buckets.bucketsMask;
+    function getMatch(Buckets storage buckets, uint256 value) internal view returns (address) {
+        uint256 bucketsMask = buckets.bucketsMask;
         if (bucketsMask == 0) return address(0);
 
-        uint256 next = nextBucket(_value, bucketsMask);
-        if (next != 0) return _buckets.buckets[next].getHead();
+        uint256 next = nextBucket(value, bucketsMask);
+        if (next != 0) return buckets.buckets[next].getHead();
 
         // `highestSetBit` is used to compute the highest non-empty bucket.
         // Knowing that `next` == 0, it is also the highest previous non-empty bucket.
         uint256 prev = highestSetBit(bucketsMask);
-        return _buckets.buckets[prev].getHead();
+        return buckets.buckets[prev].getHead();
     }
 
     /// PRIVATE ///
 
-    /// @notice Removes an account in the `_buckets`.
+    /// @notice Removes an account in the `buckets`.
     /// @dev Does not update the value.
-    /// @param _buckets The buckets to modify.
-    /// @param _id The address of the account to remove.
-    /// @param _bucket The mask of the bucket where to remove.
-    function _remove(
-        Buckets storage _buckets,
-        address _id,
-        uint256 _bucket
+    /// @param buckets The buckets to modify.
+    /// @param id The address of the account to remove.
+    /// @param bucket The mask of the bucket where to remove.
+    function remove(
+        Buckets storage buckets,
+        address id,
+        uint256 bucket
     ) private {
-        if (_buckets.buckets[_bucket].remove(_id)) _buckets.bucketsMask &= ~_bucket;
+        if (buckets.buckets[bucket].remove(id)) buckets.bucketsMask &= ~bucket;
     }
 
-    /// @notice Inserts an account in the `_buckets`.
-    /// @dev Expects that `_id` != 0.
+    /// @notice Inserts an account in the `buckets`.
+    /// @dev Expects that `id` != 0.
     /// @dev Does not update the value.
-    /// @param _buckets The buckets to modify.
-    /// @param _id The address of the account to update.
-    /// @param _bucket The mask of the bucket where to insert.
-    /// @param _head Whether to insert at the head or at the tail of the list.
-    function _insert(
-        Buckets storage _buckets,
-        address _id,
-        uint256 _bucket,
-        bool _head
+    /// @param buckets The buckets to modify.
+    /// @param id The address of the account to update.
+    /// @param bucket The mask of the bucket where to insert.
+    /// @param head Whether to insert at the head or at the tail of the list.
+    function insert(
+        Buckets storage buckets,
+        address id,
+        uint256 bucket,
+        bool head
     ) private {
-        if (_buckets.buckets[_bucket].insert(_id, _head)) _buckets.bucketsMask |= _bucket;
+        if (buckets.buckets[bucket].insert(id, head)) buckets.bucketsMask |= bucket;
     }
 
     /// PURE HELPERS ///
@@ -112,8 +112,8 @@ library LogarithmicBuckets {
     /// @notice Returns the highest set bit.
     /// @dev Used to compute the bucket associated to a given `value`.
     /// @dev Used to compute the highest non empty bucket given the `bucketsMask`.
-    function highestSetBit(uint256 _value) internal pure returns (uint256) {
-        uint256 lowerMask = setLowerBits(_value);
+    function highestSetBit(uint256 value) internal pure returns (uint256) {
+        uint256 lowerMask = setLowerBits(value);
         return lowerMask ^ (lowerMask >> 1);
     }
 
