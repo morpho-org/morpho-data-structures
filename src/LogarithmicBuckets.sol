@@ -39,17 +39,20 @@ library LogarithmicBuckets {
 
         if (value == 0) {
             if (_newValue == 0) revert ZeroValue();
-            _insert(_buckets, _id, computeBucket(_newValue), _head);
+            // `highestSetBit` is used to computed the bucket associated with `_newValue`.
+            _insert(_buckets, _id, highestSetBit(_newValue), _head);
             return;
         }
 
-        uint256 currentBucket = computeBucket(value);
+        // `highestSetBit` is used to computed the bucket associated with `value`.
+        uint256 currentBucket = highestSetBit(value);
         if (_newValue == 0) {
             _remove(_buckets, _id, currentBucket);
             return;
         }
 
-        uint256 newBucket = computeBucket(_newValue);
+        // `highestSetBit` is used to computed the bucket associated with `_newValue`.
+        uint256 newBucket = highestSetBit(_newValue);
         if (newBucket != currentBucket) {
             _remove(_buckets, _id, currentBucket);
             _insert(_buckets, _id, newBucket, _head);
@@ -69,7 +72,9 @@ library LogarithmicBuckets {
 
         if (next != 0) return _buckets.buckets[next].getHead();
 
-        uint256 prev = highestBucket(bucketsMask);
+        // `highestSetBit` is used to compute the highest non-empty bucket.
+        // Knowing that `next` == 0, it is also the highest previous non-empty bucket.
+        uint256 prev = highestSetBit(bucketsMask);
 
         return _buckets.buckets[prev].getHead();
     }
@@ -107,8 +112,10 @@ library LogarithmicBuckets {
 
     /// PURE HELPERS ///
 
-    /// @notice Returns the bucket in which the given value would fall.
-    function computeBucket(uint256 _value) internal pure returns (uint256) {
+    /// @notice Returns the highest set bit.
+    /// @dev Used to compute the bucket associated to a given `value`.
+    /// @dev Used to compute the highest non empty bucket given the `bucketsMask`.
+    function highestSetBit(uint256 _value) internal pure returns (uint256) {
         uint256 lowerMask = setLowerBits(_value);
         return lowerMask ^ (lowerMask >> 1);
     }
@@ -139,11 +146,5 @@ library LogarithmicBuckets {
             let higherBucketsMask := and(not(lowerMask), bucketsMask)
             bucket := and(higherBucketsMask, add(not(higherBucketsMask), 1))
         }
-    }
-
-    /// @notice Returns the highest non-empty bucket.
-    function highestBucket(uint256 bucketsMask) internal pure returns (uint256) {
-        uint256 lowerBucketsMask = setLowerBits(bucketsMask);
-        return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 }

@@ -125,7 +125,7 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testProveComputeBucket(uint256 _value) public {
-        uint256 bucket = LogarithmicBuckets.computeBucket(_value);
+        uint256 bucket = LogarithmicBuckets.highestSetBit(_value);
         unchecked {
             // cross-check that bucket == 2^{floor(log_2 value)}, or 0 if value == 0
             assertTrue(bucket == 0 || isPowerOfTwo(bucket));
@@ -135,7 +135,7 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testProveNextBucket(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+        uint256 curr = LogarithmicBuckets.highestSetBit(_value);
         uint256 next = nextBucketValue(_value);
         uint256 bucketsMask = buckets.bucketsMask;
         // check that `next` is a power of two or zero.
@@ -169,7 +169,7 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testProveHighestPrevEquivalence(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+        uint256 curr = LogarithmicBuckets.highestSetBit(_value);
         uint256 next = nextBucketValue(_value);
 
         if (next == 0) {
