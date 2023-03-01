@@ -40,22 +40,22 @@ library LogarithmicBuckets {
         if (value == 0) {
             if (newValue == 0) revert ZeroValue();
             // `highestSetBit` is used to compute the bucket associated with `newValue`.
-            insert(buckets, id, highestSetBit(newValue), head);
+            _insert(buckets, id, highestSetBit(newValue), head);
             return;
         }
 
         // `highestSetBit` is used to compute the bucket associated with `value`.
         uint256 currentBucket = highestSetBit(value);
         if (newValue == 0) {
-            remove(buckets, id, currentBucket);
+            _remove(buckets, id, currentBucket);
             return;
         }
 
         // `highestSetBit` is used to compute the bucket associated with `newValue`.
         uint256 newBucket = highestSetBit(newValue);
         if (newBucket != currentBucket) {
-            remove(buckets, id, currentBucket);
-            insert(buckets, id, newBucket, head);
+            _remove(buckets, id, currentBucket);
+            _insert(buckets, id, newBucket, head);
         }
     }
 
@@ -83,7 +83,7 @@ library LogarithmicBuckets {
     /// @param buckets The buckets to modify.
     /// @param id The address of the account to remove.
     /// @param bucket The mask of the bucket where to remove.
-    function remove(
+    function _remove(
         Buckets storage buckets,
         address id,
         uint256 bucket
@@ -98,7 +98,7 @@ library LogarithmicBuckets {
     /// @param id The address of the account to update.
     /// @param bucket The mask of the bucket where to insert.
     /// @param head Whether to insert at the head or at the tail of the list.
-    function insert(
+    function _insert(
         Buckets storage buckets,
         address id,
         uint256 bucket,
