@@ -12,7 +12,7 @@ library LogarithmicBuckets {
         uint256 bucketsMask;
     }
 
-    /// ERRORS ///
+    /* ERRORS */
 
     /// @notice Thrown when the address is zero at insertion.
     error ZeroAddress();
@@ -20,7 +20,7 @@ library LogarithmicBuckets {
     /// @notice Thrown when 0 value is inserted.
     error ZeroValue();
 
-    /// INTERNAL ///
+    /* INTERNAL */
 
     /// @notice Updates an account in the `buckets`.
     /// @param buckets The buckets to update.
@@ -76,7 +76,7 @@ library LogarithmicBuckets {
         return buckets.buckets[prev].getHead();
     }
 
-    /// PRIVATE ///
+    /* PRIVATE */
 
     /// @notice Removes an account in the `buckets`.
     /// @dev Does not update the value.
@@ -107,7 +107,7 @@ library LogarithmicBuckets {
         if (buckets.buckets[bucket].insert(id, head)) buckets.bucketsMask |= bucket;
     }
 
-    /// PURE HELPERS ///
+    /* PURE HELPERS */
 
     /// @notice Returns the highest set bit.
     /// @dev Used to compute the bucket associated to a given `value`.
