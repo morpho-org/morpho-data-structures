@@ -75,7 +75,7 @@ contract TestLogarithmicBucketsSeenInvariant is Test, Random {
             address user = buckets.seen(i);
             uint256 value = buckets.getValueOf(user);
             if (value != 0) {
-                uint256 bucket = LogarithmicBuckets.computeBucket(value);
+                uint256 bucket = LogarithmicBuckets.highestSetBit(value);
                 address next = buckets.getNext(bucket, user);
                 address prev = buckets.getPrev(bucket, user);
                 assertEq(buckets.getNext(bucket, prev), user);

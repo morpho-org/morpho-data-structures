@@ -55,6 +55,6 @@ contract LogarithmicBucketsMock {
     }
 
     function highestBucketValue() internal view returns (uint256) {
-        return LogarithmicBuckets.highestBucket(buckets.bucketsMask);
+        return LogarithmicBuckets.highestSetBit(buckets.bucketsMask);
     }
 }
