@@ -136,7 +136,7 @@ library LogarithmicBuckets {
         }
     }
 
-    /// @notice Returns the lowest non-empty bucket containing bigger values.
+    /// @notice Returns the lowest non-empty bucket containing larger values.
     /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
     function nextBucket(uint256 value, uint256 bucketsMask) internal pure returns (uint256 bucket) {
         uint256 lowerMask = setLowerBits(value);
