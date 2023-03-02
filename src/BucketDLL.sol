@@ -51,6 +51,7 @@ library BucketDLL {
 
     /// @notice Removes an account of the `list`.
     /// @dev This function should not be called with `id` equal to address 0.
+    /// @dev This function should not be called with an `_id` that is not in the list.
     /// @param list The list to search in.
     /// @param id The address of the account.
     /// @return Whether the bucket is empty after removal.
@@ -69,6 +70,7 @@ library BucketDLL {
 
     /// @notice Inserts an account in the `list`.
     /// @dev This function should not be called with `id` equal to address 0.
+    /// @dev This function should not be called with an `_id` that is already in the list.
     /// @param list The list to search in.
     /// @param id The address of the account.
     /// @param atHead Tells whether to insert at the head or at the tail of the list.
