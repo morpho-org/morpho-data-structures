@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
+/// @title BucketDLL
+/// @author Morpho Labs
+/// @custom:contact security@morpho.xyz
+/// @notice The doubly linked list used in logarithmic buckets.
 library BucketDLL {
     /* STRUCTS */
 
