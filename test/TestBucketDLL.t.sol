@@ -2,10 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "src/BucketDLL.sol";
+import "./mocks/BucketDLLMock.sol";
 
 contract TestBucketDLL is Test {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
 
     uint256 internal numberOfAccounts = 50;
     address[] public accounts;

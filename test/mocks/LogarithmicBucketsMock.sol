@@ -2,9 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "src/LogarithmicBuckets.sol";
+import "./BucketDLLMock.sol";
 
 contract LogarithmicBucketsMock {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     LogarithmicBuckets.Buckets public buckets;
