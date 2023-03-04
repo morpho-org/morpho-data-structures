@@ -72,12 +72,12 @@ library LogarithmicBuckets {
         if (bucketsMask == 0) return address(0);
 
         uint256 next = nextBucket(value, bucketsMask);
-        if (next != 0) return buckets.buckets[next].getHead();
+        if (next != 0) return buckets.buckets[next].getNext(address(0));
 
         // `highestSetBit` is used to compute the highest non-empty bucket.
         // Knowing that `next` == 0, it is also the highest previous non-empty bucket.
         uint256 prev = highestSetBit(bucketsMask);
-        return buckets.buckets[prev].getHead();
+        return buckets.buckets[prev].getNext(address(0));
     }
 
     /* PRIVATE */

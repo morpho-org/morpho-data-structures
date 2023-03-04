@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "./mocks/LogarithmicBucketsMock.sol";
 
 contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     uint256 public accountsLength = 50;

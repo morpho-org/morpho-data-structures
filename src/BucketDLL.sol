@@ -19,34 +19,13 @@ library BucketDLL {
 
     /* INTERNAL */
 
-    /// @notice Returns the address at the head of the `list`.
-    /// @param list The list from which to get the head.
-    /// @return The address of the head.
-    function getHead(List storage list) internal view returns (address) {
-        return list.accounts[address(0)].next;
-    }
-
-    /// @notice Returns the address at the tail of the `list`.
-    /// @param list The list from which to get the tail.
-    /// @return The address of the tail.
-    function getTail(List storage list) internal view returns (address) {
-        return list.accounts[address(0)].prev;
-    }
-
     /// @notice Returns the next id address from the current `id`.
+    /// @dev Pass the address 0 to get the head of the list.
     /// @param list The list to search in.
     /// @param id The address of the current account.
     /// @return The address of the next account.
     function getNext(List storage list, address id) internal view returns (address) {
         return list.accounts[id].next;
-    }
-
-    /// @notice Returns the previous id address from the current `id`.
-    /// @param list The list to search in.
-    /// @param id The address of the current account.
-    /// @return The address of the previous account.
-    function getPrev(List storage list, address id) internal view returns (address) {
-        return list.accounts[id].prev;
     }
 
     /// @notice Removes an account of the `list`.
@@ -70,7 +49,7 @@ library BucketDLL {
 
     /// @notice Inserts an account in the `list`.
     /// @dev This function should not be called with `id` equal to address 0.
-    /// @dev This function should not be called with an `_id` that is already in the list.
+    /// @dev This function should not be called with an `id` that is already in the list.
     /// @param list The list to search in.
     /// @param id The address of the account.
     /// @param atHead Tells whether to insert at the head or at the tail of the list.

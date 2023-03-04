@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./helpers/Random.sol";
 import "./mocks/LogarithmicBucketsMock.sol";
+import "./mocks/BucketDLLMock.sol";
 import "forge-std/Test.sol";
 
 contract TestLogarithmicBucketsInvariant is Test, Random {
@@ -31,7 +32,7 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
 }
 
 contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     address[] public seen;
