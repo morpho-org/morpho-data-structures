@@ -20,25 +20,15 @@ library BucketDLLMock {
         return BucketDLL.getNext(_list, _id);
     }
 
-    /// @notice Returns the address at the head of the `_list`.
-    /// @param _list The list from which to get the head.
-    /// @return The address of the head.
     function getHead(BucketDLL.List storage _list) internal view returns (address) {
         return _list.accounts[address(0)].next;
     }
 
-    /// @notice Returns the address at the tail of the `_list`.
-    /// @param _list The list from which to get the tail.
-    /// @return The address of the tail.
-    function getTail(BucketDLL.List storage _list) internal view returns (address) {
-        return _list.accounts[address(0)].prev;
-    }
-
-    /// @notice Returns the previous id address from the current `_id`.
-    /// @param _list The list to search in.
-    /// @param _id The address of the current account.
-    /// @return The address of the previous account.
     function getPrev(BucketDLL.List storage _list, address _id) internal view returns (address) {
         return _list.accounts[_id].prev;
+    }
+
+    function getTail(BucketDLL.List storage _list) internal view returns (address) {
+        return _list.accounts[address(0)].prev;
     }
 }
