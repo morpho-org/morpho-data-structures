@@ -3,6 +3,10 @@ pragma solidity ^0.8.0;
 
 import "./BucketDLL.sol";
 
+/// @title LogarithmicBuckets
+/// @author Morpho Labs
+/// @custom:contact security@morpho.xyz
+/// @notice The logarithmic buckets data-structure.
 library LogarithmicBuckets {
     using BucketDLL for BucketDLL.List;
 
@@ -12,7 +16,7 @@ library LogarithmicBuckets {
         uint256 bucketsMask;
     }
 
-    /// ERRORS ///
+    /* ERRORS */
 
     /// @notice Thrown when the address is zero at insertion.
     error ZeroAddress();
@@ -20,96 +24,100 @@ library LogarithmicBuckets {
     /// @notice Thrown when 0 value is inserted.
     error ZeroValue();
 
-    /// INTERNAL ///
+    /* INTERNAL */
 
-    /// @notice Updates an account in the `_buckets`.
-    /// @param _buckets The buckets to update.
-    /// @param _id The address of the account.
-    /// @param _newValue The new value of the account.
-    /// @param _head Indicates whether to insert the new values at the head or at the tail of the buckets list.
+    /// @notice Updates an account in the `buckets`.
+    /// @param buckets The buckets to update.
+    /// @param id The address of the account.
+    /// @param newValue The new value of the account.
+    /// @param head Indicates whether to insert the new values at the head or at the tail of the buckets list.
     function update(
-        Buckets storage _buckets,
-        address _id,
-        uint256 _newValue,
-        bool _head
+        Buckets storage buckets,
+        address id,
+        uint256 newValue,
+        bool head
     ) internal {
-        if (_id == address(0)) revert ZeroAddress();
-        uint256 value = _buckets.valueOf[_id];
-        _buckets.valueOf[_id] = _newValue;
+        if (id == address(0)) revert ZeroAddress();
+        uint256 value = buckets.valueOf[id];
+        buckets.valueOf[id] = newValue;
 
         if (value == 0) {
-            if (_newValue == 0) revert ZeroValue();
-            _insert(_buckets, _id, computeBucket(_newValue), _head);
+            if (newValue == 0) revert ZeroValue();
+            // `highestSetBit` is used to compute the bucket associated with `newValue`.
+            _insert(buckets, id, highestSetBit(newValue), head);
             return;
         }
 
-        uint256 currentBucket = computeBucket(value);
-        if (_newValue == 0) {
-            _remove(_buckets, _id, currentBucket);
+        // `highestSetBit` is used to compute the bucket associated with `value`.
+        uint256 currentBucket = highestSetBit(value);
+        if (newValue == 0) {
+            _remove(buckets, id, currentBucket);
             return;
         }
 
-        uint256 newBucket = computeBucket(_newValue);
+        // `highestSetBit` is used to compute the bucket associated with `newValue`.
+        uint256 newBucket = highestSetBit(newValue);
         if (newBucket != currentBucket) {
-            _remove(_buckets, _id, currentBucket);
-            _insert(_buckets, _id, newBucket, _head);
+            _remove(buckets, id, currentBucket);
+            _insert(buckets, id, newBucket, head);
         }
     }
 
-    /// @notice Returns the address in `_buckets` that is a candidate for matching the value `_value`.
-    /// @param _buckets The buckets to get the head.
-    /// @param _value The value to match.
+    /// @notice Returns the address in `buckets` that is a candidate for matching the value `value`.
+    /// @param buckets The buckets to get the head.
+    /// @param value The value to match.
     /// @return The address of the head.
-    function getMatch(Buckets storage _buckets, uint256 _value) internal view returns (address) {
-        uint256 bucketsMask = _buckets.bucketsMask;
+    function getMatch(Buckets storage buckets, uint256 value) internal view returns (address) {
+        uint256 bucketsMask = buckets.bucketsMask;
         if (bucketsMask == 0) return address(0);
-        uint256 lowerMask = setLowerBits(_value);
 
-        uint256 next = nextBucket(lowerMask, bucketsMask);
+        uint256 next = nextBucket(value, bucketsMask);
+        if (next != 0) return buckets.buckets[next].getNext(address(0));
 
-        if (next != 0) return _buckets.buckets[next].getHead();
-
-        uint256 prev = prevBucket(lowerMask, bucketsMask);
-
-        return _buckets.buckets[prev].getHead();
+        // `highestSetBit` is used to compute the highest non-empty bucket.
+        // Knowing that `next` == 0, it is also the highest previous non-empty bucket.
+        uint256 prev = highestSetBit(bucketsMask);
+        return buckets.buckets[prev].getNext(address(0));
     }
 
-    /// PRIVATE ///
+    /* PRIVATE */
 
-    /// @notice Removes an account in the `_buckets`.
+    /// @notice Removes an account in the `buckets`.
     /// @dev Does not update the value.
-    /// @param _buckets The buckets to modify.
-    /// @param _id The address of the account to remove.
-    /// @param _bucket The mask of the bucket where to remove.
+    /// @param buckets The buckets to modify.
+    /// @param id The address of the account to remove.
+    /// @param bucket The mask of the bucket where to remove.
     function _remove(
-        Buckets storage _buckets,
-        address _id,
-        uint256 _bucket
+        Buckets storage buckets,
+        address id,
+        uint256 bucket
     ) private {
-        if (_buckets.buckets[_bucket].remove(_id)) _buckets.bucketsMask &= ~_bucket;
+        if (buckets.buckets[bucket].remove(id)) buckets.bucketsMask &= ~bucket;
     }
 
-    /// @notice Inserts an account in the `_buckets`.
-    /// @dev Expects that `_id` != 0.
+    /// @notice Inserts an account in the `buckets`.
+    /// @dev Expects that `id` != 0.
     /// @dev Does not update the value.
-    /// @param _buckets The buckets to modify.
-    /// @param _id The address of the account to update.
-    /// @param _bucket The mask of the bucket where to insert.
-    /// @param _head Whether to insert at the head or at the tail of the list.
+    /// @param buckets The buckets to modify.
+    /// @param id The address of the account to update.
+    /// @param bucket The mask of the bucket where to insert.
+    /// @param head Whether to insert at the head or at the tail of the list.
     function _insert(
-        Buckets storage _buckets,
-        address _id,
-        uint256 _bucket,
-        bool _head
+        Buckets storage buckets,
+        address id,
+        uint256 bucket,
+        bool head
     ) private {
-        if (_buckets.buckets[_bucket].insert(_id, _head)) _buckets.bucketsMask |= _bucket;
+        if (buckets.buckets[bucket].insert(id, head)) buckets.bucketsMask |= bucket;
     }
 
-    /// PURE HELPERS ///
+    /* PURE HELPERS */
 
-    /// @notice Returns the bucket in which the given value would fall.
-    function computeBucket(uint256 _value) internal pure returns (uint256) {
-        uint256 lowerMask = setLowerBits(_value);
+    /// @notice Returns the highest set bit.
+    /// @dev Used to compute the bucket associated to a given `value`.
+    /// @dev Used to compute the highest non empty bucket given the `bucketsMask`.
+    function highestSetBit(uint256 value) internal pure returns (uint256) {
+        uint256 lowerMask = setLowerBits(value);
         return lowerMask ^ (lowerMask >> 1);
     }
 
@@ -128,23 +136,13 @@ library LogarithmicBuckets {
         }
     }
 
-    /// @notice Returns the following bucket which contains greater values.
+    /// @notice Returns the lowest non-empty bucket containing larger values.
     /// @dev The bucket returned is the lowest that is in `bucketsMask` and not in `lowerMask`.
-    function nextBucket(uint256 lowerMask, uint256 bucketsMask)
-        internal
-        pure
-        returns (uint256 bucket)
-    {
+    function nextBucket(uint256 value, uint256 bucketsMask) internal pure returns (uint256 bucket) {
+        uint256 lowerMask = setLowerBits(value);
         assembly {
             let higherBucketsMask := and(not(lowerMask), bucketsMask)
             bucket := and(higherBucketsMask, add(not(higherBucketsMask), 1))
         }
-    }
-
-    /// @notice Returns the preceding bucket which contains smaller values.
-    /// @dev The bucket returned is the highest that is in both `bucketsMask` and `lowerMask`.
-    function prevBucket(uint256 lowerMask, uint256 bucketsMask) internal pure returns (uint256) {
-        uint256 lowerBucketsMask = setLowerBits(lowerMask & bucketsMask);
-        return lowerBucketsMask ^ (lowerBucketsMask >> 1);
     }
 }

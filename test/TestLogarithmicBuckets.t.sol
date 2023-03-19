@@ -5,7 +5,7 @@ import "forge-std/Test.sol";
 import "./mocks/LogarithmicBucketsMock.sol";
 
 contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     uint256 public accountsLength = 50;
@@ -125,7 +125,7 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testProveComputeBucket(uint256 _value) public {
-        uint256 bucket = LogarithmicBuckets.computeBucket(_value);
+        uint256 bucket = LogarithmicBuckets.highestSetBit(_value);
         unchecked {
             // cross-check that bucket == 2^{floor(log_2 value)}, or 0 if value == 0
             assertTrue(bucket == 0 || isPowerOfTwo(bucket));
@@ -135,11 +135,12 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 
     function testProveNextBucket(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.computeBucket(_value);
+        uint256 curr = LogarithmicBuckets.highestSetBit(_value);
         uint256 next = nextBucketValue(_value);
         uint256 bucketsMask = buckets.bucketsMask;
-        // check that `next` is a strictly higer non-empty bucket, or zero
+        // Check that `next` is a power of two or zero.
         assertTrue(next == 0 || isPowerOfTwo(next));
+        // Check that `next` is a strictly higher non-empty bucket, or zero.
         assertTrue(next == 0 || next > curr);
         assertTrue(next == 0 || bucketsMask & next != 0);
         unchecked {
@@ -151,20 +152,30 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
-    function testProvePrevBucket(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.computeBucket(_value);
-        uint256 prev = prevBucketValue(_value);
+    function testProveHighestBucket() public {
+        uint256 highest = highestBucketValue();
         uint256 bucketsMask = buckets.bucketsMask;
-        // check that `prev` is a non-empty bucket that is lower than or equal to `curr`; or zero
-        assertTrue(prev == 0 || isPowerOfTwo(prev));
-        assertTrue(prev <= curr);
-        assertTrue(prev == 0 || bucketsMask & prev != 0);
+        // check that `highest` is a power of two or zero.
+        assertTrue(highest == 0 || isPowerOfTwo(highest));
+        // check that `highest` is a non-empty bucket or zero.
+        assertTrue(highest == 0 || bucketsMask & highest != 0);
         unchecked {
-            // check that `prev` is the highest one among such lower non-empty buckets, if exist
-            // note: this also checks that all the lower buckets are empty when `prev` == 0
-            for (uint256 i = curr; i > prev; i >>= 1) {
+            // check that `highest` is the highest non-empty bucket, if exists.
+            // note: this also checks that all the lower buckets are empty when `highest` == 0
+            for (uint256 i = 1 >> 256; i > highest; i >>= 1) {
                 assertTrue(bucketsMask & i == 0);
             }
+        }
+    }
+
+    function testProveHighestPrevEquivalence(uint256 _value) public {
+        uint256 curr = LogarithmicBuckets.highestSetBit(_value);
+        uint256 next = nextBucketValue(_value);
+
+        if (next == 0) {
+            uint256 highest = highestBucketValue();
+            // check that in this case, `highest` is smaller than `curr`.
+            assertTrue(highest <= curr);
         }
     }
 }

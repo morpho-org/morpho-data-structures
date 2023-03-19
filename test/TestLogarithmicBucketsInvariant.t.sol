@@ -3,6 +3,7 @@ pragma solidity ^0.8.0;
 
 import "./helpers/Random.sol";
 import "./mocks/LogarithmicBucketsMock.sol";
+import "./mocks/BucketDLLMock.sol";
 import "forge-std/Test.sol";
 
 contract TestLogarithmicBucketsInvariant is Test, Random {
@@ -31,7 +32,7 @@ contract TestLogarithmicBucketsInvariant is Test, Random {
 }
 
 contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     address[] public seen;
@@ -75,7 +76,7 @@ contract TestLogarithmicBucketsSeenInvariant is Test, Random {
             address user = buckets.seen(i);
             uint256 value = buckets.getValueOf(user);
             if (value != 0) {
-                uint256 bucket = LogarithmicBuckets.computeBucket(value);
+                uint256 bucket = LogarithmicBuckets.highestSetBit(value);
                 address next = buckets.getNext(bucket, user);
                 address prev = buckets.getPrev(bucket, user);
                 assertEq(buckets.getNext(bucket, prev), user);

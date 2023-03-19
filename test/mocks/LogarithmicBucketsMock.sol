@@ -2,9 +2,10 @@
 pragma solidity ^0.8.0;
 
 import "src/LogarithmicBuckets.sol";
+import "./BucketDLLMock.sol";
 
 contract LogarithmicBucketsMock {
-    using BucketDLL for BucketDLL.List;
+    using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
     LogarithmicBuckets.Buckets public buckets;
@@ -54,9 +55,7 @@ contract LogarithmicBucketsMock {
         return LogarithmicBuckets.nextBucket(lowerMask, bucketsMask);
     }
 
-    function prevBucketValue(uint256 _value) internal view returns (uint256) {
-        uint256 bucketsMask = buckets.bucketsMask;
-        uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
-        return LogarithmicBuckets.prevBucket(lowerMask, bucketsMask);
+    function highestBucketValue() internal view returns (uint256) {
+        return LogarithmicBuckets.highestSetBit(buckets.bucketsMask);
     }
 }
