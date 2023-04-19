@@ -255,13 +255,10 @@ library HeapOrdering {
         // Swap the last account and the account to remove, then pop it.
         uint256 newArrayLength = accountsLength - 1;
         swap(_heap, index, newArrayLength);
-        unchecked {
-            // accountsLength - 1 is performed in the line above, so these cannot underflow.
-            delete _heap.accounts[newArrayLength];
-            _heap.arrayLength = uint128(newArrayLength);
-        }
-        if (_heap.size == accountsLength) _heap.size = uint128(--_size);
+        delete _heap.accounts[newArrayLength];
         delete _heap.indexOf[_id];
+        _heap.arrayLength = uint128(newArrayLength);
+        if (_heap.size == accountsLength) _heap.size = uint128(--_size);
 
         // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
         if (index < _size) {
