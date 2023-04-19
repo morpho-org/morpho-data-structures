@@ -1,15 +1,12 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "ds-test/test.sol";
-import "forge-std/Vm.sol";
+import "forge-std/Test.sol";
 
-import "@contracts/Heap.sol";
+import "src/Heap.sol";
 
-contract TestHeap is DSTest {
+contract TestHeap is Test {
     using BasicHeap for BasicHeap.Heap;
-
-    Vm public hevm = Vm(HEVM_ADDRESS);
 
     uint256 public TESTED_SIZE = 50;
     address[] public accounts;
@@ -36,25 +33,25 @@ contract TestHeap is DSTest {
     }
 
     function testShouldNotInsertAccountWithZeroValue() public {
-        hevm.expectRevert(abi.encodeWithSignature("WrongValue()"));
+        vm.expectRevert(abi.encodeWithSignature("WrongValue()"));
         heap.insert(accounts[0], 0);
 
         assertEq(heap.getSize(), 0);
     }
 
     function testShouldNotInsertZeroAddress() public {
-        hevm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
+        vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
         heap.insert(address(0), 10);
     }
 
     function testShouldInsertSeveralTimesTheSameAccount() public {
         heap.insert(accounts[0], 1);
-        hevm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
+        vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
         heap.insert(accounts[0], 2);
     }
 
     function testShouldNotRemoveAccountThatDoesNotExist() public {
-        hevm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
+        vm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
         heap.remove(accounts[0]);
     }
 

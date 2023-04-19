@@ -31,4 +31,12 @@ yarn-error.log*
 /.vscode
 
 # test
-/test/output-tree-structure.txt
+/test-ts/output-tree-structure.txt
+*.ansi
+
+#certora
+certora/munged-simple/*
+certora/munged-fifo/*
+.certora*
+last_conf*
+certora_debug_log.txt

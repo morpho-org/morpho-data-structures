@@ -36,4 +36,4 @@ jobs:
           key: compilation-${{ github.base_ref || github.ref_name }}
 
       - name: Run tests
-        run: make test
+        run: forge test

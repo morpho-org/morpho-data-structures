@@ -1,19 +1,37 @@
-.PHONY: test install
+-include .env.local
+.EXPORT_ALL_VARIABLES:
+MAKEFLAGS += --no-print-directory
 
-export FOUNDRY_TEST=test-foundry
 
 install:
-	@git submodule update --init --recursive
-	@yarn
+	yarn
+	foundryup
+	git submodule update --init --recursive
+
+contracts:
+	FOUNDRY_TEST=/dev/null forge build --sizes --force
 
 test:
-	@echo Run all tests
-	@forge test -vvv
+	@echo Running tests with seed \"${FOUNDRY_FUZZ_SEED}\",\
+		match contract patterns \"\(${FOUNDRY_MATCH_CONTRACT}\)!${FOUNDRY_NO_MATCH_CONTRACT}\",\
+		match test patterns \"\(${FOUNDRY_MATCH_TEST}\)!${FOUNDRY_NO_MATCH_TEST}\"
+
+	forge test -vvv | tee trace.ansi
+
+test-%:
+	@FOUNDRY_MATCH_TEST=$* make test
 
 contract-% c-%:
-	@echo Run tests for contract $*
-	@forge test -vvv --match-contract $*
+	@FOUNDRY_MATCH_CONTRACT=$* make test
 
-single-% s-%:
-	@echo Run single test: $*
-	@forge test -vvv --match-test $*
+coverage:
+	@echo Create lcov coverage report
+	forge coverage --report lcov
+	lcov --remove lcov.info -o lcov.info "test/*"
+
+lcov-html:
+	@echo Transforming the lcov coverage report into html
+	genhtml lcov.info -o coverage
+
+
+.PHONY: test coverage contracts

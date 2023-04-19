@@ -1,9 +1,9 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "ds-test/test.sol";
+import "forge-std/Test.sol";
 
-import "@contracts/Heap.sol";
+import "src/Heap.sol";
 
 contract HeapStorage {
     BasicHeap.Heap internal heap;
@@ -35,7 +35,7 @@ contract HeapStorage {
     }
 }
 
-contract TestStressHeap is DSTest {
+contract TestStressHeap is Test {
     HeapStorage public hs = new HeapStorage();
     uint256 public ts;
     uint256 public im;

@@ -3,18 +3,6 @@
 This repository contains the data structures that can be used for the Morpho's matching engine 🦋.
 The goal is to compare them in terms of security and gas consumption to find the best solution for the protocol and its users.
 
-## Installation
-
-Install foundry, you can find the instructions [here](https://book.getfoundry.sh/getting-started/installation.html).
-
-Then, run `make`.
-
-## Testing
-
-Run `make test`.
-
-For the `RedBlackBinaryTree`, you can run the tests with hardhat with `yarn test`.
-
 # Data structures
 
 The data structures we implement and modified are based on public works of amazing developers. We thank them for what they have done 🙏
@@ -50,6 +38,26 @@ Other data structures may be explored in the future and we are open to any sugge
 # Contributing
 
 In this section, you will find some guidelines to read before contributing to the project.
+
+## Setup
+
+Update git submodules:
+
+```
+git submodule update --init --recursive
+```
+
+Run yarn:
+
+```
+yarn
+```
+
+## Testing
+
+The tests can be run with [foundry](https://github.com/foundry-rs/foundry).
+
+For the `RedBlackBinaryTree`, you can run the tests with hardhat with `yarn test`.
 
 ## Creating issues and PRs
 

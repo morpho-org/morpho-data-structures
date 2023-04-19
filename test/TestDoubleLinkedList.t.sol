@@ -1,13 +1,11 @@
-// SPDX-License-Identifier: GNU AGPLv3
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
 import "forge-std/Test.sol";
-import "@contracts/DoubleLinkedList.sol";
+import "src/DoubleLinkedList.sol";
 
 contract TestDoubleLinkedList is Test {
     using DoubleLinkedList for DoubleLinkedList.List;
-
-    Vm public hevm = Vm(HEVM_ADDRESS);
 
     uint256 public NDS = 50;
     address[] public accounts;
@@ -34,23 +32,23 @@ contract TestDoubleLinkedList is Test {
     }
 
     function testShouldNotInsertAccountWithZeroValue() public {
-        hevm.expectRevert(abi.encodeWithSignature("ValueIsZero()"));
+        vm.expectRevert(abi.encodeWithSignature("ValueIsZero()"));
         list.insertSorted(accounts[0], 0, NDS);
     }
 
     function testShouldNotInsertZeroAddress() public {
-        hevm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
+        vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
         list.insertSorted(address(0), 10, NDS);
     }
 
     function testShouldNotRemoveAccountThatDoesNotExist() public {
-        hevm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
+        vm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
         list.remove(accounts[0]);
     }
 
     function testShouldInsertSeveralTimesTheSameAccount() public {
         list.insertSorted(accounts[0], 1, NDS);
-        hevm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
+        vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
         list.insertSorted(accounts[0], 2, NDS);
     }
 
@@ -217,7 +215,7 @@ contract TestDoubleLinkedList is Test {
         }
 
         // Add last 10 accounts at the same value.
-        for (uint256 i = NDS - 10; i < NDS; i++) {
+        for (uint256 i = accounts.length - 10; i < NDS; i++) {
             list.insertSorted(accounts[i], 10, newNDS);
         }
 
