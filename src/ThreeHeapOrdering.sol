@@ -219,7 +219,7 @@ library ThreeHeapOrdering {
 
     /// @notice Removes an account in the `_heap`.
     /// @dev Only call when this function `_id` is in the `_heap` with value `_removedValue`.
-    /// @param _heap The computed heap to modify.
+    /// @param _heap The heap to modify.
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
@@ -242,6 +242,7 @@ library ThreeHeapOrdering {
         Account memory lastAccount = _heap.accounts[accountsLength - 1];
         _heap.accounts.pop();
 
+        // If the removed account was in the heap, restore the invariant.
         if (index < _size) {
             if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
