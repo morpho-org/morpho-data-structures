@@ -72,8 +72,8 @@ library ThreeHeapOrdering {
     /// @dev The heap may lose its invariant about the order of the values stored.
     /// @dev Only call this function with an index within array's bounds.
     /// @param _heap The heap to modify.
-    /// @param _index The index of the account in the heap to be set.
     /// @param _account The account to set the `_index` to.
+    /// @param _index The index of the account in the heap to be set.
     function setAccount(
         HeapArray storage _heap,
         Account memory _account,
