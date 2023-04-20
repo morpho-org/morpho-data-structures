@@ -246,7 +246,7 @@ library HeapOrdering {
         Account memory lastAccount = _heap.accounts[accountsLength - 1];
         _heap.accounts.pop();
 
-        // If the swapped account is in the heap, restore the invariant: its value can be smaller or larger than the removed value.
+        // If the removed account was in the heap, restore the invariant.
         if (index < _size) {
             if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
