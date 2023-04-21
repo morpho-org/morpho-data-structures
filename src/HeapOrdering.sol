@@ -106,6 +106,7 @@ library HeapOrdering {
                 _index = parentIndex;
             }
         }
+
         setAccount(_heap, _accountToShift, _index);
     }
 
