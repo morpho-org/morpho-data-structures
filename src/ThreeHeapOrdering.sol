@@ -93,12 +93,13 @@ library ThreeHeapOrdering {
         Account memory _accountToShift,
         uint256 _index
     ) private {
+        uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
 
         while (
             _index > ROOT &&
-            _accountToShift.value >
+            valueToShift >
             (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value
         ) {
             setAccount(_heap, parentAccount, _index);

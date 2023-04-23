@@ -93,6 +93,7 @@ library HeapOrdering {
         Account memory _accountToShift,
         uint256 _index
     ) private {
+        uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
 
@@ -100,7 +101,7 @@ library HeapOrdering {
             // _index is checked to be greater than 0 before subtracting 1
             while (
                 _index > ROOT &&
-                _accountToShift.value > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
+                valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
             ) {
                 setAccount(_heap, parentAccount, _index);
                 _index = parentIndex;
@@ -122,6 +123,7 @@ library HeapOrdering {
         Account memory _accountToShift,
         uint256 _index
     ) private {
+        uint256 valueToShift = _accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
         // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
@@ -141,7 +143,7 @@ library HeapOrdering {
                 }
             }
 
-            if (childToSwap.value > _accountToShift.value) {
+            if (childToSwap.value > valueToShift) {
                 setAccount(_heap, childToSwap, _index);
                 _index = childIndex;
                 childIndex = (childIndex << 1) + 1;
