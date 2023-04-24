@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Test} from "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "src/RedBlackBinaryTreeOptimized.sol";
+import {RedBlackBinaryTreeOptimized} from "src/RedBlackBinaryTreeOptimized.sol";
 
 contract TestRedBlackBinaryTreeOptimized is Test {
     using RedBlackBinaryTreeOptimized for RedBlackBinaryTreeOptimized.Tree;
@@ -149,10 +149,13 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         while (account != address(0)) {
             newAccount = tree.next(account);
             if (newAccount != address(0)) {
-                assertGe(
-                    tree.keyToValue[newAccount],
-                    tree.keyToValue[account],
-                    "Not respected of the hierarchy"
+                assertTrue(
+                    RedBlackBinaryTreeOptimized.compare(
+                        tree.keyToValue[newAccount],
+                        newAccount,
+                        tree.keyToValue[account],
+                        account
+                    )
                 );
             }
             account = newAccount;
@@ -160,10 +163,13 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         while (account != address(0)) {
             newAccount = tree.prev(account);
             if (newAccount != address(0)) {
-                assertGe(
-                    tree.keyToValue[account],
-                    tree.keyToValue[newAccount],
-                    "Not respect of the hierarchy"
+                assertTrue(
+                    RedBlackBinaryTreeOptimized.compare(
+                        tree.keyToValue[account],
+                        account,
+                        tree.keyToValue[newAccount],
+                        newAccount
+                    )
                 );
             }
             account = newAccount;
