@@ -24,7 +24,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
     }
 
     function testInsertShouldRevertValueEqual0(address key) public {
-        vm.assume(key != address(0));
+        vm.assume(key != ADDR_ZERO);
         vm.expectRevert("RBBT:value-cannot-be-0");
         tree.insert(key, 0);
     }
@@ -37,7 +37,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
     }
 
     function testInsertCorrectValue(address key, uint256 value) public {
-        vm.assume(value != 0 && key != address(0));
+        vm.assume(value != 0 && key != ADDR_ZERO);
         tree.insert(key, value);
         assertEq(tree.last(), key, "Incorrect key inserted");
         assertEq(tree.first(), key, "Incorrect key inserted");
@@ -45,11 +45,11 @@ contract TestRedBlackBinaryTreeOptimized is Test {
     }
 
     function FirstReturnAddressZeroIfEmpty() public {
-        assertEq(tree.first(), address(0), "Address Not Null");
+        assertEq(tree.first(), ADDR_ZERO, "Address Not Null");
     }
 
     function LastReturnAddressZeroIfEmpty() public {
-        assertEq(tree.last(), address(0), "Address Not Null");
+        assertEq(tree.last(), ADDR_ZERO, "Address Not Null");
     }
 
     function testFirstCorrectValue(uint256[] memory values) public {
@@ -83,13 +83,13 @@ contract TestRedBlackBinaryTreeOptimized is Test {
     }
 
     function testRemoveShouldRevertIfAccountNotExisted(address key) public {
-        vm.assume(key != address(0));
+        vm.assume(key != ADDR_ZERO);
         vm.expectRevert("RBBT:account-not-exist");
         tree.remove(key);
     }
 
     function testRemoveCannotBeDoneTwice(address key, uint256 value) public {
-        vm.assume(value != 0 && key != address(0));
+        vm.assume(value != 0 && key != ADDR_ZERO);
         tree.insert(key, value);
         tree.remove(key);
         vm.expectRevert("RBBT:account-not-exist");
@@ -97,11 +97,11 @@ contract TestRedBlackBinaryTreeOptimized is Test {
     }
 
     function testRemove(address key, uint256 value) public {
-        vm.assume(value != 0 && key != address(0));
+        vm.assume(value != 0 && key != ADDR_ZERO);
         tree.insert(key, value);
         tree.remove(key);
-        assertEq(tree.last(), address(0), "Tree should be empty");
-        assertEq(tree.first(), address(0), "Tree should be empty");
+        assertEq(tree.last(), ADDR_ZERO, "Tree should be empty");
+        assertEq(tree.first(), ADDR_ZERO, "Tree should be empty");
         assertEq(tree.keyToValue[key], 0, "Value Not Removed");
     }
 
@@ -146,9 +146,9 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         }
         address account = accounts[seed % accounts.length];
         address newAccount;
-        while (account != address(0)) {
+        while (account != ADDR_ZERO) {
             newAccount = tree.next(account);
-            if (newAccount != address(0)) {
+            if (newAccount != ADDR_ZERO) {
                 assertTrue(
                     RedBlackBinaryTreeOptimized.compare(
                         tree.keyToValue[newAccount],
@@ -160,9 +160,9 @@ contract TestRedBlackBinaryTreeOptimized is Test {
             }
             account = newAccount;
         }
-        while (account != address(0)) {
+        while (account != ADDR_ZERO) {
             newAccount = tree.prev(account);
-            if (newAccount != address(0)) {
+            if (newAccount != ADDR_ZERO) {
                 assertTrue(
                     RedBlackBinaryTreeOptimized.compare(
                         tree.keyToValue[account],
