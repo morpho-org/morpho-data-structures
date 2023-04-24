@@ -72,8 +72,8 @@ library ThreeHeapOrdering {
     /// @dev The heap may lose its invariant about the order of the values stored.
     /// @dev Only call this function with an index within array's bounds.
     /// @param _heap The heap to modify.
-    /// @param _index The index of the account in the heap to be set.
     /// @param _account The account to set the `_index` to.
+    /// @param _index The index of the account in the heap to be set.
     function setAccount(
         HeapArray storage _heap,
         Account memory _account,
@@ -93,12 +93,13 @@ library ThreeHeapOrdering {
         Account memory _accountToShift,
         uint256 _index
     ) private {
+        uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
 
         while (
             _index > ROOT &&
-            _accountToShift.value >
+            valueToShift >
             (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value
         ) {
             setAccount(_heap, parentAccount, _index);
@@ -219,7 +220,7 @@ library ThreeHeapOrdering {
 
     /// @notice Removes an account in the `_heap`.
     /// @dev Only call when this function `_id` is in the `_heap` with value `_removedValue`.
-    /// @param _heap The computed heap to modify.
+    /// @param _heap The heap to modify.
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
@@ -242,6 +243,7 @@ library ThreeHeapOrdering {
         Account memory lastAccount = _heap.accounts[accountsLength - 1];
         _heap.accounts.pop();
 
+        // If the removed account was in the heap, restore the invariant.
         if (index < _size) {
             if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
