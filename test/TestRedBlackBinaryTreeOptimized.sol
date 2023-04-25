@@ -127,7 +127,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
 
     function testKeyExistsShouldWorkIfAccountInserted(uint256[] memory values) public {
         vm.assume(values.length > NDS);
-        
+
         for (uint256 i = 0; i < NDS; ++i) {
             values[i] = bound(values[i], 1, type(uint256).max);
             tree.insert(accounts[i], values[i]);
@@ -141,15 +141,15 @@ contract TestRedBlackBinaryTreeOptimized is Test {
 
     function testNextAndPrevFunctionInTree(uint256[] memory values, uint256 seed) public {
         vm.assume(values.length > NDS);
-        
+
         for (uint256 i = 0; i < NDS; ++i) {
             values[i] = bound(values[i], 1, type(uint256).max);
             tree.insert(accounts[i], values[i]);
         }
-        
+
         address account = accounts[seed % accounts.length];
         address newAccount;
-        
+
         while (account != ADDR_ZERO) {
             newAccount = tree.next(account);
             if (newAccount != ADDR_ZERO) {
@@ -164,7 +164,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
             }
             account = newAccount;
         }
-        
+
         while (account != ADDR_ZERO) {
             newAccount = tree.prev(account);
             if (newAccount != ADDR_ZERO) {
@@ -178,6 +178,32 @@ contract TestRedBlackBinaryTreeOptimized is Test {
                 );
             }
             account = newAccount;
+        }
+    }
+
+    function testCompareIfValueDifferent(
+        uint256 valueA,
+        address accountA,
+        uint256 valueB,
+        address accountB
+    ) public {
+        vm.assume(valueA != valueB);
+        if (valueA > valueB) {
+            assertTrue(RedBlackBinaryTreeOptimized.compare(valueA, accountA, valueB, accountB));
+        } else {
+            assertFalse(RedBlackBinaryTreeOptimized.compare(valueA, accountA, valueB, accountB));
+        }
+    }
+
+    function testCompareShouldReturnTrueIfValuesEquals(
+        uint256 value,
+        address accountA,
+        address accountB
+    ) public {
+        if (accountA > accountB) {
+            assertTrue(RedBlackBinaryTreeOptimized.compare(value, accountA, value, accountB));
+        } else {
+            assertFalse(RedBlackBinaryTreeOptimized.compare(value, accountA, value, accountB));
         }
     }
 }
