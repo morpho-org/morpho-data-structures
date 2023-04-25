@@ -105,7 +105,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         assertEq(tree.keyToValue[key], 0, "Value Not Removed");
     }
 
-    function testRemoveMultiplesAccountsWithRandomPosition(
+    function testRemoveMultipleAccountsWithRandomPosition(
         uint256[] memory seed,
         uint256[] memory values
     ) public {
