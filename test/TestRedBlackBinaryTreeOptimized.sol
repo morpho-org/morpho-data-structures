@@ -112,8 +112,8 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         vm.assume(values.length > NDS && seed.length > NDS);
 
         for (uint256 i = 0; i < NDS; ++i) {
-            values[i] = bound(values[i], 1, type(uint256).max);
             if (seed[i] % 2 == 0) {
+                values[i] = bound(values[i], 1, type(uint256).max);
                 tree.insert(accounts[i], values[i]);
             }
         }
