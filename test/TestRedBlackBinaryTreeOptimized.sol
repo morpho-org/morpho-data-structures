@@ -162,6 +162,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
             }
             account = newAccount;
         }
+        
         while (account != ADDR_ZERO) {
             newAccount = tree.prev(account);
             if (newAccount != ADDR_ZERO) {
