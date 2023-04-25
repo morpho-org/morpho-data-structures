@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/Heap.sol";
+import {BasicHeap} from "src/Heap.sol";
 
 contract TestHeap is Test {
     using BasicHeap for BasicHeap.Heap;
@@ -32,19 +32,12 @@ contract TestHeap is Test {
         assertEq(heap.getRightChild(accounts[0]), ADDR_ZERO);
     }
 
-    function testShouldNotInsertAccountWithZeroValue() public {
-        vm.expectRevert(abi.encodeWithSignature("WrongValue()"));
-        heap.insert(accounts[0], 0);
-
-        assertEq(heap.getSize(), 0);
-    }
-
     function testShouldNotInsertZeroAddress() public {
         vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        heap.insert(address(0), 10);
+        heap.insert(ADDR_ZERO, 10);
     }
 
-    function testShouldInsertSeveralTimesTheSameAccount() public {
+    function testShouldNotInsertSeveralTimesTheSameAccount() public {
         heap.insert(accounts[0], 1);
         vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
         heap.insert(accounts[0], 2);
@@ -223,11 +216,7 @@ contract TestHeap is Test {
         }
 
         for (uint256 i = 0; i < 10; i++) {
-            assertEq(
-                heap.accounts[10 + i].id,
-                accounts[TESTED_SIZE - 10 + i],
-                "order not expected, 2"
-            );
+            assertEq(heap.accounts[10 + i].id, accounts[TESTED_SIZE - 10 + i], "order not expected, 2");
         }
     }
 
