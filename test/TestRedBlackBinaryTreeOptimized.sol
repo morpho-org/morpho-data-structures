@@ -146,8 +146,10 @@ contract TestRedBlackBinaryTreeOptimized is Test {
             values[i] = bound(values[i], 1, type(uint256).max);
             tree.insert(accounts[i], values[i]);
         }
+        
         address account = accounts[seed % accounts.length];
         address newAccount;
+        
         while (account != ADDR_ZERO) {
             newAccount = tree.next(account);
             if (newAccount != ADDR_ZERO) {
