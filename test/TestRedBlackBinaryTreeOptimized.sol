@@ -82,7 +82,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         assertEq(tree.last(), maxValueKey, "Incorrect smallest key");
     }
 
-    function testRemoveShouldRevertIfAccountNotExisted(address key) public {
+    function testRemoveShouldRevertIfAccountDoesNotExist(address key) public {
         vm.assume(key != ADDR_ZERO);
         vm.expectRevert("RBBT:account-not-exist");
         tree.remove(key);
