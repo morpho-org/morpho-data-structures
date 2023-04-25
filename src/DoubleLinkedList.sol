@@ -90,6 +90,8 @@ library DoubleLinkedList {
     }
 
     /// @notice Inserts an account in the `_list` at the right slot based on its `_value`.
+    /// @dev Allows to keep a list of addresses sorted in descending order by their associated value. Each new address is inserted into the sorted list.
+    /// @dev The value of the previous address and the value of the next address in the DLL frames the value of the inserted address.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     /// @param _value The value of the account.
