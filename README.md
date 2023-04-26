@@ -82,18 +82,27 @@ Before merging a PR:
 
 ## Code Formatting
 
-We use prettier with the default configuration mentionned in the [Solidity Prettier Plugin](https://github.com/prettier-solidity/prettier-plugin-solidity).
-We recommend developers using VS Code to set their local config as below:
+Configure your VSCode to automatically format a file on save, using `forge fmt`:
 
-```
+- Install [emeraldwalk.runonsave](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave)
+- Update your `settings.json`:
+
+```json
 {
-	"editor.formatOnSave": true,
-	"solidity.formatter": "prettier",
-	"editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[solidity]": {
+    "editor.formatOnSave": false
+  },
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": ".sol",
+        "isAsync": true,
+        "cmd": "forge fmt ${file}"
+      }
+    ]
+  }
 }
 ```
-
-In doing so the code will be formatted on each save.
 
 We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
 
