@@ -9,7 +9,7 @@ library BasicHeap {
 
     struct Heap {
         Account[] accounts; // All the accounts.
-        mapping(address => uint256) indexOf; // A mapping from an address to a rank in accounts. Beware: ranks are shifted by one compared to indexes, so the first rank is 1 and not 0.
+        mapping(address => uint256) indexOf; // A mapping from an address to an index in accounts. From index i, the parent index is (i-1)/2, the left child index is 2*i+1 and the right child index is 2*i+2.
     }
 
     /// CONSTANTS ///
