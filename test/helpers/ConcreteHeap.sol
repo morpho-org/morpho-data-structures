@@ -28,6 +28,10 @@ contract ConcreteHeap {
         return heap.getSize();
     }
 
+    function containsAccount(address _id) public view returns (bool) {
+        return heap.containsAccount(_id);
+    }
+
     function getValueOf(address _id) public view returns (uint256) {
         return heap.getValueOf(_id);
     }

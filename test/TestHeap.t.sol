@@ -48,6 +48,15 @@ contract TestHeap is Test {
         heap.remove(accounts[0]);
     }
 
+    function testContainsAccount() public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(accounts[i], (i + TESTED_SIZE / 2) % TESTED_SIZE);
+            for (uint256 j; j <= i; ++j) {
+                assertTrue(heap.containsAccount(accounts[j]));
+            }
+        }
+    }
+
     function testShouldHaveTheRightOrder() public {
         heap.insert(accounts[0], 20);
         heap.insert(accounts[1], 40);
