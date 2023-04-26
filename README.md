@@ -5,7 +5,7 @@ The goal is to compare them in terms of security and gas consumption to find the
 
 # Data structures
 
-The data structures we implement and modified are based on public works of amazing developers. We thank them for what they have done 🙏
+The data structures we implement and modified are based on the public works of amazing developers. We thank them for what they have done 🙏
 
 You can refer to the following table for the complexity of some data structures.
 
@@ -13,7 +13,7 @@ You can refer to the following table for the complexity of some data structures.
 
 ## Double Linked List
 
-The current implementation of the double linked list is based on this [article](https://hackernoon.com/a-linked-list-implementation-for-ethereum-deep-dive-oy9432pa) written by Alberto Cuesta Cañada. You can find the repository [here](https://github.com/HQ20/contracts/tree/master/contracts/lists). Note that the code has been modified to meet our own needs and to allow us to sort the first accounts of the double linked list. Our implementation is not a generalized one.
+The current implementation of the double-linked list is based on this [article](https://hackernoon.com/a-linked-list-implementation-for-ethereum-deep-dive-oy9432pa) written by Alberto Cuesta Cañada. You can find the repository [here](https://github.com/HQ20/contracts/tree/master/contracts/lists). Note that the code has been modified to meet our own needs and to allow us to sort the first accounts of the double-linked list. Our implementation is not a generalized one.
 What you can do with it:
 
 - Insert an address sorted by a value passed along this address.
@@ -29,7 +29,14 @@ In order to manipulate a binary tree and visualize how it manages to stay balanc
 
 ## Heap based ordering
 
-This implementation is based on a heap data structure and refines it by adding an unsorted portion after it. This gives us an approximation of a heap, and thus operations are performed in constant time. The main entry point is the `update` function, calling internally either `insert`, `increase`, `decrease` or `remove`.
+This implementation is based on a heap data structure and refines it by adding an unsorted portion after it. This gives us an approximation of a heap, and thus operations are performed in constant time.
+
+At least the first 'maxSortedUsers'/2 addresses are sorted in the Heap. To keep constant time operation, we divide by two the size of the Heap once the size overtakes the 'maxSortedUsers' number. It means that we remove all leaves of the heap.
+
+The choice of this implementation is explained by our desire to store a maximum of high-value nodes in the heap to use them for peer-to-peer matching.
+Indeed, a naive implementation that would remove the tail and insert new values at 'maxSortedUsers' (once the heap is full), would end up concentrating all new values on the same single path from the leaf to the root node because the ShiftUp function will be always called from the same node. The risk is that low-value nodes stay in the Heap and that all the liquidity will be concentrated on the path from the leaf of index 'maxSortedUsers' to the root.
+Removing all the leaves enables the protocol to remove low-value nodes and to call the ShiftUp function at different locations in the Heap. This process therefore keeps a maximum of liquidity available in the heap for peer-to-peer lending
+The main entry point is the `update` function, calling internally either `insert`, `increase`, `decrease` or `remove`.
 
 ## Other data structures
 
@@ -55,7 +62,7 @@ yarn
 
 ## Testing
 
-The tests can be run with [foundry](https://github.com/foundry-rs/foundry).
+The tests can be run with [Foundry](https://github.com/foundry-rs/foundry).
 
 For the `RedBlackBinaryTree`, you can run the tests with hardhat with `yarn test`.
 

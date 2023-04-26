@@ -58,8 +58,10 @@ library HeapOrdering {
 
     /// PRIVATE ///
 
-    /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
-    /// @dev We use division by 2 to remove the leaves of the heap.
+    /// @notice Computes a new suitable size for the Heap from `_size` that is smaller than `_maxSortedUsers`.
+    /// @notice It helps solving to have all the liquity on the same path.
+    /// @notice You can go to the README file for more information.
+    /// @dev We use division by 2 the size to remove the leaves of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
@@ -74,11 +76,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _index The index of the account in the heap to be set.
     /// @param _account The account to set the `_index` to.
-    function setAccount(
-        HeapArray storage _heap,
-        uint256 _index,
-        Account memory _account
-    ) private {
+    function setAccount(HeapArray storage _heap, uint256 _index, Account memory _account) private {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
     }
@@ -89,11 +87,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _index1 The index of the first account in the heap.
     /// @param _index2 The index of the second account in the heap.
-    function swap(
-        HeapArray storage _heap,
-        uint256 _index1,
-        uint256 _index2
-    ) private {
+    function swap(HeapArray storage _heap, uint256 _index1, uint256 _index2) private {
         if (_index1 == _index2) return;
         Account memory accountOldIndex1 = _heap.accounts[_index1];
         Account memory accountOldIndex2 = _heap.accounts[_index2];
@@ -127,11 +121,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _size The computed size of the heap.
     /// @param _index The index of the account to move.
-    function shiftDown(
-        HeapArray storage _heap,
-        uint256 _size,
-        uint256 _index
-    ) private {
+    function shiftDown(HeapArray storage _heap, uint256 _size, uint256 _index) private {
         Account memory accountToShift = _heap.accounts[_index];
         uint256 valueToShift = accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
