@@ -15,11 +15,7 @@ abstract contract TestCommonHeapOrdering is Test {
     uint256 public MAX_SORTED_USERS = 50;
     address public ADDR_ZERO = address(0);
 
-    function update(
-        address _id,
-        uint256 _formerValue,
-        uint256 _newValue
-    ) public {
+    function update(address _id, uint256 _formerValue, uint256 _newValue) public {
         heap.update(_id, _formerValue, _newValue, MAX_SORTED_USERS);
     }
 
@@ -292,15 +288,23 @@ abstract contract TestCommonHeapOrdering is Test {
     }
 
     function testInsertLast() public {
-        for (uint256 i; i < 10; i++) update(accounts[i], 0, NB_ACCOUNTS - i);
+        for (uint256 i; i < 10; i++) {
+            update(accounts[i], 0, NB_ACCOUNTS - i);
+        }
 
-        for (uint256 i = 10; i < 15; i++) update(accounts[i], 0, i - 9);
+        for (uint256 i = 10; i < 15; i++) {
+            update(accounts[i], 0, i - 9);
+        }
 
-        for (uint256 i = 10; i < 15; i++) assertLe(heap.accountsValue(i), 10);
+        for (uint256 i = 10; i < 15; i++) {
+            assertLe(heap.accountsValue(i), 10);
+        }
     }
 
     function testDecreaseIndexChanges() public {
-        for (uint256 i = 0; i < 16; i++) update(accounts[i], 0, 20 - i);
+        for (uint256 i = 0; i < 16; i++) {
+            update(accounts[i], 0, 20 - i);
+        }
 
         uint256 index0Before = heap.indexOf(accounts[0]);
 
@@ -312,7 +316,9 @@ abstract contract TestCommonHeapOrdering is Test {
     }
 
     function testIncreaseIndexChanges() public {
-        for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, 20 - i);
+        for (uint256 i = 0; i < 20; i++) {
+            update(accounts[i], 0, 20 - i);
+        }
 
         uint256 index17Before = heap.indexOf(accounts[17]);
 

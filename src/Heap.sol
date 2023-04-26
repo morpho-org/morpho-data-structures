@@ -32,11 +32,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to insert.
     /// @param _value The value of the account to insert.
-    function insert(
-        Heap storage _heap,
-        address _id,
-        uint256 _value
-    ) internal {
+    function insert(Heap storage _heap, address _id, uint256 _value) internal {
         if (_value == 0) revert WrongValue();
         if (_id == address(0)) revert AddressIsZero();
         if (_heap.ranks[_id] != 0) revert AccountAlreadyInserted();
@@ -54,11 +50,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
-    function decrease(
-        Heap storage _heap,
-        address _id,
-        uint256 _newValue
-    ) internal {
+    function decrease(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 rank = _heap.ranks[_id];
         if (rank == 0) revert AccountDoesNotExist();
         uint256 oldValue = getAccount(_heap, rank).value;
@@ -73,11 +65,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to increase the amount.
     /// @param _newValue The new value of the account.
-    function increase(
-        Heap storage _heap,
-        address _id,
-        uint256 _newValue
-    ) internal {
+    function increase(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 rank = _heap.ranks[_id];
         if (rank == 0) revert AccountDoesNotExist();
         uint256 oldValue = getAccount(_heap, rank).value;
@@ -127,11 +115,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _rank The rank of the account in the heap to be set.
     /// @param _account The account to set the `_rank` to.
-    function setAccount(
-        Heap storage _heap,
-        uint256 _rank,
-        Account memory _account
-    ) private {
+    function setAccount(Heap storage _heap, uint256 _rank, Account memory _account) private {
         _heap.accounts[_rank - 1] = _account;
         _heap.ranks[_account.id] = _rank;
     }
@@ -142,11 +126,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _rank The rank of the account in the heap to be set.
     /// @param _newValue The new value to set the `_rank` to.
-    function setAccountValue(
-        Heap storage _heap,
-        uint256 _rank,
-        uint256 _newValue
-    ) private {
+    function setAccountValue(Heap storage _heap, uint256 _rank, uint256 _newValue) private {
         _heap.accounts[_rank - 1].value = _newValue;
     }
 
@@ -156,11 +136,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _rank1 The rank of the first account in the heap.
     /// @param _rank2 The rank of the second account in the heap.
-    function swap(
-        Heap storage _heap,
-        uint256 _rank1,
-        uint256 _rank2
-    ) private {
+    function swap(Heap storage _heap, uint256 _rank1, uint256 _rank2) private {
         Account memory accountOldRank1 = getAccount(_heap, _rank1);
         Account memory accountOldRank2 = getAccount(_heap, _rank2);
         setAccount(_heap, _rank1, accountOldRank2);
@@ -195,10 +171,9 @@ library BasicHeap {
 
         while (childRank <= size) {
             // Compute the rank of the child with largest value.
-            if (
-                childRank < size &&
-                getAccount(_heap, childRank + 1).value > getAccount(_heap, childRank).value
-            ) childRank++;
+            if (childRank < size && getAccount(_heap, childRank + 1).value > getAccount(_heap, childRank).value) {
+                childRank++;
+            }
 
             childAccount = getAccount(_heap, childRank);
 
@@ -206,7 +181,9 @@ library BasicHeap {
                 setAccount(_heap, _rank, childAccount);
                 _rank = childRank;
                 childRank *= 2;
-            } else break;
+            } else {
+                break;
+            }
         }
         setAccount(_heap, _rank, initialAccount);
     }

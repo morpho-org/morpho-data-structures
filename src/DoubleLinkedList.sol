@@ -94,12 +94,7 @@ library DoubleLinkedList {
     /// @param _id The address of the account.
     /// @param _value The value of the account.
     /// @param _maxIterations The max number of iterations.
-    function insertSorted(
-        List storage _list,
-        address _id,
-        uint256 _value,
-        uint256 _maxIterations
-    ) internal {
+    function insertSorted(List storage _list, address _id, uint256 _value, uint256 _maxIterations) internal {
         if (_value == 0) revert ValueIsZero();
         if (_id == address(0)) revert AddressIsZero();
         if (_list.accounts[_id].value != 0) revert AccountAlreadyInserted();
@@ -107,11 +102,7 @@ library DoubleLinkedList {
         uint256 numberOfIterations;
         address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
 
-        while (
-            numberOfIterations < _maxIterations &&
-            next != address(0) &&
-            _list.accounts[next].value >= _value
-        ) {
+        while (numberOfIterations < _maxIterations && next != address(0) && _list.accounts[next].value >= _value) {
             next = _list.accounts[next].next;
             unchecked {
                 ++numberOfIterations;

@@ -23,7 +23,8 @@ library RedBlackBinaryTree {
         mapping(address => uint256) keyToValue; // Maps key to its value.
     }
 
-    /** @dev Returns the smallest value in the tree `_self`.
+    /**
+     * @dev Returns the smallest value in the tree `_self`.
      *  @param _self The tree to search in.
      */
     function first(Tree storage _self) public view returns (uint256 value) {
@@ -34,7 +35,8 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the highest value in the tree `_self`.
+    /**
+     * @dev Returns the highest value in the tree `_self`.
      *  @param _self The tree to search in.
      */
     function last(Tree storage _self) public view returns (uint256 value) {
@@ -45,7 +47,8 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the next value below `_value`.
+    /**
+     * @dev Returns the next value below `_value`.
      *  @param _self The tree to search in.
      *  @param _value The value to search after.
      */
@@ -62,7 +65,8 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the previous value above `_value`.
+    /**
+     * @dev Returns the previous value above `_value`.
      *  @param _self The tree to search in.
      *  @param _value The value to search before.
      */
@@ -79,7 +83,8 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns whether the `_value` exists in the tree or not.
+    /**
+     * @dev Returns whether the `_value` exists in the tree or not.
      *  @param _self The tree to search in.
      *  @param _value The value to search.
      *  @return Whether the `_value` exists in the tree or not.
@@ -91,7 +96,8 @@ library RedBlackBinaryTree {
         return false;
     }
 
-    /** @dev Returns whether the `_key` exists in the tree or not.
+    /**
+     * @dev Returns whether the `_key` exists in the tree or not.
      *  @param _self The tree to search in.
      *  @param _key The key to search.
      *  @return Whether the `_key` exists in the tree or not.
@@ -100,36 +106,31 @@ library RedBlackBinaryTree {
         return _self.keyToValue[_key] != 0;
     }
 
-    /** @dev Returns the `_key` that has the given `_value` at the specified `_index`.
+    /**
+     * @dev Returns the `_key` that has the given `_value` at the specified `_index`.
      *  @param _self The tree to search in.
      *  @param _value The value to search.
      *  @param _index The index in the list of keys.
      *  @return The key address.
      */
-    function valueKeyAtIndex(
-        Tree storage _self,
-        uint256 _value,
-        uint256 _index
-    ) public view returns (address) {
+    function valueKeyAtIndex(Tree storage _self, uint256 _value, uint256 _index) public view returns (address) {
         require(exists(_self, _value), "RBBT:value-not-exist");
         return _self.nodes[_value].keys[_index];
     }
 
-    /** @dev Returns the number of keys in a given node.
+    /**
+     * @dev Returns the number of keys in a given node.
      *  @param _self The tree to search in.
      *  @param _value The value of the node to search for.
      *  @return The number of keys in this node.
      */
-    function getNumberOfKeysAtValue(Tree storage _self, uint256 _value)
-        public
-        view
-        returns (uint256)
-    {
+    function getNumberOfKeysAtValue(Tree storage _self, uint256 _value) public view returns (uint256) {
         if (!exists(_self, _value)) return 0;
         return _self.nodes[_value].keys.length;
     }
 
-    /** @dev Returns whether or not there is any key in the tree.
+    /**
+     * @dev Returns whether or not there is any key in the tree.
      *  @param _self The tree to search in.
      *  @return Whether or not a key exist in the tree.
      */
@@ -137,16 +138,13 @@ library RedBlackBinaryTree {
         return _self.nodes[_self.root].keys.length > 0;
     }
 
-    /** @dev Inserts the `_key` with `_value` in the tree.
+    /**
+     * @dev Inserts the `_key` with `_value` in the tree.
      *  @param _self The tree in which to add the (key, value) pair.
      *  @param _key The key to add.
      *  @param _value The value to add.
      */
-    function insert(
-        Tree storage _self,
-        address _key,
-        uint256 _value
-    ) public {
+    function insert(Tree storage _self, address _key, uint256 _value) public {
         require(_value != 0, "RBBT:value-cannot-be-0");
         require(_self.keyToValue[_key] == 0, "RBBT:account-already-in");
         _self.keyToValue[_key] = _value;
@@ -181,7 +179,8 @@ library RedBlackBinaryTree {
         insertFixup(_self, _value);
     }
 
-    /** @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
+    /**
+     * @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
      *  @param _self The tree in which to remove the (key, value) pair.
      *  @param _key The key to remove.
      */
@@ -237,7 +236,8 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Returns the minimum of the subtree beginning at a given node.
+    /**
+     * @dev Returns the minimum of the subtree beginning at a given node.
      *  @param _self The tree to search in.
      *  @param _value The value of the node to start at.
      */
@@ -248,7 +248,8 @@ library RedBlackBinaryTree {
         return _value;
     }
 
-    /** @dev Returns the maximum of the subtree beginning at a given node.
+    /**
+     * @dev Returns the maximum of the subtree beginning at a given node.
      *  @param _self The tree to search in.
      *  @param _value The value of the node to start at.
      */
@@ -259,8 +260,9 @@ library RedBlackBinaryTree {
         return _value;
     }
 
-    /** @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
-             After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child)
+    /**
+     * @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
+     *          After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child)
      *  @param _self The tree to apply the rotation to.
      *  @param _value The value of the node to rotate.
      */
@@ -284,8 +286,9 @@ library RedBlackBinaryTree {
         _self.nodes[_value].parent = cursor;
     }
 
-    /** @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
-             After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child)
+    /**
+     * @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
+     *          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child)
      *  @param _self The tree to apply the rotation to.
      *  @param _value The value of the node to rotate.
      */
@@ -309,7 +312,8 @@ library RedBlackBinaryTree {
         _self.nodes[_value].parent = cursor;
     }
 
-    /** @dev Makes sure there is no violation of the tree properties after an insertion.
+    /**
+     * @dev Makes sure there is no violation of the tree properties after an insertion.
      *  @param _self The tree to check and correct if needed.
      *  @param _value The value that was inserted.
      */
@@ -356,16 +360,13 @@ library RedBlackBinaryTree {
         _self.nodes[_self.root].red = false;
     }
 
-    /** @dev Replace the parent of A by B's parent.
+    /**
+     * @dev Replace the parent of A by B's parent.
      *  @param _self The tree to work with.
      *  @param _a The node that will get the new parents.
      *  @param _b The node that gives its parent.
      */
-    function replaceParent(
-        Tree storage _self,
-        uint256 _a,
-        uint256 _b
-    ) private {
+    function replaceParent(Tree storage _self, uint256 _a, uint256 _b) private {
         uint256 bParent = _self.nodes[_b].parent;
         _self.nodes[_a].parent = bParent;
         if (bParent == 0) {
@@ -379,7 +380,8 @@ library RedBlackBinaryTree {
         }
     }
 
-    /** @dev Makes sure there is no violation of the tree properties after removal.
+    /**
+     * @dev Makes sure there is no violation of the tree properties after removal.
      *  @param _self The tree to check and correct if needed.
      *  @param _value The probe value of the function remove.
      */
@@ -395,10 +397,8 @@ library RedBlackBinaryTree {
                     rotateLeft(_self, valueParent);
                     cursor = _self.nodes[valueParent].rightChild;
                 }
-                if (
-                    !_self.nodes[_self.nodes[cursor].leftChild].red &&
-                    !_self.nodes[_self.nodes[cursor].rightChild].red
-                ) {
+                if (!_self.nodes[_self.nodes[cursor].leftChild].red && !_self.nodes[_self.nodes[cursor].rightChild].red)
+                {
                     _self.nodes[cursor].red = true;
                     _value = valueParent;
                 } else {
@@ -422,10 +422,8 @@ library RedBlackBinaryTree {
                     rotateRight(_self, valueParent);
                     cursor = _self.nodes[valueParent].leftChild;
                 }
-                if (
-                    !_self.nodes[_self.nodes[cursor].rightChild].red &&
-                    !_self.nodes[_self.nodes[cursor].leftChild].red
-                ) {
+                if (!_self.nodes[_self.nodes[cursor].rightChild].red && !_self.nodes[_self.nodes[cursor].leftChild].red)
+                {
                     _self.nodes[cursor].red = true;
                     _value = valueParent;
                 } else {

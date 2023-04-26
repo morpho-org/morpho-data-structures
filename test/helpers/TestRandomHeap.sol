@@ -56,8 +56,9 @@ abstract contract TestRandomHeap is Test, Random {
 
     function removeHead() public returns (uint256 value) {
         address head = heap.getHead();
-        if (head == address(0)) return 0;
-        else {
+        if (head == address(0)) {
+            return 0;
+        } else {
             value = heap.getValueOf(head);
             heap.update(head, value, 0, maxSortedUsers);
         }
@@ -67,8 +68,9 @@ abstract contract TestRandomHeap is Test, Random {
     function testFullHeapSort() public {
         maxSortedUsers = n;
         for (uint256 i; i < n; i++) {
-            if (ids.length == 0) insert();
-            else {
+            if (ids.length == 0) {
+                insert();
+            } else {
                 uint256 r = randomUint256(5);
                 if (r < 2) insert();
                 else if (r == 2) remove();

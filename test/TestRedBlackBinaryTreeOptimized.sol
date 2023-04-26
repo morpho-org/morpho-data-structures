@@ -105,10 +105,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         assertEq(tree.keyToValue[key], 0, "Value Not Removed");
     }
 
-    function testRemoveMultipleAccountsWithRandomPosition(
-        uint256[] memory seed,
-        uint256[] memory values
-    ) public {
+    function testRemoveMultipleAccountsWithRandomPosition(uint256[] memory seed, uint256[] memory values) public {
         vm.assume(values.length > NDS && seed.length > NDS);
 
         for (uint256 i = 0; i < NDS; ++i) {
@@ -127,7 +124,6 @@ contract TestRedBlackBinaryTreeOptimized is Test {
 
     function testKeyExistsShouldWorkIfAccountInserted(uint256[] memory values) public {
         vm.assume(values.length > NDS);
-        
 
         for (uint256 i = 0; i < NDS; ++i) {
             values[i] = bound(values[i], 1, type(uint256).max);
@@ -142,7 +138,6 @@ contract TestRedBlackBinaryTreeOptimized is Test {
 
     function testNextAndPrevFunctionInTree(uint256[] memory values, uint256 seed) public {
         vm.assume(values.length > NDS);
-        
 
         for (uint256 i = 0; i < NDS; ++i) {
             values[i] = bound(values[i], 1, type(uint256).max);
@@ -157,10 +152,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
             if (newAccount != ADDR_ZERO) {
                 assertTrue(
                     RedBlackBinaryTreeOptimized.compare(
-                        tree.keyToValue[newAccount],
-                        newAccount,
-                        tree.keyToValue[account],
-                        account
+                        tree.keyToValue[newAccount], newAccount, tree.keyToValue[account], account
                     )
                 );
             }
@@ -172,10 +164,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
             if (newAccount != ADDR_ZERO) {
                 assertTrue(
                     RedBlackBinaryTreeOptimized.compare(
-                        tree.keyToValue[account],
-                        account,
-                        tree.keyToValue[newAccount],
-                        newAccount
+                        tree.keyToValue[account], account, tree.keyToValue[newAccount], newAccount
                     )
                 );
             }
@@ -183,12 +172,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         }
     }
 
-    function testCompareIfValueDifferent(
-        uint256 valueA,
-        address accountA,
-        uint256 valueB,
-        address accountB
-    ) public {
+    function testCompareIfValueDifferent(uint256 valueA, address accountA, uint256 valueB, address accountB) public {
         vm.assume(valueA != valueB);
         if (valueA > valueB) {
             assertTrue(RedBlackBinaryTreeOptimized.compare(valueA, accountA, valueB, accountB));
@@ -197,11 +181,7 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         }
     }
 
-    function testCompareShouldReturnTrueIfValuesEquals(
-        uint256 value,
-        address accountA,
-        address accountB
-    ) public {
+    function testCompareShouldReturnTrueIfValuesEquals(uint256 value, address accountA, address accountB) public {
         if (accountA > accountB) {
             assertTrue(RedBlackBinaryTreeOptimized.compare(value, accountA, value, accountB));
         } else {

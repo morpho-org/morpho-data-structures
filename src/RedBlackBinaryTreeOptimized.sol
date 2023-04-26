@@ -21,7 +21,8 @@ library RedBlackBinaryTreeOptimized {
         mapping(address => uint256) keyToValue; // Maps key to its value
     }
 
-    /** @dev Returns the address of the smallest value in the tree `_self`.
+    /**
+     * @dev Returns the address of the smallest value in the tree `_self`.
      *  @param _self The tree to search in.
      */
     function first(Tree storage _self) public view returns (address key) {
@@ -32,7 +33,8 @@ library RedBlackBinaryTreeOptimized {
         }
     }
 
-    /** @dev Returns the address of the highest value in the tree `_self`.
+    /**
+     * @dev Returns the address of the highest value in the tree `_self`.
      *  @param _self The tree to search in.
      */
     function last(Tree storage _self) public view returns (address key) {
@@ -43,7 +45,8 @@ library RedBlackBinaryTreeOptimized {
         }
     }
 
-    /** @dev Returns the address of the next user after `_key`.
+    /**
+     * @dev Returns the address of the next user after `_key`.
      *  @param _self The tree to search in.
      *  @param _key The address to search after.
      */
@@ -60,7 +63,8 @@ library RedBlackBinaryTreeOptimized {
         }
     }
 
-    /** @dev Returns the address of the previous user above `_key`.
+    /**
+     * @dev Returns the address of the previous user above `_key`.
      *  @param _self The tree to search in.
      *  @param _key The address to search before.
      */
@@ -77,7 +81,8 @@ library RedBlackBinaryTreeOptimized {
         }
     }
 
-    /** @dev Returns whether the `_key` exists in the tree or not.
+    /**
+     * @dev Returns whether the `_key` exists in the tree or not.
      *  @param _self The tree to search in.
      *  @param _key The key to search.
      *  @return Whether the `_key` exists in the tree or not.
@@ -86,18 +91,18 @@ library RedBlackBinaryTreeOptimized {
         return _self.keyToValue[_key] != 0;
     }
 
-    /** @dev Returns true if A>B according to the order relationship.
+    /**
+     * @dev Returns true if A>B according to the order relationship.
      *  @param _valueA value for user A.
      *  @param _addressA Address for user A.
      *  @param _valueB value for user B.
      *  @param _addressB Address for user B.
      */
-    function compare(
-        uint256 _valueA,
-        address _addressA,
-        uint256 _valueB,
-        address _addressB
-    ) public pure returns (bool) {
+    function compare(uint256 _valueA, address _addressA, uint256 _valueB, address _addressB)
+        public
+        pure
+        returns (bool)
+    {
         if (_valueA == _valueB) {
             if (_addressA > _addressB) {
                 return true;
@@ -109,7 +114,8 @@ library RedBlackBinaryTreeOptimized {
         return false;
     }
 
-    /** @dev Returns whether or not there is any key in the tree.
+    /**
+     * @dev Returns whether or not there is any key in the tree.
      *  @param _self The tree to search in.
      *  @return Whether or not a key exist in the tree.
      */
@@ -117,16 +123,13 @@ library RedBlackBinaryTreeOptimized {
         return _self.root != address(0);
     }
 
-    /** @dev Inserts the `_key` with `_value` in the tree.
+    /**
+     * @dev Inserts the `_key` with `_value` in the tree.
      *  @param _self The tree in which to add the (key, value) pair.
      *  @param _key The key to add.
      *  @param _value The value to add.
      */
-    function insert(
-        Tree storage _self,
-        address _key,
-        uint256 _value
-    ) public {
+    function insert(Tree storage _self, address _key, uint256 _value) public {
         require(_value != 0, "RBBT:value-cannot-be-0");
         require(_self.keyToValue[_key] == 0, "RBBT:account-already-in");
         _self.keyToValue[_key] = _value;
@@ -155,7 +158,8 @@ library RedBlackBinaryTreeOptimized {
         insertFixup(_self, _key);
     }
 
-    /** @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
+    /**
+     * @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
      *  @param _self The tree in which to remove the (key, value) pair.
      *  @param _key The key to remove.
      */
@@ -164,9 +168,7 @@ library RedBlackBinaryTreeOptimized {
         _self.keyToValue[_key] = 0;
         address probe;
         address cursor;
-        if (
-            _self.nodes[_key].leftChild == address(0) || _self.nodes[_key].rightChild == address(0)
-        ) {
+        if (_self.nodes[_key].leftChild == address(0) || _self.nodes[_key].rightChild == address(0)) {
             cursor = _key;
         } else {
             cursor = _self.nodes[_key].rightChild;
@@ -206,7 +208,8 @@ library RedBlackBinaryTreeOptimized {
         delete _self.nodes[cursor];
     }
 
-    /** @dev Returns the minimum of the subtree beginning at a given node.
+    /**
+     * @dev Returns the minimum of the subtree beginning at a given node.
      *  @param _self The tree to search in.
      *  @param _key The value of the node to start at.
      */
@@ -217,7 +220,8 @@ library RedBlackBinaryTreeOptimized {
         return _key;
     }
 
-    /** @dev Returns the maximum of the subtree beginning at a given node.
+    /**
+     * @dev Returns the maximum of the subtree beginning at a given node.
      *  @param _self The tree to search in.
      *  @param _key The address of the node to start at.
      */
@@ -228,7 +232,8 @@ library RedBlackBinaryTreeOptimized {
         return _key;
     }
 
-    /** @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
+    /**
+     * @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
      *       After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child)
      *  @param _self The tree to apply the rotation to.
      *  @param _key The address of the node to rotate.
@@ -254,8 +259,9 @@ library RedBlackBinaryTreeOptimized {
         _self.nodes[_key].parent = cursor;
     }
 
-    /** @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
-             After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child)
+    /**
+     * @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
+     *          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child)
      *  @param _self The tree to apply the rotation to.
      *  @param _key The address of the node to rotate.
      */
@@ -279,7 +285,8 @@ library RedBlackBinaryTreeOptimized {
         _self.nodes[_key].parent = cursor;
     }
 
-    /** @dev Makes sure there is no violation of the tree properties after an insertion.
+    /**
+     * @dev Makes sure there is no violation of the tree properties after an insertion.
      *  @param _self The tree to check and correct if needed.
      *  @param _key The address of the user that was inserted.
      */
@@ -326,16 +333,13 @@ library RedBlackBinaryTreeOptimized {
         _self.nodes[_self.root].red = false;
     }
 
-    /** @dev Replace the parent of A by B's parent.
+    /**
+     * @dev Replace the parent of A by B's parent.
      *  @param _self The tree to work with.
      *  @param _a The node that will get the new parents.
      *  @param _b The node that gives its parent.
      */
-    function replaceParent(
-        Tree storage _self,
-        address _a,
-        address _b
-    ) private {
+    function replaceParent(Tree storage _self, address _a, address _b) private {
         address bParent = _self.nodes[_b].parent;
         _self.nodes[_a].parent = bParent;
         if (bParent == address(0)) {
@@ -349,7 +353,8 @@ library RedBlackBinaryTreeOptimized {
         }
     }
 
-    /** @dev Makes sure there is no violation of the tree properties after removal.
+    /**
+     * @dev Makes sure there is no violation of the tree properties after removal.
      *  @param _self The tree to check and correct if needed.
      *  @param _key The address requested in the function remove.
      */
@@ -365,10 +370,8 @@ library RedBlackBinaryTreeOptimized {
                     rotateLeft(_self, keyParent);
                     cursor = _self.nodes[keyParent].rightChild;
                 }
-                if (
-                    !_self.nodes[_self.nodes[cursor].leftChild].red &&
-                    !_self.nodes[_self.nodes[cursor].rightChild].red
-                ) {
+                if (!_self.nodes[_self.nodes[cursor].leftChild].red && !_self.nodes[_self.nodes[cursor].rightChild].red)
+                {
                     _self.nodes[cursor].red = true;
                     _key = keyParent;
                 } else {
@@ -392,10 +395,8 @@ library RedBlackBinaryTreeOptimized {
                     rotateRight(_self, keyParent);
                     cursor = _self.nodes[keyParent].leftChild;
                 }
-                if (
-                    !_self.nodes[_self.nodes[cursor].rightChild].red &&
-                    !_self.nodes[_self.nodes[cursor].leftChild].red
-                ) {
+                if (!_self.nodes[_self.nodes[cursor].rightChild].red && !_self.nodes[_self.nodes[cursor].leftChild].red)
+                {
                     _self.nodes[cursor].red = true;
                     _key = keyParent;
                 } else {

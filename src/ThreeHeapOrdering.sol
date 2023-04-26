@@ -88,19 +88,12 @@ library ThreeHeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftUp(
-        HeapArray storage _heap,
-        Account memory _accountToShift,
-        uint256 _index
-    ) private {
+    function shiftUp(HeapArray storage _heap, Account memory _accountToShift, uint256 _index) private {
         uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
 
-        while (
-            _index > ROOT &&
-            valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value
-        ) {
+        while (_index > ROOT && valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) / 3]).value) {
             setAccount(_heap, parentAccount, _index);
             _index = parentIndex;
         }
@@ -114,12 +107,9 @@ library ThreeHeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftDown(
-        HeapArray storage _heap,
-        uint256 _size,
-        Account memory _accountToShift,
-        uint256 _index
-    ) private {
+    function shiftDown(HeapArray storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index)
+        private
+    {
         Account memory targetAccount = _accountToShift;
         uint256 targetIndex = _index;
         uint256 nextIndex = _index * 3;
@@ -154,13 +144,9 @@ library ThreeHeapOrdering {
     /// @param _id The address of the account to insert.
     /// @param _value The value of the account to insert.
     /// @param _maxSortedUsers The maximum size of the heap.
-    function insert(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _value,
-        uint256 _maxSortedUsers
-    ) private {
+    function insert(HeapArray storage _heap, uint256 _size, address _id, uint96 _value, uint256 _maxSortedUsers)
+        private
+    {
         // `_heap` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
 
@@ -180,12 +166,7 @@ library ThreeHeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
-    function decrease(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _newValue
-    ) private {
+    function decrease(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue) private {
         uint256 index = _heap.indexOf[_id];
 
         // We only need to take care of sorting if there are nodes below in the heap.
@@ -200,13 +181,9 @@ library ThreeHeapOrdering {
     /// @param _id The address of the account to increase the amount.
     /// @param _newValue The new value of the account.
     /// @param _maxSortedUsers The maximum size of the heap.
-    function increase(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _newValue,
-        uint256 _maxSortedUsers
-    ) private {
+    function increase(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue, uint256 _maxSortedUsers)
+        private
+    {
         uint256 index = _heap.indexOf[_id];
 
         if (index < _size) {
@@ -224,12 +201,7 @@ library ThreeHeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
-    function remove(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _removedValue
-    ) private {
+    function remove(HeapArray storage _heap, uint256 _size, address _id, uint96 _removedValue) private {
         uint256 index = _heap.indexOf[_id];
         delete _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;

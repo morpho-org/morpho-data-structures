@@ -144,7 +144,9 @@ contract TestHeapOrdering is TestCommonHeapOrdering {
 
     function testInsertWrap() public {
         MAX_SORTED_USERS = 20;
-        for (uint256 i = 0; i < 20; i++) update(accounts[i], 0, NB_ACCOUNTS - i);
+        for (uint256 i = 0; i < 20; i++) {
+            update(accounts[i], 0, NB_ACCOUNTS - i);
+        }
 
         update(accounts[20], 0, 1);
 
