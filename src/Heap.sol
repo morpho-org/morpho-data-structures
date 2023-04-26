@@ -127,7 +127,7 @@ library BasicHeap {
         uint256 parentIndex;
 
         unchecked {
-            // _index is checked to be greater than 0 before subtracting 1
+            // `_index` is checked to be greater than 0 before subtracting 1.
             while (
                 _index > ROOT
                     && _accountToShift.value > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
@@ -136,6 +136,7 @@ library BasicHeap {
                 _index = parentIndex;
             }
         }
+
         setAccount(_heap, _accountToShift, _index);
     }
 
@@ -157,6 +158,7 @@ library BasicHeap {
             unchecked {
                 rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
             }
+
             if (rightChildIndex < _size) {
                 Account memory rightChild = _heap.accounts[rightChildIndex];
                 if (rightChild.value > childToSwap.value) {
