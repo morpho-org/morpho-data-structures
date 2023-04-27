@@ -2,14 +2,14 @@
 pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
-
+import {BasicHeap} from "src/Heap.sol";
 import {ConcreteHeap} from "./helpers/ConcreteHeap.sol";
 
 contract Heap is ConcreteHeap {
     address[] internal accountsUsed;
 
     function accountsValue(uint256 _index) external view returns (uint256) {
-        return heap.accounts[_index].value;
+        return BasicHeap.computeValue(heap.accounts[_index].randomStruct);
     }
 
     function accountsId(uint256 _index) external view returns (address) {
@@ -22,12 +22,12 @@ contract Heap is ConcreteHeap {
 
     /// Functions to fuzz ///
 
-    function insertCorrect(address account, uint256 amount) external {
-        insert(account, amount);
+    function insertCorrect(address account, BasicHeap.RandomStruct memory randomStruct) external {
+        insert(account, randomStruct);
         accountsUsed.push(account);
     }
 
-    function increaseCorrect(uint256 index, uint256 amount) external {
+    function increaseCorrect(uint256 index, BasicHeap.RandomStruct memory randomStruct) external {
         if (accountsUsed.length == 0) {
             return;
         }
@@ -37,10 +37,12 @@ contract Heap is ConcreteHeap {
         if (accountValue == type(uint256).max) {
             return;
         }
-        increase(account, amount > accountValue ? amount : amount % (type(uint256).max - accountValue) + accountValue);
+        if (BasicHeap.computeValue(randomStruct) > accountValue) {
+            increase(account, randomStruct);
+        }
     }
 
-    function decreaseCorrect(uint256 index, uint256 amount) external {
+    function decreaseCorrect(uint256 index, BasicHeap.RandomStruct memory randomStruct) external {
         if (accountsUsed.length == 0) {
             return;
         }
@@ -50,7 +52,9 @@ contract Heap is ConcreteHeap {
         if (accountValue == 0) {
             return;
         }
-        decrease(account, amount < accountValue ? amount : amount % accountValue);
+        if (BasicHeap.computeValue(randomStruct) < accountValue) {
+            decrease(account, randomStruct);
+        }
     }
 
     function removeCorrect(uint256 index) external {

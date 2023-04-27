@@ -8,16 +8,16 @@ contract ConcreteHeap {
 
     BasicHeap.Heap internal heap;
 
-    function insert(address _id, uint256 _value) public {
-        heap.insert(_id, _value);
+    function insert(address _id, BasicHeap.RandomStruct memory randomStruct) public {
+        heap.insert(_id, randomStruct);
     }
 
-    function decrease(address _id, uint256 _newValue) public {
-        heap.decrease(_id, _newValue);
+    function decrease(address _id, BasicHeap.RandomStruct memory randomStruct) public {
+        heap.decrease(_id, randomStruct);
     }
 
-    function increase(address _id, uint256 _newValue) public {
-        heap.increase(_id, _newValue);
+    function increase(address _id, BasicHeap.RandomStruct memory randomStruct) public {
+        heap.increase(_id, randomStruct);
     }
 
     function remove(address _id) public {

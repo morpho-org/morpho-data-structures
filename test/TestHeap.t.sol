@@ -23,7 +23,7 @@ contract TestHeap is Test {
     }
 
     function testInsertOneSingleAccount() public {
-        heap.insert(accounts[0], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
         assertEq(heap.getSize(), 1);
         assertEq(heap.getValueOf(accounts[0]), 1);
@@ -34,13 +34,13 @@ contract TestHeap is Test {
 
     function testShouldNotInsertZeroAddress() public {
         vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        heap.insert(ADDR_ZERO, 10);
+        heap.insert(ADDR_ZERO, BasicHeap.RandomStruct({value: 10, data: bytes32(0)}));
     }
 
     function testShouldNotInsertSeveralTimesTheSameAccount() public {
-        heap.insert(accounts[0], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
         vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
-        heap.insert(accounts[0], 2);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
     }
 
     function testShouldNotRemoveAccountThatDoesNotExist() public {
@@ -50,7 +50,8 @@ contract TestHeap is Test {
 
     function testContainsAccount() public {
         for (uint256 i; i < TESTED_SIZE; ++i) {
-            heap.insert(accounts[i], (i + TESTED_SIZE / 2) % TESTED_SIZE);
+            uint256 value = (i + TESTED_SIZE / 2) % TESTED_SIZE;
+            heap.insert(accounts[i], BasicHeap.RandomStruct({value: value, data: bytes32(0)}));
             for (uint256 j; j < TESTED_SIZE; ++j) {
                 assertEq(heap.containsAccount(accounts[j]), j <= i);
             }
@@ -58,8 +59,8 @@ contract TestHeap is Test {
     }
 
     function testShouldHaveTheRightOrder() public {
-        heap.insert(accounts[0], 20);
-        heap.insert(accounts[1], 40);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 20, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 40, data: bytes32(0)}));
         address root = heap.getRoot();
         address leftChild = heap.getLeftChild(root);
         assertEq(root, accounts[1]);
@@ -67,7 +68,7 @@ contract TestHeap is Test {
     }
 
     function testShouldRemoveOneSingleAccount() public {
-        heap.insert(accounts[0], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
         heap.remove(accounts[0]);
 
         assertEq(heap.getSize(), 0);
@@ -78,8 +79,8 @@ contract TestHeap is Test {
     }
 
     function testShouldInsertTwoAccounts() public {
-        heap.insert(accounts[0], 2);
-        heap.insert(accounts[1], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
         address root = heap.getRoot();
         address leftChild = heap.getLeftChild(root);
@@ -96,9 +97,9 @@ contract TestHeap is Test {
     }
 
     function testShouldInsertThreeAccounts() public {
-        heap.insert(accounts[0], 3);
-        heap.insert(accounts[1], 2);
-        heap.insert(accounts[2], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
         address root = heap.getRoot();
         address leftChild = heap.getLeftChild(root);
@@ -116,8 +117,8 @@ contract TestHeap is Test {
     }
 
     function testShouldRemoveOneAccountOverTwo() public {
-        heap.insert(accounts[0], 2);
-        heap.insert(accounts[1], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
         heap.remove(accounts[0]);
 
         address root = heap.getRoot();
@@ -132,8 +133,8 @@ contract TestHeap is Test {
     }
 
     function testShouldRemoveBothAccounts() public {
-        heap.insert(accounts[0], 2);
-        heap.insert(accounts[1], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
         heap.remove(accounts[0]);
         heap.remove(accounts[1]);
 
@@ -142,9 +143,9 @@ contract TestHeap is Test {
     }
 
     function testShouldInsertThreeAccountsAndRemoveThem() public {
-        heap.insert(accounts[0], 3);
-        heap.insert(accounts[1], 2);
-        heap.insert(accounts[2], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
         address root = heap.getRoot();
 
@@ -182,7 +183,10 @@ contract TestHeap is Test {
 
     function testShouldInsertAccountsAllSorted() public {
         for (uint256 i = 0; i < accounts.length; i++) {
-            heap.insert(accounts[i], TESTED_SIZE - i);
+            heap.insert(
+                accounts[i],
+                BasicHeap.RandomStruct({value: TESTED_SIZE - i, data: bytes32(0)})
+            );
         }
 
         assertEq(heap.getRoot(), accounts[0]);
@@ -194,7 +198,10 @@ contract TestHeap is Test {
 
     function testShouldRemoveAllSortedAccount() public {
         for (uint256 i = 0; i < accounts.length; i++) {
-            heap.insert(accounts[i], TESTED_SIZE - i);
+            heap.insert(
+                accounts[i],
+                BasicHeap.RandomStruct({value: TESTED_SIZE - i, data: bytes32(0)})
+            );
         }
 
         for (uint256 i = 0; i < accounts.length; i++) {
@@ -210,12 +217,12 @@ contract TestHeap is Test {
 
         // Add first 10 accounts with decreasing value.
         for (uint256 i = 0; i < 10; i++) {
-            heap.insert(accounts[i], value - i);
+            heap.insert(accounts[i], BasicHeap.RandomStruct({value: value - i, data: bytes32(0)}));
         }
 
         // Add last 10 accounts at the same value.
         for (uint256 i = TESTED_SIZE - 10; i < TESTED_SIZE; i++) {
-            heap.insert(accounts[i], 10);
+            heap.insert(accounts[i], BasicHeap.RandomStruct({value: 10, data: bytes32(0)}));
         }
 
         assertEq(heap.getRoot(), accounts[0], "root not expected");
@@ -225,94 +232,98 @@ contract TestHeap is Test {
         }
 
         for (uint256 i = 0; i < 10; i++) {
-            assertEq(heap.accounts[10 + i].id, accounts[TESTED_SIZE - 10 + i], "order not expected, 2");
+            assertEq(
+                heap.accounts[10 + i].id,
+                accounts[TESTED_SIZE - 10 + i],
+                "order not expected, 2"
+            );
         }
     }
 
     function testDecreaseOrder1() public {
-        heap.insert(accounts[0], 4);
-        heap.insert(accounts[1], 3);
-        heap.insert(accounts[2], 2);
-        heap.decrease(accounts[0], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 4, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.decrease(accounts[0], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
-        assertEq(heap.accounts[0].value, 3);
-        assertEq(heap.accounts[1].value, 1);
-        assertEq(heap.accounts[2].value, 2);
+        assertEq(heap.getValueOf(accounts[0]), 3);
+        assertEq(heap.getValueOf(accounts[1]), 1);
+        assertEq(heap.getValueOf(accounts[2]), 2);
     }
 
     function testDecreaseOrder2() public {
-        heap.insert(accounts[0], 4);
-        heap.insert(accounts[1], 2);
-        heap.insert(accounts[2], 3);
-        heap.decrease(accounts[0], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 4, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.decrease(accounts[0], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
-        assertEq(heap.accounts[0].value, 3);
-        assertEq(heap.accounts[1].value, 2);
-        assertEq(heap.accounts[2].value, 1);
+        assertEq(heap.getValueOf(accounts[0]), 3);
+        assertEq(heap.getValueOf(accounts[1]), 2);
+        assertEq(heap.getValueOf(accounts[2]), 1);
     }
 
     function testIncreaseOrder() public {
-        heap.insert(accounts[0], 4);
-        heap.insert(accounts[1], 3);
-        heap.insert(accounts[2], 2);
-        heap.increase(accounts[2], 5);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 4, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.increase(accounts[2], BasicHeap.RandomStruct({value: 5, data: bytes32(0)}));
 
-        assertEq(heap.accounts[0].value, 5);
-        assertEq(heap.accounts[1].value, 3);
-        assertEq(heap.accounts[2].value, 4);
+        assertEq(heap.getValueOf(accounts[0]), 5);
+        assertEq(heap.getValueOf(accounts[1]), 3);
+        assertEq(heap.getValueOf(accounts[2]), 4);
     }
 
     function testRemoveShiftDown() public {
-        heap.insert(accounts[0], 10);
-        heap.insert(accounts[1], 9);
-        heap.insert(accounts[2], 3);
-        heap.insert(accounts[3], 8);
-        heap.insert(accounts[4], 7);
-        heap.insert(accounts[5], 2);
-        heap.insert(accounts[6], 1);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 10, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 9, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.insert(accounts[3], BasicHeap.RandomStruct({value: 8, data: bytes32(0)}));
+        heap.insert(accounts[4], BasicHeap.RandomStruct({value: 7, data: bytes32(0)}));
+        heap.insert(accounts[5], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[6], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 9);
-        assertEq(heap.accounts[2].value, 3);
-        assertEq(heap.accounts[3].value, 8);
-        assertEq(heap.accounts[4].value, 7);
-        assertEq(heap.accounts[5].value, 2);
-        assertEq(heap.accounts[6].value, 1);
+        assertEq(heap.getValueOf(accounts[0]), 10);
+        assertEq(heap.getValueOf(accounts[1]), 9);
+        assertEq(heap.getValueOf(accounts[2]), 3);
+        assertEq(heap.getValueOf(accounts[3]), 8);
+        assertEq(heap.getValueOf(accounts[4]), 7);
+        assertEq(heap.getValueOf(accounts[5]), 2);
+        assertEq(heap.getValueOf(accounts[6]), 1);
 
         heap.remove(accounts[1]);
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 8);
-        assertEq(heap.accounts[2].value, 3);
-        assertEq(heap.accounts[3].value, 1);
-        assertEq(heap.accounts[4].value, 7);
-        assertEq(heap.accounts[5].value, 2);
+        assertEq(heap.getValueOf(accounts[0]), 10);
+        assertEq(heap.getValueOf(accounts[1]), 8);
+        assertEq(heap.getValueOf(accounts[2]), 3);
+        assertEq(heap.getValueOf(accounts[3]), 1);
+        assertEq(heap.getValueOf(accounts[4]), 7);
+        assertEq(heap.getValueOf(accounts[5]), 2);
     }
 
     function testRemoveShiftUp() public {
-        heap.insert(accounts[0], 10);
-        heap.insert(accounts[1], 3);
-        heap.insert(accounts[2], 9);
-        heap.insert(accounts[3], 2);
-        heap.insert(accounts[4], 1);
-        heap.insert(accounts[5], 8);
-        heap.insert(accounts[6], 7);
+        heap.insert(accounts[0], BasicHeap.RandomStruct({value: 10, data: bytes32(0)}));
+        heap.insert(accounts[1], BasicHeap.RandomStruct({value: 3, data: bytes32(0)}));
+        heap.insert(accounts[2], BasicHeap.RandomStruct({value: 9, data: bytes32(0)}));
+        heap.insert(accounts[3], BasicHeap.RandomStruct({value: 2, data: bytes32(0)}));
+        heap.insert(accounts[4], BasicHeap.RandomStruct({value: 1, data: bytes32(0)}));
+        heap.insert(accounts[5], BasicHeap.RandomStruct({value: 8, data: bytes32(0)}));
+        heap.insert(accounts[6], BasicHeap.RandomStruct({value: 7, data: bytes32(0)}));
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 3);
-        assertEq(heap.accounts[2].value, 9);
-        assertEq(heap.accounts[3].value, 2);
-        assertEq(heap.accounts[4].value, 1);
-        assertEq(heap.accounts[5].value, 8);
-        assertEq(heap.accounts[6].value, 7);
+        assertEq(heap.getValueOf(accounts[0]), 10);
+        assertEq(heap.getValueOf(accounts[1]), 3);
+        assertEq(heap.getValueOf(accounts[2]), 9);
+        assertEq(heap.getValueOf(accounts[3]), 2);
+        assertEq(heap.getValueOf(accounts[4]), 1);
+        assertEq(heap.getValueOf(accounts[5]), 8);
+        assertEq(heap.getValueOf(accounts[6]), 7);
 
         heap.remove(accounts[4]);
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 7);
-        assertEq(heap.accounts[2].value, 9);
-        assertEq(heap.accounts[3].value, 2);
-        assertEq(heap.accounts[4].value, 3);
-        assertEq(heap.accounts[5].value, 8);
+        assertEq(heap.getValueOf(accounts[0]), 10);
+        assertEq(heap.getValueOf(accounts[1]), 7);
+        assertEq(heap.getValueOf(accounts[2]), 9);
+        assertEq(heap.getValueOf(accounts[3]), 2);
+        assertEq(heap.getValueOf(accounts[4]), 3);
+        assertEq(heap.getValueOf(accounts[5]), 8);
     }
 }
