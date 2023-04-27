@@ -61,7 +61,7 @@ library HeapOrdering {
     /// @notice Computes a new suitable size for the Heap from `_size` that is smaller than `_maxSortedUsers`.
     /// @notice It helps solving to have all the liquity on the same path.
     /// @notice You can go to the README file for more information.
-    /// @dev We use division by 2 the size to remove the leaves of the heap.
+    /// @dev We divide by 2 the size to remove the leaves of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
@@ -84,7 +84,6 @@ library HeapOrdering {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
     }
-
 
     /// @notice Moves an account up the heap until its value is smaller than the one of its parent.
     /// @dev This functions restores the invariant about the order of the values stored when the account to move is the only one with value greater than what it should be.

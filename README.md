@@ -31,10 +31,10 @@ In order to manipulate a binary tree and visualize how it manages to stay balanc
 
 This implementation is based on a heap data structure and refines it by adding an unsorted portion after it. This gives us an approximation of a heap, and thus operations are performed in constant time.
 
-At least the first 'maxSortedUsers'/2 addresses are sorted in the Heap. To keep constant time operation, we divide by two the size of the Heap once the size overtakes the 'maxSortedUsers' number. It means that we remove all leaves of the heap.
+At least the first `maxSortedUsers / 2` addresses are sorted in the Heap. To keep constant time operation, we divide by two the size of the Heap once the size overtakes the `maxSortedUsers` number. It means that we remove all leaves of the heap.
 
 The choice of this implementation is explained by our desire to store a maximum of high-value nodes in the heap to use them for peer-to-peer matching.
-Indeed, a naive implementation that would remove the tail and insert new values at 'maxSortedUsers' (once the heap is full), would end up concentrating all new values on the same single path from the leaf to the root node because the ShiftUp function will be always called from the same node. The risk is that low-value nodes stay in the Heap and that all the liquidity will be concentrated on the path from the leaf of index 'maxSortedUsers' to the root.
+Indeed, a naive implementation that would remove the tail and insert new values at `maxSortedUsers` (once the heap is full), would end up concentrating all new values on the same single path from the leaf to the root node because the ShiftUp function will be always called from the same node. The risk is that low-value nodes stay in the Heap and that all the liquidity will be concentrated on the path from the leaf of index 'maxSortedUsers' to the root.
 Removing all the leaves enables the protocol to remove low-value nodes and to call the ShiftUp function at different locations in the Heap. This process therefore keeps a maximum of liquidity available in the heap for peer-to-peer lending
 The main entry point is the `update` function, calling internally either `insert`, `increase`, `decrease` or `remove`.
 
