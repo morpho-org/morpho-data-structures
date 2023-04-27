@@ -15,7 +15,7 @@ contract TestDoubleLinkedList is Test {
 
     function setUp() public {
         accounts = new address[](NDS);
-        accounts[0] = address(this);
+        accounts[0] = address(bytes20(keccak256("TestDoubleLinkedList.accounts")));
         for (uint256 i = 1; i < NDS; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }

@@ -14,6 +14,10 @@ jobs:
         with:
           submodules: recursive
 
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
@@ -37,3 +41,9 @@ jobs:
 
       - name: Run tests
         run: forge test
+
+      - name: Install halmos
+        run: python3 -m pip install --upgrade halmos
+
+      - name: Run halmos
+        run: halmos --function testProve --loop 4

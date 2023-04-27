@@ -19,12 +19,12 @@ describe('Test RedBlackBinaryTreeOptimized Library', () => {
     const redBlackBinaryTreeOptimized = await RedBlackBinaryTreeOptimized.deploy();
     await redBlackBinaryTreeOptimized.deployed();
 
-    const TestRedBlackBinaryTreeOptimized = await ethers.getContractFactory('TestRedBlackBinaryTreeOptimized', {
+    const RedBlackBinaryTreeOptimizedMock = await ethers.getContractFactory('RedBlackBinaryTreeOptimizedMock', {
       libraries: {
         RedBlackBinaryTreeOptimized: redBlackBinaryTreeOptimized.address,
       },
     });
-    testRedBlackBinaryTreeOptimized = await TestRedBlackBinaryTreeOptimized.deploy();
+    testRedBlackBinaryTreeOptimized = await RedBlackBinaryTreeOptimizedMock.deploy();
     await testRedBlackBinaryTreeOptimized.deployed();
   });
 
