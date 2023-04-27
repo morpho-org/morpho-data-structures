@@ -2,9 +2,14 @@
 pragma solidity ^0.8.0;
 
 library BasicHeap {
+    struct RandomStruct {
+        uint256 value; // The value of the account.
+        bytes32 data; // All the data required for each account.
+    }
+
     struct Account {
         address id; // The address of the account.
-        uint256 value; // The value of the account.
+        RandomStruct randomStruct; // Data used to sort the accounts in the Heap
     }
 
     struct Heap {
@@ -32,46 +37,65 @@ library BasicHeap {
 
     /// INTERNAL ///
 
+    /// @notice Compute the value associated with each account
+    ///@dev Function to modified to computed the desired output used for sorting account.
+    function computeValue(RandomStruct memory randomStruct) internal pure returns (uint256 value) {
+        value = randomStruct.value;
+    }
+
     /// @notice Inserts an account in the `_heap`.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to insert.
-    /// @param _value The value of the account to insert.
-    function insert(Heap storage _heap, address _id, uint256 _value) internal {
+    /// @param randomStruct The new data of the account.
+    function insert(Heap storage _heap, address _id, RandomStruct memory randomStruct) internal {
         if (_id == address(0)) revert AddressIsZero();
 
         uint256 accountsLength = _heap.accounts.length;
-        if (containsAccount(_heap, _heap.indexOf[_id], accountsLength, _id)) revert AccountAlreadyInserted();
+        if (containsAccount(_heap, _heap.indexOf[_id], accountsLength, _id))
+            revert AccountAlreadyInserted();
 
         _heap.accounts.push();
 
-        shiftUp(_heap, Account(_id, _value), accountsLength);
+        shiftUp(_heap, Account(_id, randomStruct), accountsLength);
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to decrease the amount.
-    /// @param _newValue The new value of the account.
-    function decrease(Heap storage _heap, address _id, uint256 _newValue) internal {
+    /// @param newRandomStruct The new data of the account.
+    function decrease(
+        Heap storage _heap,
+        address _id,
+        RandomStruct memory newRandomStruct
+    ) internal {
         uint256 index = _heap.indexOf[_id];
 
-        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
-        if (_newValue >= _heap.accounts[index].value) revert WrongValue();
+        if ((!containsAccount(_heap, index, _heap.accounts.length, _id)))
+            revert AccountDoesNotExist();
+        if (computeValue(newRandomStruct) >= computeValue(_heap.accounts[index].randomStruct))
+            revert WrongValue();
 
-        shiftDown(_heap, _heap.accounts.length, Account(_id, _newValue), index);
+        shiftDown(_heap, _heap.accounts.length, Account(_id, newRandomStruct), index);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with a smaller value than `_newValue`.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to increase the amount.
-    /// @param _newValue The new value of the account.
-    function increase(Heap storage _heap, address _id, uint256 _newValue) internal {
+    /// @param newRandomStruct The new data of the account.
+    function increase(
+        Heap storage _heap,
+        address _id,
+        RandomStruct memory newRandomStruct
+    ) internal {
         uint256 index = _heap.indexOf[_id];
 
-        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
-        if (_newValue <= _heap.accounts[index].value) revert WrongValue();
+        if ((!containsAccount(_heap, index, _heap.accounts.length, _id)))
+            revert AccountDoesNotExist();
+        if (computeValue(newRandomStruct) <= computeValue(_heap.accounts[index].randomStruct))
+            revert WrongValue();
 
-        shiftUp(_heap, Account(_id, _newValue), index);
+        shiftUp(_heap, Account(_id, newRandomStruct), index);
     }
 
     /// @notice Removes an account in the `_heap`.
@@ -93,7 +117,10 @@ library BasicHeap {
                 Account memory lastAccount = _heap.accounts[accountsLength];
                 _heap.accounts.pop();
 
-                if (_heap.accounts[index].value > lastAccount.value) {
+                if (
+                    computeValue(_heap.accounts[index].randomStruct) >
+                    computeValue(lastAccount.randomStruct)
+                ) {
                     shiftDown(_heap, accountsLength, lastAccount, index);
                 } else {
                     shiftUp(_heap, lastAccount, index);
@@ -121,14 +148,18 @@ library BasicHeap {
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
     function shiftUp(Heap storage _heap, Account memory _accountToShift, uint256 _index) private {
-        uint256 valueToShift = _accountToShift.value;
+        uint256 valueToShift = computeValue(_accountToShift.randomStruct);
         Account memory parentAccount;
         uint256 parentIndex;
 
         unchecked {
             // `_index` is checked to be greater than 0 before subtracting 1.
             while (
-                _index > ROOT && valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
+                _index > ROOT &&
+                valueToShift >
+                computeValue(
+                    (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).randomStruct
+                )
             ) {
                 setAccount(_heap, parentAccount, _index);
                 _index = parentIndex;
@@ -144,8 +175,13 @@ library BasicHeap {
     /// @param _size The size of the heap.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftDown(Heap storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index) private {
-        uint256 valueToShift = _accountToShift.value;
+    function shiftDown(
+        Heap storage _heap,
+        uint256 _size,
+        Account memory _accountToShift,
+        uint256 _index
+    ) private {
+        uint256 valueToShift = computeValue(_accountToShift.randomStruct);
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
         // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
@@ -160,13 +196,15 @@ library BasicHeap {
 
             if (rightChildIndex < _size) {
                 Account memory rightChild = _heap.accounts[rightChildIndex];
-                if (rightChild.value > childToSwap.value) {
+                if (
+                    computeValue(rightChild.randomStruct) > computeValue(childToSwap.randomStruct)
+                ) {
                     childToSwap = rightChild;
                     childIndex = rightChildIndex;
                 }
             }
 
-            if (childToSwap.value > valueToShift) {
+            if (computeValue(childToSwap.randomStruct) > valueToShift) {
                 setAccount(_heap, childToSwap, _index);
                 _index = childIndex;
                 childIndex = (childIndex << 1) + 1;
@@ -185,11 +223,12 @@ library BasicHeap {
     /// @param _accountsLength The length of the `_heap` accounts array.
     /// @param _id The address of the account to search for.
     /// @return True if the account exists in the `_heap`, false otherwise.
-    function containsAccount(Heap storage _heap, uint256 _index, uint256 _accountsLength, address _id)
-        private
-        view
-        returns (bool)
-    {
+    function containsAccount(
+        Heap storage _heap,
+        uint256 _index,
+        uint256 _accountsLength,
+        address _id
+    ) private view returns (bool) {
         if (_index != 0) {
             return true;
         } else if (_accountsLength != 0) {
@@ -223,8 +262,9 @@ library BasicHeap {
     function getValueOf(Heap storage _heap, address _id) internal view returns (uint256) {
         uint256 index;
 
-        if (!containsAccount(_heap, index = _heap.indexOf[_id], _heap.accounts.length, _id)) return 0;
-        else return _heap.accounts[index].value;
+        if (!containsAccount(_heap, index = _heap.indexOf[_id], _heap.accounts.length, _id))
+            return 0;
+        else return computeValue(_heap.accounts[index].randomStruct);
     }
 
     /// @notice Returns the address at the head of the `_heap`.
