@@ -53,10 +53,9 @@ library BasicHeap {
     /// @param _newValue The new value of the account.
     function decrease(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 index = _heap.indexOf[_id];
-        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
 
-        uint256 oldValue = _heap.accounts[index].value;
-        if (_newValue >= oldValue) revert WrongValue();
+        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
+        if (_newValue >= _heap.accounts[index].value) revert WrongValue();
 
         shiftDown(_heap, _heap.accounts.length, Account(_id, _newValue), index);
     }
@@ -68,10 +67,9 @@ library BasicHeap {
     /// @param _newValue The new value of the account.
     function increase(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 index = _heap.indexOf[_id];
-        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
 
-        uint256 oldValue = _heap.accounts[index].value;
-        if (_newValue <= oldValue) revert WrongValue();
+        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
+        if (_newValue <= _heap.accounts[index].value) revert WrongValue();
 
         shiftUp(_heap, Account(_id, _newValue), index);
     }
@@ -123,14 +121,14 @@ library BasicHeap {
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
     function shiftUp(Heap storage _heap, Account memory _accountToShift, uint256 _index) private {
+        uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
 
         unchecked {
             // `_index` is checked to be greater than 0 before subtracting 1.
             while (
-                _index > ROOT
-                    && _accountToShift.value > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
+                _index > ROOT && valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
             ) {
                 setAccount(_heap, parentAccount, _index);
                 _index = parentIndex;
@@ -147,6 +145,7 @@ library BasicHeap {
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
     function shiftDown(Heap storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index) private {
+        uint256 valueToShift = _accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
         // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
@@ -167,7 +166,7 @@ library BasicHeap {
                 }
             }
 
-            if (childToSwap.value > _accountToShift.value) {
+            if (childToSwap.value > valueToShift) {
                 setAccount(_heap, childToSwap, _index);
                 _index = childIndex;
                 childIndex = (childIndex << 1) + 1;
@@ -241,9 +240,12 @@ library BasicHeap {
     /// @param _id The address to get the parent.
     /// @return The address of the parent.
     function getParent(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 index;
-        if ((index = _heap.indexOf[_id]) == 0) return address(0);
-        else return _heap.accounts[(index - 1) >> 1].id;
+        uint256 index = _heap.indexOf[_id];
+
+        unchecked {
+            if (index == 0) return address(0);
+            else return _heap.accounts[(index - 1) >> 1].id;
+        }
     }
 
     /// @notice Returns the address of the left child of the given address, returns the zero address if it's not in the heap or if it has no left child.
@@ -251,10 +253,10 @@ library BasicHeap {
     /// @param _id The address to get the left child.
     /// @return The address of the left child.
     function getLeftChild(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 index;
-        uint256 accountsLength;
+        uint256 index = _heap.indexOf[_id];
+        uint256 accountsLength = _heap.accounts.length;
 
-        if (!containsAccount(_heap, index = _heap.indexOf[_id], accountsLength = _heap.accounts.length, _id)) {
+        if (!containsAccount(_heap, index, accountsLength, _id)) {
             return address(0);
         } else if ((index = (index << 1) + 1) >= accountsLength) {
             return address(0);
@@ -268,10 +270,10 @@ library BasicHeap {
     /// @param _id The address to get the right child.
     /// @return The address of the right child.
     function getRightChild(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 index;
-        uint256 accountsLength;
+        uint256 index = _heap.indexOf[_id];
+        uint256 accountsLength = _heap.accounts.length;
 
-        if (!containsAccount(_heap, index = _heap.indexOf[_id], accountsLength = _heap.accounts.length, _id)) {
+        if (!containsAccount(_heap, index, accountsLength, _id)) {
             return address(0);
         } else if ((index = (index << 1) + 2) >= accountsLength) {
             return address(0);
