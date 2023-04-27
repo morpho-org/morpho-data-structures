@@ -7,7 +7,5 @@ certoraRun \
     --verify MockDLL:certora/specs/sanity.spec \
     --loop_iter 7 \
     --optimistic_loop \
-    --send_only \
-    --staging \
     --msg "FIFO DLL sanity" \
     $@

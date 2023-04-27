@@ -2,11 +2,11 @@
 pragma solidity ^0.8.0;
 
 import "./TestCommonHeapOrdering.t.sol";
-import "./helpers/ConcreteThreeHeapOrdering.sol";
+import "./mocks/ThreeHeapOrderingMock.sol";
 
 contract TestThreeHeapOrdering is TestCommonHeapOrdering {
     constructor() {
-        heap = new ConcreteThreeHeapOrdering();
+        heap = new ThreeHeapOrderingMock();
     }
 
     function testComputeSizeSmall() public {

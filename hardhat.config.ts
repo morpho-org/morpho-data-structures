@@ -21,7 +21,7 @@ module.exports = {
     },
   },
   paths: {
-    sources: './src',
+    sources: './test-ts',
     tests: './test-ts',
   },
   etherscan: {
