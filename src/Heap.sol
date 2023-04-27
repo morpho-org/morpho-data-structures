@@ -68,7 +68,7 @@ library BasicHeap {
     function increase(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 index = _heap.indexOf[_id];
 
-        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
+        if (!containsAccount(_heap, index, _heap.accounts.length, _id)) revert AccountDoesNotExist();
         if (_newValue <= _heap.accounts[index].value) revert WrongValue();
 
         shiftUp(_heap, Account(_id, _newValue), index);
@@ -82,7 +82,7 @@ library BasicHeap {
         uint256 index = _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
-        if ((!containsAccount(_heap, index, accountsLength, _id))) revert AccountDoesNotExist();
+        if (!containsAccount(_heap, index, accountsLength, _id)) revert AccountDoesNotExist();
 
         delete _heap.indexOf[_id];
 
