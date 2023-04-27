@@ -54,13 +54,13 @@ contract TestHeapOrderingInvariant is Test {
                     i * 2 + 1 >= length || i * 2 + 1 >= heap.size()
                         || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)
                 )
-            ); // prettier-ignore
+            );
             assertTrue(
                 (
                     i * 2 + 2 >= length || i * 2 + 2 >= heap.size()
                         || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)
                 )
-            ); // prettier-ignore
+            );
         }
     }
 

@@ -54,19 +54,19 @@ contract TestThreeHeapOrderingInvariant is Test {
                     i * 3 + 1 >= length || i * 3 + 1 >= heap.size()
                         || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 1)
                 )
-            ); // prettier-ignore
+            );
             assertTrue(
                 (
                     i * 3 + 2 >= length || i * 3 + 2 >= heap.size()
                         || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 2)
                 )
-            ); // prettier-ignore
+            );
             assertTrue(
                 (
                     i * 3 + 3 >= length || i * 3 + 3 >= heap.size()
                         || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 3)
                 )
-            ); // prettier-ignore
+            );
         }
     }
 
