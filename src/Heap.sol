@@ -189,11 +189,13 @@ library BasicHeap {
         view
         returns (bool)
     {
-        if (_index != 0) return true;
-        if (_accountsLength != 0) {
+        if (_index != 0) {
+            return true;
+        } else if (_accountsLength != 0) {
             return _heap.accounts[0].id == _id;
+        } else {
+            return false;
         }
-        return false;
     }
 
     /// VIEW ///
@@ -239,7 +241,7 @@ library BasicHeap {
     function getParent(Heap storage _heap, address _id) internal view returns (address) {
         uint256 index;
         if ((index = _heap.indexOf[_id]) == 0) return address(0);
-        return _heap.accounts[(index - 1) >> 1].id;
+        else return _heap.accounts[(index - 1) >> 1].id;
     }
 
     /// @notice Returns the address of the left child of the given address, returns the zero address if it's not in the heap or if it has no left child.
@@ -252,10 +254,11 @@ library BasicHeap {
 
         if (!containsAccount(_heap, index = _heap.indexOf[_id], accountsLength = _heap.accounts.length, _id)) {
             return address(0);
+        } else if ((index = (index << 1) + 1) >= accountsLength) {
+            return address(0);
+        } else {
+            return _heap.accounts[index].id;
         }
-
-        if ((index = (index << 1) + 1) >= accountsLength) return address(0);
-        return _heap.accounts[index].id;
     }
 
     /// @notice Returns the address of the right child of the given address, returns the zero address if it's not in the heap or if it has no right child.
@@ -268,9 +271,10 @@ library BasicHeap {
 
         if (!containsAccount(_heap, index = _heap.indexOf[_id], accountsLength = _heap.accounts.length, _id)) {
             return address(0);
+        } else if ((index = (index << 1) + 2) >= accountsLength) {
+            return address(0);
+        } else {
+            return _heap.accounts[index].id;
         }
-
-        if ((index = (index << 1) + 2) >= accountsLength) return address(0);
-        return _heap.accounts[index].id;
     }
 }
