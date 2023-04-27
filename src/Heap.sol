@@ -88,16 +88,18 @@ library BasicHeap {
 
         delete _heap.indexOf[_id];
 
-        if (index == accountsLength - 1) {
-            _heap.accounts.pop();
-        } else {
-            Account memory lastAccount = _heap.accounts[accountsLength - 1];
-            _heap.accounts.pop();
-
-            if (_heap.accounts[index].value > lastAccount.value) {
-                shiftDown(_heap, accountsLength - 1, lastAccount, index);
+        unchecked {
+            if (index == --accountsLength) {
+                _heap.accounts.pop();
             } else {
-                shiftUp(_heap, lastAccount, index);
+                Account memory lastAccount = _heap.accounts[accountsLength];
+                _heap.accounts.pop();
+
+                if (_heap.accounts[index].value > lastAccount.value) {
+                    shiftDown(_heap, accountsLength, lastAccount, index);
+                } else {
+                    shiftUp(_heap, lastAccount, index);
+                }
             }
         }
     }
