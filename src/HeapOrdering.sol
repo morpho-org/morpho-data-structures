@@ -59,8 +59,7 @@ library HeapOrdering {
     /// PRIVATE ///
 
     /// @notice Computes a new suitable size for the Heap from `_size` that is smaller than `_maxSortedUsers`.
-    /// @notice It helps solving to have all the liquity on the same path.
-    /// @notice You can go to the README file for more information.
+    /// @notice Computing the size this way is meant to avoid having all the liquidity in the same path.
     /// @dev We divide by 2 the size to remove the leaves of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.

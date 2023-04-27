@@ -90,8 +90,6 @@ library DoubleLinkedList {
     }
 
     /// @notice Inserts an account in the `_list` at the right slot based on its `_value`.
-    /// @dev Allows to keep a list of addresses. Each new address is inserted into the list.
-    /// @dev The implementation ensures that at most `_maxIterations` addresses will be correctly sorted in descending order by their associated value.
     /// @param _list The list to search in.
     /// @param _id The address of the account.
     /// @param _value The value of the account.
