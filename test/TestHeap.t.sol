@@ -51,8 +51,8 @@ contract TestHeap is Test {
     function testContainsAccount() public {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(accounts[i], (i + TESTED_SIZE / 2) % TESTED_SIZE);
-            for (uint256 j; j <= i; ++j) {
-                assertTrue(heap.containsAccount(accounts[j]));
+            for (uint256 j; j < TESTED_SIZE; ++j) {
+                assertEq(heap.containsAccount(accounts[j]), j <= i);
             }
         }
     }
