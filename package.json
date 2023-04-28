@@ -15,16 +15,11 @@
   },
   "devDependencies": {
     "husky": "^7.0.1",
-    "prettier": "^2.3.2",
-    "prettier-plugin-solidity": "^1.0.0-beta.13",
     "solhint": "^3.3.6",
-    "solhint-plugin-prettier": "0.0.5",
     "solidity-coverage": "^0.7.16",
     "lint-staged": "^13.1.0"
   },
   "lint-staged": {
-    "*.sol": "forge fmt",
-    "*.json": "yarn prettier",
-    "*.yml": "yarn prettier"
+    "*.sol": "forge fmt"
   }
 }
