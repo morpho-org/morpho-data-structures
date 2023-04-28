@@ -27,11 +27,11 @@ library RedBlackBinaryTreeOptimized {
         mapping(address => uint256) keyToValue; // Maps key to its value
     }
 
-    /* PUBLIC */
+    /* INTERNAL */
 
     /// @dev Returns the address of the smallest value in the tree `_self`.
     /// @param _self The tree to search in.
-    function first(Tree storage _self) public view returns (address key) {
+    function first(Tree storage _self) internal view returns (address key) {
         key = _self.root;
         if (key == address(0)) return address(0);
         while (_self.nodes[key].leftChild != address(0)) {
@@ -41,7 +41,7 @@ library RedBlackBinaryTreeOptimized {
 
     /// @dev Returns the address of the highest value in the tree `_self`.
     /// @param _self The tree to search in.
-    function last(Tree storage _self) public view returns (address key) {
+    function last(Tree storage _self) internal view returns (address key) {
         key = _self.root;
         if (key == address(0)) return address(0);
         while (_self.nodes[key].rightChild != address(0)) {
@@ -52,7 +52,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Returns the address of the next user after `_key`.
     /// @param _self The tree to search in.
     /// @param _key The address to search after.
-    function next(Tree storage _self, address _key) public view returns (address cursor) {
+    function next(Tree storage _self, address _key) internal view returns (address cursor) {
         require(_key != address(0), "RBBT(1):key-is-nul-address");
         if (_self.nodes[_key].rightChild != address(0)) {
             cursor = subTreeMin(_self, _self.nodes[_key].rightChild);
@@ -68,7 +68,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Returns the address of the previous user above `_key`.
     /// @param _self The tree to search in.
     /// @param _key The address to search before.
-    function prev(Tree storage _self, address _key) public view returns (address cursor) {
+    function prev(Tree storage _self, address _key) internal view returns (address cursor) {
         require(_key != address(0), "RBBT(2):start-value=0");
         if (_self.nodes[_key].leftChild != address(0)) {
             cursor = subTreeMax(_self, _self.nodes[_key].leftChild);
@@ -85,7 +85,7 @@ library RedBlackBinaryTreeOptimized {
     /// @param _self The tree to search in.
     /// @param _key The key to search.
     /// @return Whether the `_key` exists in the tree or not.
-    function keyExists(Tree storage _self, address _key) public view returns (bool) {
+    function keyExists(Tree storage _self, address _key) internal view returns (bool) {
         return _self.keyToValue[_key] != 0;
     }
 
@@ -95,7 +95,7 @@ library RedBlackBinaryTreeOptimized {
     /// @param _valueB value for user B.
     /// @param _addressB Address for user B.
     function compare(uint256 _valueA, address _addressA, uint256 _valueB, address _addressB)
-        public
+        internal
         pure
         returns (bool)
     {
@@ -113,7 +113,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Returns whether or not there is any key in the tree.
     /// @param _self The tree to search in.
     /// @return Whether or not a key exist in the tree.
-    function isNotEmpty(Tree storage _self) public view returns (bool) {
+    function isNotEmpty(Tree storage _self) internal view returns (bool) {
         return _self.root != address(0);
     }
 
@@ -121,7 +121,7 @@ library RedBlackBinaryTreeOptimized {
     /// @param _self The tree in which to add the (key, value) pair.
     /// @param _key The key to add.
     /// @param _value The value to add.
-    function insert(Tree storage _self, address _key, uint256 _value) public {
+    function insert(Tree storage _self, address _key, uint256 _value) internal {
         require(_value != 0, "RBBT:value-cannot-be-0");
         require(_self.keyToValue[_key] == 0, "RBBT:account-already-in");
         _self.keyToValue[_key] = _value;
@@ -153,7 +153,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
     /// @param _self The tree in which to remove the (key, value) pair.
     /// @param _key The key to remove.
-    function remove(Tree storage _self, address _key) public {
+    function remove(Tree storage _self, address _key) internal {
         require(_self.keyToValue[_key] != 0, "RBBT:account-not-exist");
         _self.keyToValue[_key] = 0;
         address probe;
