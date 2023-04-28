@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {BasicHeap} from "src/Heap.sol";
 
-contract ConcreteHeap {
+contract HeapMock {
     using BasicHeap for BasicHeap.Heap;
 
     BasicHeap.Heap internal heap;

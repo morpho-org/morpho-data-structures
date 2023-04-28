@@ -3,9 +3,9 @@ pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
 
-import {ConcreteHeap} from "./helpers/ConcreteHeap.sol";
+import {HeapMock} from "./mocks/HeapMock.sol";
 
-contract Heap is ConcreteHeap {
+contract Heap is HeapMock {
     address[] internal accountsUsed;
 
     function accountsValue(uint256 _index) external view returns (uint256) {
