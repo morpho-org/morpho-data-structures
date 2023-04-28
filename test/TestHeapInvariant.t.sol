@@ -125,7 +125,7 @@ contract TestHeapInvariant is Test {
     }
 
     // Rule:
-    // For all i in [[0, length]], indexOf(account.id[i]) == i
+    // For all i in [[0, length]], indexOf[accounts[i].id] == i
     function invariantIndexOf() public {
         uint256 size = heap.getSize();
 

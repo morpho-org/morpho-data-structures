@@ -225,9 +225,9 @@ library BasicHeap {
     /// @param _id The address of the account.
     /// @return The value of the account.
     function getValueOf(Heap storage _heap, address _id) internal view returns (uint256) {
-        uint256 index;
+        uint256 index = _heap.indexOf[_id];
 
-        if (!containsAccount(_heap, index = _heap.indexOf[_id], _heap.accounts.length, _id)) return 0;
+        if (!containsAccount(_heap, index, _heap.accounts.length, _id)) return 0;
         else return _heap.accounts[index].value;
     }
 
