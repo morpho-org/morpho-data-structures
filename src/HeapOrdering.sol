@@ -32,6 +32,67 @@ library HeapOrdering {
 
     /* INTERNAL */
 
+    /// @notice Returns the number of users in the `_heap`.
+    /// @param _heap The heap parameter.
+    /// @return The length of the heap.
+    function length(HeapArray storage _heap) internal view returns (uint256) {
+        return _heap.accounts.length;
+    }
+
+    /// @notice Returns the value of the account linked to `_id`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The value of the account.
+    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
+        uint256 index = _heap.indexOf[_id];
+        if (index >= _heap.accounts.length) return 0;
+        Account memory account = _heap.accounts[index];
+        if (account.id != _id) return 0;
+        else return account.value;
+    }
+
+    /// @notice Returns the address at the head of the `_heap`.
+    /// @param _heap The heap to get the head.
+    /// @return The address of the head.
+    function getHead(HeapArray storage _heap) internal view returns (address) {
+        if (_heap.accounts.length > 0) return _heap.accounts[ROOT].id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address at the tail of unsorted portion of the `_heap`.
+    /// @param _heap The heap to get the tail.
+    /// @return The address of the tail.
+    function getTail(HeapArray storage _heap) internal view returns (address) {
+        uint256 accountsLength = _heap.accounts.length;
+        if (accountsLength > 0) return _heap.accounts[accountsLength - 1].id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address coming before `_id` in accounts.
+    /// @dev The account associated to the returned address does not necessarily have a lower value than the one of the account associated to `_id`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the previous account.
+    function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
+        uint256 index = _heap.indexOf[_id];
+        if (index > ROOT) return _heap.accounts[index - 1].id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address coming after `_id` in accounts.
+    /// @dev The account associated to the returned address does not necessarily have a greater value than the one of the account associated to `_id`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The address of the next account.
+    function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
+        uint256 index = _heap.indexOf[_id];
+        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id) {
+            return address(0);
+        } else {
+            return _heap.accounts[index + 1].id;
+        }
+    }
+
     /// @notice Updates an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0.
     /// @param _heap The heap to modify.
@@ -238,69 +299,6 @@ library HeapOrdering {
             else shiftUp(_heap, lastAccount, index);
         } else {
             setAccount(_heap, lastAccount, index);
-        }
-    }
-
-    /* GETTERS */
-
-    /// @notice Returns the number of users in the `_heap`.
-    /// @param _heap The heap parameter.
-    /// @return The length of the heap.
-    function length(HeapArray storage _heap) internal view returns (uint256) {
-        return _heap.accounts.length;
-    }
-
-    /// @notice Returns the value of the account linked to `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The value of the account.
-    function getValueOf(HeapArray storage _heap, address _id) internal view returns (uint256) {
-        uint256 index = _heap.indexOf[_id];
-        if (index >= _heap.accounts.length) return 0;
-        Account memory account = _heap.accounts[index];
-        if (account.id != _id) return 0;
-        else return account.value;
-    }
-
-    /// @notice Returns the address at the head of the `_heap`.
-    /// @param _heap The heap to get the head.
-    /// @return The address of the head.
-    function getHead(HeapArray storage _heap) internal view returns (address) {
-        if (_heap.accounts.length > 0) return _heap.accounts[ROOT].id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address at the tail of unsorted portion of the `_heap`.
-    /// @param _heap The heap to get the tail.
-    /// @return The address of the tail.
-    function getTail(HeapArray storage _heap) internal view returns (address) {
-        uint256 accountsLength = _heap.accounts.length;
-        if (accountsLength > 0) return _heap.accounts[accountsLength - 1].id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address coming before `_id` in accounts.
-    /// @dev The account associated to the returned address does not necessarily have a lower value than the one of the account associated to `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The address of the previous account.
-    function getPrev(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 index = _heap.indexOf[_id];
-        if (index > ROOT) return _heap.accounts[index - 1].id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address coming after `_id` in accounts.
-    /// @dev The account associated to the returned address does not necessarily have a greater value than the one of the account associated to `_id`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The address of the next account.
-    function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
-        uint256 index = _heap.indexOf[_id];
-        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id) {
-            return address(0);
-        } else {
-            return _heap.accounts[index + 1].id;
         }
     }
 }

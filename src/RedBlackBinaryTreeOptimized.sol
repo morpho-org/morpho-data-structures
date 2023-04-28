@@ -55,7 +55,7 @@ library RedBlackBinaryTreeOptimized {
     function next(Tree storage _self, address _key) internal view returns (address cursor) {
         require(_key != address(0), "RBBT(1):key-is-nul-address");
         if (_self.nodes[_key].rightChild != address(0)) {
-            cursor = subTreeMin(_self, _self.nodes[_key].rightChild);
+            cursor = _subTreeMin(_self, _self.nodes[_key].rightChild);
         } else {
             cursor = _self.nodes[_key].parent;
             while (cursor != address(0) && _key == _self.nodes[cursor].rightChild) {
@@ -71,7 +71,7 @@ library RedBlackBinaryTreeOptimized {
     function prev(Tree storage _self, address _key) internal view returns (address cursor) {
         require(_key != address(0), "RBBT(2):start-value=0");
         if (_self.nodes[_key].leftChild != address(0)) {
-            cursor = subTreeMax(_self, _self.nodes[_key].leftChild);
+            cursor = _subTreeMax(_self, _self.nodes[_key].leftChild);
         } else {
             cursor = _self.nodes[_key].parent;
             while (cursor != address(0) && _key == _self.nodes[cursor].leftChild) {
@@ -147,7 +147,7 @@ library RedBlackBinaryTreeOptimized {
         } else {
             _self.nodes[cursor].rightChild = _key;
         }
-        insertFixup(_self, _key);
+        _insertFixup(_self, _key);
     }
 
     /// @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
@@ -184,7 +184,7 @@ library RedBlackBinaryTreeOptimized {
         }
         bool doFixup = !_self.nodes[cursor].red;
         if (cursor != _key) {
-            replaceParent(_self, cursor, _key);
+            _replaceParent(_self, cursor, _key);
             _self.nodes[cursor].leftChild = _self.nodes[_key].leftChild;
             _self.nodes[_self.nodes[cursor].leftChild].parent = cursor;
             _self.nodes[cursor].rightChild = _self.nodes[_key].rightChild;
@@ -193,7 +193,7 @@ library RedBlackBinaryTreeOptimized {
             (cursor, _key) = (_key, cursor);
         }
         if (doFixup) {
-            removeFixup(_self, probe);
+            _removeFixup(_self, probe);
         }
         delete _self.nodes[cursor];
     }
@@ -203,7 +203,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Returns the minimum of the subtree beginning at a given node.
     /// @param _self The tree to search in.
     /// @param _key The value of the node to start at.
-    function subTreeMin(Tree storage _self, address _key) private view returns (address) {
+    function _subTreeMin(Tree storage _self, address _key) private view returns (address) {
         while (_self.nodes[_key].leftChild != address(0)) {
             _key = _self.nodes[_key].leftChild;
         }
@@ -213,7 +213,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Returns the maximum of the subtree beginning at a given node.
     /// @param _self The tree to search in.
     /// @param _key The address of the node to start at.
-    function subTreeMax(Tree storage _self, address _key) private view returns (address) {
+    function _subTreeMax(Tree storage _self, address _key) private view returns (address) {
         while (_self.nodes[_key].rightChild != address(0)) {
             _key = _self.nodes[_key].rightChild;
         }
@@ -224,7 +224,7 @@ library RedBlackBinaryTreeOptimized {
     ///       After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child).
     /// @param _self The tree to apply the rotation to.
     /// @param _key The address of the node to rotate.
-    function rotateLeft(Tree storage _self, address _key) private {
+    function _rotateLeft(Tree storage _self, address _key) private {
         address cursor = _self.nodes[_key].rightChild;
         address keyParent = _self.nodes[_key].parent;
         address cursorLeft = _self.nodes[cursor].leftChild;
@@ -249,7 +249,7 @@ library RedBlackBinaryTreeOptimized {
     ///          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child).
     /// @param _self The tree to apply the rotation to.
     /// @param _key The address of the node to rotate.
-    function rotateRight(Tree storage _self, address _key) private {
+    function _rotateRight(Tree storage _self, address _key) private {
         address cursor = _self.nodes[_key].leftChild;
         address keyParent = _self.nodes[_key].parent;
         address cursorRight = _self.nodes[cursor].rightChild;
@@ -272,7 +272,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Makes sure there is no violation of the tree properties after an insertion.
     /// @param _self The tree to check and correct if needed.
     /// @param _key The address of the user that was inserted.
-    function insertFixup(Tree storage _self, address _key) private {
+    function _insertFixup(Tree storage _self, address _key) private {
         address cursor;
         while (_key != _self.root && _self.nodes[_self.nodes[_key].parent].red) {
             address keyParent = _self.nodes[_key].parent;
@@ -286,12 +286,12 @@ library RedBlackBinaryTreeOptimized {
                 } else {
                     if (_key == _self.nodes[keyParent].rightChild) {
                         _key = keyParent;
-                        rotateLeft(_self, _key);
+                        _rotateLeft(_self, _key);
                     }
                     keyParent = _self.nodes[_key].parent;
                     _self.nodes[keyParent].red = false;
                     _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    rotateRight(_self, _self.nodes[keyParent].parent);
+                    _rotateRight(_self, _self.nodes[keyParent].parent);
                 }
             } else {
                 cursor = _self.nodes[_self.nodes[keyParent].parent].leftChild;
@@ -303,12 +303,12 @@ library RedBlackBinaryTreeOptimized {
                 } else {
                     if (_key == _self.nodes[keyParent].leftChild) {
                         _key = keyParent;
-                        rotateRight(_self, _key);
+                        _rotateRight(_self, _key);
                     }
                     keyParent = _self.nodes[_key].parent;
                     _self.nodes[keyParent].red = false;
                     _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    rotateLeft(_self, _self.nodes[keyParent].parent);
+                    _rotateLeft(_self, _self.nodes[keyParent].parent);
                 }
             }
         }
@@ -319,7 +319,7 @@ library RedBlackBinaryTreeOptimized {
     /// @param _self The tree to work with.
     /// @param _a The node that will get the new parents.
     /// @param _b The node that gives its parent.
-    function replaceParent(Tree storage _self, address _a, address _b) private {
+    function _replaceParent(Tree storage _self, address _a, address _b) private {
         address bParent = _self.nodes[_b].parent;
         _self.nodes[_a].parent = bParent;
         if (bParent == address(0)) {
@@ -336,7 +336,7 @@ library RedBlackBinaryTreeOptimized {
     /// @dev Makes sure there is no violation of the tree properties after removal.
     /// @param _self The tree to check and correct if needed.
     /// @param _key The address requested in the function remove.
-    function removeFixup(Tree storage _self, address _key) private {
+    function _removeFixup(Tree storage _self, address _key) private {
         address cursor;
         while (_key != _self.root && !_self.nodes[_key].red) {
             address keyParent = _self.nodes[_key].parent;
@@ -345,7 +345,7 @@ library RedBlackBinaryTreeOptimized {
                 if (_self.nodes[cursor].red) {
                     _self.nodes[cursor].red = false;
                     _self.nodes[keyParent].red = true;
-                    rotateLeft(_self, keyParent);
+                    _rotateLeft(_self, keyParent);
                     cursor = _self.nodes[keyParent].rightChild;
                 }
                 if (!_self.nodes[_self.nodes[cursor].leftChild].red && !_self.nodes[_self.nodes[cursor].rightChild].red)
@@ -356,13 +356,13 @@ library RedBlackBinaryTreeOptimized {
                     if (!_self.nodes[_self.nodes[cursor].rightChild].red) {
                         _self.nodes[_self.nodes[cursor].leftChild].red = false;
                         _self.nodes[cursor].red = true;
-                        rotateRight(_self, cursor);
+                        _rotateRight(_self, cursor);
                         cursor = _self.nodes[keyParent].rightChild;
                     }
                     _self.nodes[cursor].red = _self.nodes[keyParent].red;
                     _self.nodes[keyParent].red = false;
                     _self.nodes[_self.nodes[cursor].rightChild].red = false;
-                    rotateLeft(_self, keyParent);
+                    _rotateLeft(_self, keyParent);
                     _key = _self.root;
                 }
             } else {
@@ -370,7 +370,7 @@ library RedBlackBinaryTreeOptimized {
                 if (_self.nodes[cursor].red) {
                     _self.nodes[cursor].red = false;
                     _self.nodes[keyParent].red = true;
-                    rotateRight(_self, keyParent);
+                    _rotateRight(_self, keyParent);
                     cursor = _self.nodes[keyParent].leftChild;
                 }
                 if (!_self.nodes[_self.nodes[cursor].rightChild].red && !_self.nodes[_self.nodes[cursor].leftChild].red)
@@ -381,13 +381,13 @@ library RedBlackBinaryTreeOptimized {
                     if (!_self.nodes[_self.nodes[cursor].leftChild].red) {
                         _self.nodes[_self.nodes[cursor].rightChild].red = false;
                         _self.nodes[cursor].red = true;
-                        rotateLeft(_self, cursor);
+                        _rotateLeft(_self, cursor);
                         cursor = _self.nodes[keyParent].leftChild;
                     }
                     _self.nodes[cursor].red = _self.nodes[keyParent].red;
                     _self.nodes[keyParent].red = false;
                     _self.nodes[_self.nodes[cursor].leftChild].red = false;
-                    rotateRight(_self, keyParent);
+                    _rotateRight(_self, keyParent);
                     _key = _self.root;
                 }
             }

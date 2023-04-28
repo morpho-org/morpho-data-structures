@@ -34,6 +34,61 @@ library BasicHeap {
 
     /* INTERNAL */
 
+    /// @notice Returns the size of the `_heap`.
+    /// @param _heap The heap parameter.
+    /// @return The size of the heap.
+    function getSize(Heap storage _heap) internal view returns (uint256) {
+        return _heap.accounts.length;
+    }
+
+    /// @notice Returns the value of the account linked to `_id`, returns 0 if the account is not in the `_heap`.
+    /// @param _heap The heap to search in.
+    /// @param _id The address of the account.
+    /// @return The value of the account.
+    function getValueOf(Heap storage _heap, address _id) internal view returns (uint256) {
+        uint256 rank = _heap.ranks[_id];
+        if (rank == 0) return 0;
+        else return getAccount(_heap, rank).value;
+    }
+
+    /// @notice Returns the address at the root of the `_heap`, returns the zero address if the `_heap` is empty.
+    /// @param _heap The heap to get the root.
+    /// @return The address of the root node.
+    function getRoot(Heap storage _heap) internal view returns (address) {
+        if (getSize(_heap) > 0) return getAccount(_heap, 1).id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address of the parent node of the given address in the `_heap`, returns the zero address if it's the root or if the address is not in the heap.
+    /// @param _heap The heap in which to search for the parent.
+    /// @param _id The address to get the parent.
+    /// @return The address of the parent.
+    function getParent(Heap storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id] / 2;
+        if (rank != 0) return getAccount(_heap, rank).id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address of the left child of the given address, returns the zero address if it's not in the heap or if it has no left child.
+    /// @param _heap The heap in which to search for the left child.
+    /// @param _id The address to get the left child.
+    /// @return The address of the left child.
+    function getLeftChild(Heap storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id] * 2;
+        if (rank != 0 && rank <= getSize(_heap)) return getAccount(_heap, rank).id;
+        else return address(0);
+    }
+
+    /// @notice Returns the address of the right child of the given address, returns the zero address if it's not in the heap or if it has no right child.
+    /// @param _heap The heap in which to search for the right child.
+    /// @param _id The address to get the right child.
+    /// @return The address of the right child.
+    function getRightChild(Heap storage _heap, address _id) internal view returns (address) {
+        uint256 rank = _heap.ranks[_id] * 2 + 1;
+        if (rank != 1 && rank <= getSize(_heap)) return getAccount(_heap, rank).id;
+        else return address(0);
+    }
+
     /// @notice Inserts an account in the `_heap`.
     /// @param _heap The heap to modify.
     /// @param _id The address of the account to insert.
@@ -192,62 +247,5 @@ library BasicHeap {
             }
         }
         setAccount(_heap, _rank, initialAccount);
-    }
-
-    /* GETTERS */
-
-    /// @notice Returns the size of the `_heap`.
-    /// @param _heap The heap parameter.
-    /// @return The size of the heap.
-    function getSize(Heap storage _heap) internal view returns (uint256) {
-        return _heap.accounts.length;
-    }
-
-    /// @notice Returns the value of the account linked to `_id`, returns 0 if the account is not in the `_heap`.
-    /// @param _heap The heap to search in.
-    /// @param _id The address of the account.
-    /// @return The value of the account.
-    function getValueOf(Heap storage _heap, address _id) internal view returns (uint256) {
-        uint256 rank = _heap.ranks[_id];
-        if (rank == 0) return 0;
-        else return getAccount(_heap, rank).value;
-    }
-
-    /// @notice Returns the address at the root of the `_heap`, returns the zero address if the `_heap` is empty.
-    /// @param _heap The heap to get the root.
-    /// @return The address of the root node.
-    function getRoot(Heap storage _heap) internal view returns (address) {
-        if (getSize(_heap) > 0) return getAccount(_heap, 1).id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address of the parent node of the given address in the `_heap`, returns the zero address if it's the root or if the address is not in the heap.
-    /// @param _heap The heap in which to search for the parent.
-    /// @param _id The address to get the parent.
-    /// @return The address of the parent.
-    function getParent(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id] / 2;
-        if (rank != 0) return getAccount(_heap, rank).id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address of the left child of the given address, returns the zero address if it's not in the heap or if it has no left child.
-    /// @param _heap The heap in which to search for the left child.
-    /// @param _id The address to get the left child.
-    /// @return The address of the left child.
-    function getLeftChild(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id] * 2;
-        if (rank != 0 && rank <= getSize(_heap)) return getAccount(_heap, rank).id;
-        else return address(0);
-    }
-
-    /// @notice Returns the address of the right child of the given address, returns the zero address if it's not in the heap or if it has no right child.
-    /// @param _heap The heap in which to search for the right child.
-    /// @param _id The address to get the right child.
-    /// @return The address of the right child.
-    function getRightChild(Heap storage _heap, address _id) internal view returns (address) {
-        uint256 rank = _heap.ranks[_id] * 2 + 1;
-        if (rank != 1 && rank <= getSize(_heap)) return getAccount(_heap, rank).id;
-        else return address(0);
     }
 }
