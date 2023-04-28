@@ -3,13 +3,6 @@
 This repository contains the data structures that are used in Morpho's matching engine.
 The data structures are built to be secure and gas efficient.
 
-# Data structures
-
-The data structures we implement and modified are based on the public works of amazing developers. We thank them for what they have done 🙏
-
-You can refer to the following table for the complexity of some data structures.
-
-![complexities](https://devopedia.org/images/article/17/7752.1513922040.jpg)
 
 ## Double Linked List
 
