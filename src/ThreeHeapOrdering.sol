@@ -60,7 +60,7 @@ library ThreeHeapOrdering {
         }
     }
 
-    /// PRIVATE ///
+    /* PRIVATE */
 
     /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
     /// @dev We use division by 3 to remove the leaves of the heap.
@@ -224,7 +224,7 @@ library ThreeHeapOrdering {
         }
     }
 
-    /// GETTERS ///
+    /* GETTERS */
 
     /// @notice Returns the number of users in the `_heap`.
     /// @param _heap The heap parameter.

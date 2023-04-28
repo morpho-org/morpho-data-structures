@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 library BasicHeap {
+    /* STRUCTS */
     struct Account {
         address id; // The address of the account.
         uint256 value; // The value of the account.
@@ -12,7 +13,7 @@ library BasicHeap {
         mapping(address => uint256) ranks; // A mapping from an address to a rank in accounts. Beware: ranks are shifted by one compared to indexes, so the first rank is 1 and not 0.
     }
 
-    /// ERRORS ///
+    /* ERRORS */
 
     /// @notice Thrown when trying to modify an account with a wrong value.
     error WrongValue();
@@ -26,7 +27,7 @@ library BasicHeap {
     /// @notice Thrown when the account to modify does not exist.
     error AccountDoesNotExist();
 
-    /// INTERNAL ///
+    /* INTERNAL */
 
     /// @notice Inserts an account in the `_heap`.
     /// @param _heap The heap to modify.
@@ -97,7 +98,7 @@ library BasicHeap {
         }
     }
 
-    /// PRIVATE ///
+    /* PRIVATE */
 
     /// @notice Returns the account of rank `_rank`.
     /// @dev The first rank is 1 and the last one is the size of the heap.
@@ -188,7 +189,7 @@ library BasicHeap {
         setAccount(_heap, _rank, initialAccount);
     }
 
-    /// VIEW ///
+    /* GETTERS */
 
     /// @notice Returns the size of the `_heap`.
     /// @param _heap The heap parameter.

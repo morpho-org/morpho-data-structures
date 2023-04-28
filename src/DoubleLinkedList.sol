@@ -6,7 +6,7 @@ pragma solidity ^0.8.0;
 /// @custom:contact security@morpho.xyz
 /// @notice Modified double linked list with capped sorting insertion.
 library DoubleLinkedList {
-    /// STRUCTS ///
+    /* STRUCTS */
 
     struct Account {
         address prev;
@@ -20,7 +20,7 @@ library DoubleLinkedList {
         address tail;
     }
 
-    /// ERRORS ///
+    /* ERRORS */
 
     /// @notice Thrown when the account is already inserted in the double linked list.
     error AccountAlreadyInserted();
@@ -34,7 +34,7 @@ library DoubleLinkedList {
     /// @notice Thrown when the value is zero at insertion.
     error ValueIsZero();
 
-    /// INTERNAL ///
+    /* INTERNAL */
 
     /// @notice Returns the `account` linked to `_id`.
     /// @param _list The list to search in.

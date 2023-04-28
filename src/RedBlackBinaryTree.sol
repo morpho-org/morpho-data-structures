@@ -23,6 +23,8 @@ library RedBlackBinaryTree {
         mapping(address => uint256) keyToValue; // Maps key to its value.
     }
 
+    /* PUBLIC */
+
     /// @dev Returns the smallest value in the tree `_self`.
     /// @param _self The tree to search in.
     function first(Tree storage _self) public view returns (uint256 value) {
@@ -213,6 +215,8 @@ library RedBlackBinaryTree {
             delete _self.nodes[cursor];
         }
     }
+
+    /* PRIVATE */
 
     /// @dev Returns the minimum of the subtree beginning at a given node.
     /// @param _self The tree to search in.

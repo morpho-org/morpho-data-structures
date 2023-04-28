@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "../lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
+import {SafeCast} from "../lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
 
 library HeapOrdering {
+    /* STRUCTS */
     struct Account {
         address id; // The address of the account.
         uint96 value; // The value of the account.
@@ -15,16 +16,16 @@ library HeapOrdering {
         mapping(address => uint256) indexOf; // A mapping from an address to an index in accounts. From index i, the parent index is (i-1)/2, the left child index is 2*i+1 and the right child index is 2*i+2.
     }
 
-    /// CONSTANTS ///
+    /* CONSTANTS */
 
     uint256 private constant ROOT = 0;
 
-    /// ERRORS ///
+    /* ERRORS */
 
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
 
-    /// INTERNAL ///
+    /* INTERNAL */
 
     /// @notice Updates an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0.
@@ -60,7 +61,7 @@ library HeapOrdering {
         }
     }
 
-    /// PRIVATE ///
+    /* PRIVATE */
 
     /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
     /// @dev We use division by 2 to remove the leaves of the heap.
@@ -235,7 +236,7 @@ library HeapOrdering {
         }
     }
 
-    /// GETTERS ///
+    /* GETTERS */
 
     /// @notice Returns the number of users in the `_heap`.
     /// @param _heap The heap parameter.
