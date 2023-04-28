@@ -58,7 +58,7 @@ library BasicHeap {
     function decrease(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 index = _heap.indexOf[_id];
 
-        if ((!containsAccount(_heap, index, _heap.accounts.length, _id))) revert AccountDoesNotExist();
+        if (!containsAccount(_heap, index, _heap.accounts.length, _id)) revert AccountDoesNotExist();
         if (_newValue >= _heap.accounts[index].value) revert WrongValue();
 
         shiftDown(_heap, _heap.accounts.length, Account(_id, _newValue), index);
