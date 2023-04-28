@@ -1,7 +1,7 @@
 # Morpho Data Structures 🦋
 
 This repository contains the data structures that are used in Morpho's matching engine.
-The goal is to compare them in terms of security and gas consumption to find the best solution for the protocol and its users.
+The data structures are built to be secure and gas efficient.
 
 # Data structures
 
