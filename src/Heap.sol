@@ -44,11 +44,11 @@ library BasicHeap {
         if (_id == address(0)) revert AddressIsZero();
 
         uint256 accountsLength = _heap.accounts.length;
-        if (containsAccount(_heap, _heap.indexOf[_id], accountsLength, _id)) revert AccountAlreadyInserted();
+        if (_containsAccount(_heap, _heap.indexOf[_id], accountsLength, _id)) revert AccountAlreadyInserted();
 
         _heap.accounts.push();
 
-        shiftUp(_heap, Account(_id, _value), accountsLength);
+        _shiftUp(_heap, Account(_id, _value), accountsLength);
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
@@ -58,10 +58,10 @@ library BasicHeap {
     function decrease(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 index = _heap.indexOf[_id];
 
-        if (!containsAccount(_heap, index, _heap.accounts.length, _id)) revert AccountDoesNotExist();
+        if (!_containsAccount(_heap, index, _heap.accounts.length, _id)) revert AccountDoesNotExist();
         if (_newValue >= _heap.accounts[index].value) revert WrongValue();
 
-        shiftDown(_heap, _heap.accounts.length, Account(_id, _newValue), index);
+        _shiftDown(_heap, _heap.accounts.length, Account(_id, _newValue), index);
     }
 
     /// @notice Increases the amount of an account in the `_heap`.
@@ -72,10 +72,10 @@ library BasicHeap {
     function increase(Heap storage _heap, address _id, uint256 _newValue) internal {
         uint256 index = _heap.indexOf[_id];
 
-        if (!containsAccount(_heap, index, _heap.accounts.length, _id)) revert AccountDoesNotExist();
+        if (!_containsAccount(_heap, index, _heap.accounts.length, _id)) revert AccountDoesNotExist();
         if (_newValue <= _heap.accounts[index].value) revert WrongValue();
 
-        shiftUp(_heap, Account(_id, _newValue), index);
+        _shiftUp(_heap, Account(_id, _newValue), index);
     }
 
     /// @notice Removes an account in the `_heap`.
@@ -86,7 +86,7 @@ library BasicHeap {
         uint256 index = _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
-        if (!containsAccount(_heap, index, accountsLength, _id)) revert AccountDoesNotExist();
+        if (!_containsAccount(_heap, index, accountsLength, _id)) revert AccountDoesNotExist();
 
         delete _heap.indexOf[_id];
 
@@ -98,9 +98,9 @@ library BasicHeap {
                 _heap.accounts.pop();
 
                 if (_heap.accounts[index].value > lastAccount.value) {
-                    shiftDown(_heap, accountsLength, lastAccount, index);
+                    _shiftDown(_heap, accountsLength, lastAccount, index);
                 } else {
-                    shiftUp(_heap, lastAccount, index);
+                    _shiftUp(_heap, lastAccount, index);
                 }
             }
         }
@@ -114,7 +114,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _account The account to set the `_index` to.
     /// @param _index The index of the account in the heap to be set.
-    function setAccount(Heap storage _heap, Account memory _account, uint256 _index) private {
+    function _setAccount(Heap storage _heap, Account memory _account, uint256 _index) private {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
     }
@@ -124,7 +124,7 @@ library BasicHeap {
     /// @param _heap The heap to modify.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftUp(Heap storage _heap, Account memory _accountToShift, uint256 _index) private {
+    function _shiftUp(Heap storage _heap, Account memory _accountToShift, uint256 _index) private {
         uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
@@ -134,12 +134,12 @@ library BasicHeap {
             while (
                 _index > ROOT && valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
             ) {
-                setAccount(_heap, parentAccount, _index);
+                _setAccount(_heap, parentAccount, _index);
                 _index = parentIndex;
             }
         }
 
-        setAccount(_heap, _accountToShift, _index);
+        _setAccount(_heap, _accountToShift, _index);
     }
 
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
@@ -148,7 +148,7 @@ library BasicHeap {
     /// @param _size The size of the heap.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftDown(Heap storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index) private {
+    function _shiftDown(Heap storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index) private {
         uint256 valueToShift = _accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
@@ -170,7 +170,7 @@ library BasicHeap {
                 }
 
                 if (childToSwap.value > valueToShift) {
-                    setAccount(_heap, childToSwap, _index);
+                    _setAccount(_heap, childToSwap, _index);
                     _index = childIndex;
                     childIndex = (childIndex << 1) + 1;
                 } else {
@@ -179,7 +179,7 @@ library BasicHeap {
             }
         }
 
-        setAccount(_heap, _accountToShift, _index);
+        _setAccount(_heap, _accountToShift, _index);
     }
 
     /// @notice Checks if an account with the given address `_id` exists in the `_heap`.
@@ -189,7 +189,7 @@ library BasicHeap {
     /// @param _accountsLength The length of the `_heap` accounts array.
     /// @param _id The address of the account to search for.
     /// @return True if the account exists in the `_heap`, false otherwise.
-    function containsAccount(Heap storage _heap, uint256 _index, uint256 _accountsLength, address _id)
+    function _containsAccount(Heap storage _heap, uint256 _index, uint256 _accountsLength, address _id)
         private
         view
         returns (bool)
@@ -217,7 +217,7 @@ library BasicHeap {
     /// @param _id The address of the account to search for.
     /// @return True if the account exists in the heap, false otherwise.
     function containsAccount(Heap storage _heap, address _id) internal view returns (bool) {
-        return containsAccount(_heap, _heap.indexOf[_id], _heap.accounts.length, _id);
+        return _containsAccount(_heap, _heap.indexOf[_id], _heap.accounts.length, _id);
     }
 
     /// @notice Returns the value of the account linked to `_id`.
@@ -227,7 +227,7 @@ library BasicHeap {
     function getValueOf(Heap storage _heap, address _id) internal view returns (uint256) {
         uint256 index = _heap.indexOf[_id];
 
-        if (!containsAccount(_heap, index, _heap.accounts.length, _id)) return 0;
+        if (!_containsAccount(_heap, index, _heap.accounts.length, _id)) return 0;
         else return _heap.accounts[index].value;
     }
 
@@ -260,7 +260,7 @@ library BasicHeap {
         uint256 index = _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
-        if (!containsAccount(_heap, index, accountsLength, _id)) {
+        if (!_containsAccount(_heap, index, accountsLength, _id)) {
             return address(0);
         } else if ((index = (index << 1) + 1) >= accountsLength) {
             return address(0);
@@ -277,7 +277,7 @@ library BasicHeap {
         uint256 index = _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
 
-        if (!containsAccount(_heap, index, accountsLength, _id)) {
+        if (!_containsAccount(_heap, index, accountsLength, _id)) {
             return address(0);
         } else if ((index = (index << 1) + 2) >= accountsLength) {
             return address(0);
