@@ -160,22 +160,22 @@ library BasicHeap {
             // Find the child with largest value.
             unchecked {
                 rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
-            }
 
-            if (rightChildIndex < _size) {
-                Account memory rightChild = _heap.accounts[rightChildIndex];
-                if (rightChild.value > childToSwap.value) {
-                    childToSwap = rightChild;
-                    childIndex = rightChildIndex;
+                if (rightChildIndex < _size) {
+                    Account memory rightChild = _heap.accounts[rightChildIndex];
+                    if (rightChild.value > childToSwap.value) {
+                        childToSwap = rightChild;
+                        childIndex = rightChildIndex;
+                    }
                 }
-            }
 
-            if (childToSwap.value > valueToShift) {
-                setAccount(_heap, childToSwap, _index);
-                _index = childIndex;
-                childIndex = (childIndex << 1) + 1;
-            } else {
-                break;
+                if (childToSwap.value > valueToShift) {
+                    setAccount(_heap, childToSwap, _index);
+                    _index = childIndex;
+                    childIndex = (childIndex << 1) + 1;
+                } else {
+                    break;
+                }
             }
         }
 
