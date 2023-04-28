@@ -49,18 +49,8 @@ contract TestHeapOrderingInvariant is Test {
         uint256 length = heap.length();
 
         for (uint256 i; i < length; ++i) {
-            assertTrue(
-                (
-                    i * 2 + 1 >= length || i * 2 + 1 >= heap.size()
-                        || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)
-                )
-            );
-            assertTrue(
-                (
-                    i * 2 + 2 >= length || i * 2 + 2 >= heap.size()
-                        || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)
-                )
-            );
+            assertTrue((i * 2 + 1 >= length || i * 2 + 1 >= heap.size()|| heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)));// forgefmt: disable-line
+            assertTrue(( i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)));// forgefmt: disable-line
         }
     }
 

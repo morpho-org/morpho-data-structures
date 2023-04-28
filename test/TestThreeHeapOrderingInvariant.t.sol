@@ -49,24 +49,9 @@ contract TestThreeHeapOrderingInvariant is Test {
         uint256 length = heap.length();
 
         for (uint256 i; i < length; ++i) {
-            assertTrue(
-                (
-                    i * 3 + 1 >= length || i * 3 + 1 >= heap.size()
-                        || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 1)
-                )
-            );
-            assertTrue(
-                (
-                    i * 3 + 2 >= length || i * 3 + 2 >= heap.size()
-                        || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 2)
-                )
-            );
-            assertTrue(
-                (
-                    i * 3 + 3 >= length || i * 3 + 3 >= heap.size()
-                        || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 3)
-                )
-            );
+            assertTrue((i * 3 + 1 >= length || i * 3 + 1 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 1)));// forgefmt: disable-line
+            assertTrue((i * 3 + 2 >= length || i * 3 + 2 >= heap.size()|| heap.accountsValue(i) >= heap.accountsValue(i * 3 + 2)));// forgefmt: disable-line
+            assertTrue((i * 3 + 3 >= length || i * 3 + 3 >= heap.size()|| heap.accountsValue(i) >= heap.accountsValue(i * 3 + 3)));// forgefmt: disable-line
         }
     }
 
