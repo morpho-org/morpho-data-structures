@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/Heap.sol";
+import {BasicHeap} from "src/Heap.sol";
 
 contract HeapStorage {
     BasicHeap.Heap internal heap;

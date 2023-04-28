@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
-import "forge-std/console.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "./helpers/ConcreteThreeHeapOrdering.sol";
+import {ConcreteThreeHeapOrdering} from "./helpers/ConcreteThreeHeapOrdering.sol";
+import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
 
 contract Heap is ConcreteThreeHeapOrdering {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;

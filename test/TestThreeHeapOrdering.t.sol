@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "./TestCommonHeapOrdering.t.sol";
-import "./helpers/ConcreteThreeHeapOrdering.sol";
+import {TestCommonHeapOrdering} from "./TestCommonHeapOrdering.t.sol";
+import {ConcreteThreeHeapOrdering} from "./helpers/ConcreteThreeHeapOrdering.sol";
 
 contract TestThreeHeapOrdering is TestCommonHeapOrdering {
     constructor() {

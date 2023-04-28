@@ -7,7 +7,13 @@ pragma solidity ^0.8.0;
 // Significant portions from BokkyPooBahsRedBlackTreeLibrary,
 // https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
 
+/// @title Red Black Binary Tree Optimized.
+/// @author Morpho Labs.
+/// @custom:contact security@morpho.xyz
+/// @notice Optimized implementation of a Red Balck Binary Tree.
 library RedBlackBinaryTreeOptimized {
+    /* STRUCTS */
+
     struct Node {
         address parent; // The parent node of the current node.
         address leftChild; // The left child of the current node.
@@ -20,6 +26,8 @@ library RedBlackBinaryTreeOptimized {
         mapping(address => Node) nodes; // Map user's address to node
         mapping(address => uint256) keyToValue; // Maps key to its value
     }
+
+    /* PUBLIC */
 
     /// @dev Returns the address of the smallest value in the tree `_self`.
     /// @param _self The tree to search in.
@@ -190,6 +198,8 @@ library RedBlackBinaryTreeOptimized {
         delete _self.nodes[cursor];
     }
 
+    /* PRIVATE */
+
     /// @dev Returns the minimum of the subtree beginning at a given node.
     /// @param _self The tree to search in.
     /// @param _key The value of the node to start at.
@@ -211,7 +221,7 @@ library RedBlackBinaryTreeOptimized {
     }
 
     /// @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
-    ///       After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child)
+    ///       After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child).
     /// @param _self The tree to apply the rotation to.
     /// @param _key The address of the node to rotate.
     function rotateLeft(Tree storage _self, address _key) private {
@@ -236,7 +246,7 @@ library RedBlackBinaryTreeOptimized {
     }
 
     /// @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
-    ///          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child)
+    ///          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child).
     /// @param _self The tree to apply the rotation to.
     /// @param _key The address of the node to rotate.
     function rotateRight(Tree storage _self, address _key) private {

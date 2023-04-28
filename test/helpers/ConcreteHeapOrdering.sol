@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "src/HeapOrdering.sol";
-import "./IConcreteHeapOrdering.sol";
+import {HeapOrdering} from "src/HeapOrdering.sol";
+import {IConcreteHeapOrdering} from "./IConcreteHeapOrdering.sol";
 
 contract ConcreteHeapOrdering is IConcreteHeapOrdering {
     using HeapOrdering for HeapOrdering.HeapArray;

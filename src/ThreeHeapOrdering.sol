@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "../lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
+import {SafeCast} from "../lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
 
 library ThreeHeapOrdering {
+    /* STRUCTS */
+
     struct Account {
         address id; // The address of the account.
         uint96 value; // The value of the account.
@@ -15,16 +17,16 @@ library ThreeHeapOrdering {
         mapping(address => uint256) indexOf; // A mapping from an address to an index in accounts.
     }
 
-    /// CONSTANTS ///
+    /* CONSTANTS */
 
     uint256 private constant ROOT = 0;
 
-    /// ERRORS ///
+    /* ERRORS */
 
     /// @notice Thrown when the address is zero at insertion.
     error AddressIsZero();
 
-    /// INTERNAL ///
+    /* INTERNAL */
 
     /// @notice Updates an account in the `_heap`.
     /// @dev Only call this function when `_id` is in the `_heap` with value `_formerValue` or when `_id` is not in the `_heap` with `_formerValue` equal to 0. Don't call this function with `_maxSortedUsers` equal to 0.

@@ -1,8 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
+/// @title BasicHeap.
+/// @author Morpho Labs.
+/// @custom:contact security@morpho.xyz
+/// @notice Basic implementation of a Heap.
 library BasicHeap {
     /* STRUCTS */
+
     struct Account {
         address id; // The address of the account.
         uint256 value; // The value of the account.

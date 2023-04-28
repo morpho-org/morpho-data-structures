@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.13;
 
-import "./Random.sol";
-import "./IConcreteHeapOrdering.sol";
-import "forge-std/Test.sol";
+import {Random} from "./Random.sol";
+import {IConcreteHeapOrdering} from "./IConcreteHeapOrdering.sol";
+import {Test} from "forge-std/Test.sol";
 
 abstract contract TestRandomHeap is Test, Random {
     IConcreteHeapOrdering public heap;

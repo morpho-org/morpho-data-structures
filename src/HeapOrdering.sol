@@ -3,8 +3,13 @@ pragma solidity ^0.8.0;
 
 import {SafeCast} from "../lib/openzeppelin-contracts/contracts/utils/math/SafeCast.sol";
 
+/// @title Heap Ordering.
+/// @author Morpho Labs.
+/// @custom:contact security@morpho.xyz
+/// @notice Modified implementation of a Heap with capped sorting insertion.
 library HeapOrdering {
     /* STRUCTS */
+
     struct Account {
         address id; // The address of the account.
         uint96 value; // The value of the account.

@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
-import "forge-std/console.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/HeapOrdering.sol";
-import "./helpers/IConcreteHeapOrdering.sol";
+import {HeapOrdering} from "src/HeapOrdering.sol";
+import {IConcreteHeapOrdering} from "./helpers/IConcreteHeapOrdering.sol";
 
 abstract contract TestCommonHeapOrdering is Test {
     IConcreteHeapOrdering internal heap;

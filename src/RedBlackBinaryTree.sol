@@ -7,7 +7,13 @@ pragma solidity ^0.8.0;
 // Significant portions from BokkyPooBahsRedBlackTreeLibrary,
 // https://github.com/bokkypoobah/BokkyPooBahsRedBlackTreeLibrary
 
+/// @title Red Black Binary Tree.
+/// @author Morpho Labs.
+/// @custom:contact security@morpho.xyz
+/// @notice Basic implementation of a Red Balck Binary Tree.
 library RedBlackBinaryTree {
+    /* STRUCTS */
+
     struct Node {
         uint256 parent; // The parent node of the current node.
         uint256 leftChild; // The left child of the current node.
@@ -239,7 +245,7 @@ library RedBlackBinaryTree {
     }
 
     /// @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
-    ///          After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child)
+    ///          After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child).
     /// @param _self The tree to apply the rotation to.
     /// @param _value The value of the node to rotate.
     function rotateLeft(Tree storage _self, uint256 _value) private {
@@ -263,7 +269,7 @@ library RedBlackBinaryTree {
     }
 
     /// @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
-    ///          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child)
+    ///          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child).
     /// @param _self The tree to apply the rotation to.
     /// @param _value The value of the node to rotate.
     function rotateRight(Tree storage _self, uint256 _value) private {
