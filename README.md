@@ -3,7 +3,6 @@
 This repository contains the data structures that are used in Morpho's matching engine.
 The data structures are built to be secure and gas efficient.
 
-
 ## Double Linked List
 
 The current implementation of the double-linked list is based on this [article](https://hackernoon.com/a-linked-list-implementation-for-ethereum-deep-dive-oy9432pa) written by Alberto Cuesta Cañada. You can find the repository [here](https://github.com/HQ20/contracts/tree/master/contracts/lists). Note that the code has been modified to meet our own needs and to allow us to sort the first accounts of the double-linked list. Our implementation is not a generalized one.
