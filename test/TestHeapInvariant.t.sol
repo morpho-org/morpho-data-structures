@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
+import {StdUtils} from "forge-std/StdUtils.sol";
 import {Test} from "forge-std/Test.sol";
 
 import {HeapMock} from "./mocks/HeapMock.sol";
 
-contract Heap is HeapMock {
+contract Heap is HeapMock, StdUtils {
     address[] internal accountsUsed;
 
     function accountsValue(uint256 _index) external view returns (uint256) {
@@ -31,38 +32,35 @@ contract Heap is HeapMock {
         if (accountsUsed.length == 0) {
             return;
         }
-        index %= accountsUsed.length;
+        index = bound(index, 0, accountsUsed.length - 1);
         address account = accountsUsed[index];
         uint256 accountValue = getValueOf(account);
         if (accountValue == type(uint256).max) {
             return;
         }
-        increase(
-            account,
-            amount > accountValue
-                ? amount
-                : (amount % (type(uint256).max - accountValue)) + accountValue
-        );
+
+        increase(account, bound(amount, accountValue + 1, type(uint256).max));
+
     }
 
     function decreaseCorrect(uint256 index, uint256 amount) external {
         if (accountsUsed.length == 0) {
             return;
         }
-        index %= accountsUsed.length;
+        index = bound(index, 0, accountsUsed.length - 1);
         address account = accountsUsed[index];
         uint256 accountValue = getValueOf(account);
         if (accountValue == 0) {
             return;
         }
-        decrease(account, amount < accountValue ? amount : amount % accountValue);
+        decrease(account, bound(amount, 0, accountValue - 1));
     }
 
     function removeCorrect(uint256 index) external {
         if (accountsUsed.length == 0) {
             return;
         }
-        index %= accountsUsed.length;
+        index = bound(index, 0, accountsUsed.length - 1);
         remove(accountsUsed[index]);
         accountsUsed[index] = accountsUsed[accountsUsed.length - 1];
         accountsUsed.pop();
