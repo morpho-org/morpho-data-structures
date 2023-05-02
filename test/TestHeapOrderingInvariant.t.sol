@@ -4,9 +4,9 @@ pragma solidity ^0.8.0;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 
-import "./helpers/ConcreteHeapOrdering.sol";
+import "./mocks/HeapOrderingMock.sol";
 
-contract Heap is ConcreteHeapOrdering {
+contract Heap is HeapOrderingMock {
     using HeapOrdering for HeapOrdering.HeapArray;
 
     uint256 public MAX_SORTED_USERS = 16;

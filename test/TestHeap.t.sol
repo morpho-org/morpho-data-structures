@@ -16,7 +16,7 @@ contract TestHeap is Test {
 
     function setUp() public {
         accounts = new address[](TESTED_SIZE);
-        accounts[0] = address(this);
+        accounts[0] = address(bytes20(keccak256("TestHeap.accounts")));
         for (uint256 i = 1; i < TESTED_SIZE; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
