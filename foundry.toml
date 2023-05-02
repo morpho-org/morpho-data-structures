@@ -1,5 +1,11 @@
 [profile.default]
 solc_version = "0.8.17"
+no_match_test = "testGasUsage"
+
+[profile.gas]
+no_match_test = "None"
+match_test = "testGasUsage"
+verbosity = 2
 
 [fuzz]
 runs = 1024

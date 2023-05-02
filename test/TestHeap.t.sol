@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/Heap.sol";
+import {BasicHeap} from "src/Heap.sol";
 
 contract TestHeap is Test {
     using BasicHeap for BasicHeap.Heap;
@@ -16,7 +16,7 @@ contract TestHeap is Test {
 
     function setUp() public {
         accounts = new address[](TESTED_SIZE);
-        accounts[0] = address(this);
+        accounts[0] = address(bytes20(keccak256("TestHeap.accounts")));
         for (uint256 i = 1; i < TESTED_SIZE; i++) {
             accounts[i] = address(uint160(accounts[i - 1]) + 1);
         }
@@ -32,19 +32,12 @@ contract TestHeap is Test {
         assertEq(heap.getRightChild(accounts[0]), ADDR_ZERO);
     }
 
-    function testShouldNotInsertAccountWithZeroValue() public {
-        vm.expectRevert(abi.encodeWithSignature("WrongValue()"));
-        heap.insert(accounts[0], 0);
-
-        assertEq(heap.getSize(), 0);
-    }
-
     function testShouldNotInsertZeroAddress() public {
         vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        heap.insert(address(0), 10);
+        heap.insert(ADDR_ZERO, 10);
     }
 
-    function testShouldInsertSeveralTimesTheSameAccount() public {
+    function testShouldNotInsertSeveralTimesTheSameAccount() public {
         heap.insert(accounts[0], 1);
         vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
         heap.insert(accounts[0], 2);
@@ -53,6 +46,15 @@ contract TestHeap is Test {
     function testShouldNotRemoveAccountThatDoesNotExist() public {
         vm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
         heap.remove(accounts[0]);
+    }
+
+    function testContainsAccount() public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(accounts[i], (i + TESTED_SIZE / 2) % TESTED_SIZE);
+            for (uint256 j; j < TESTED_SIZE; ++j) {
+                assertEq(heap.containsAccount(accounts[j]), j <= i);
+            }
+        }
     }
 
     function testShouldHaveTheRightOrder() public {
