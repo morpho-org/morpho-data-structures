@@ -2,7 +2,7 @@
 pragma solidity ^0.8.13;
 
 import {Random} from "./Random.sol";
-import {IConcreteHeapOrdering} from "./IConcreteHeapOrdering.sol";
+import {IConcreteHeapOrdering} from "./interfaces/IConcreteHeapOrdering.sol";
 import {Test} from "forge-std/Test.sol";
 
 abstract contract TestRandomHeap is Test, Random {

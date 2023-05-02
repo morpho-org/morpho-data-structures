@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {HeapOrdering} from "src/HeapOrdering.sol";
-import {IConcreteHeapOrdering} from "./IConcreteHeapOrdering.sol";
+import {IConcreteHeapOrdering} from "./interfaces/IConcreteHeapOrdering.sol";
 
 contract ConcreteHeapOrdering is IConcreteHeapOrdering {
     using HeapOrdering for HeapOrdering.HeapArray;

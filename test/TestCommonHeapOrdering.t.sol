@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Test} from "forge-std/Test.sol";
 
 import {HeapOrdering} from "src/HeapOrdering.sol";
-import {IConcreteHeapOrdering} from "./helpers/IConcreteHeapOrdering.sol";
+import {IConcreteHeapOrdering} from "./helpers/interfaces/IConcreteHeapOrdering.sol";
 
 abstract contract TestCommonHeapOrdering is Test {
     IConcreteHeapOrdering internal heap;
