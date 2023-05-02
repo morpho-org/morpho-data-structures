@@ -111,18 +111,18 @@ library HeapOrdering {
         uint96 newValue = SafeCast.toUint96(_newValue);
 
         uint256 size = _heap.size;
-        uint256 newSize = computeSize(size, _maxSortedUsers);
+        uint256 newSize = _computeSize(size, _maxSortedUsers);
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
             if (newValue == 0) {
-                remove(_heap, newSize, _id, formerValue);
+                _remove(_heap, newSize, _id, formerValue);
             } else if (formerValue == 0) {
-                insert(_heap, newSize, _id, newValue, _maxSortedUsers);
+                _insert(_heap, newSize, _id, newValue, _maxSortedUsers);
             } else if (formerValue < newValue) {
-                increase(_heap, newSize, _id, newValue, _maxSortedUsers);
+                _increase(_heap, newSize, _id, newValue, _maxSortedUsers);
             } else {
-                decrease(_heap, newSize, _id, newValue);
+                _decrease(_heap, newSize, _id, newValue);
             }
         }
     }
@@ -134,7 +134,7 @@ library HeapOrdering {
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.
-    function computeSize(uint256 _size, uint256 _maxSortedUsers) private pure returns (uint256) {
+    function _computeSize(uint256 _size, uint256 _maxSortedUsers) private pure returns (uint256) {
         while (_size >= _maxSortedUsers) _size >>= 1;
         return _size;
     }
@@ -145,7 +145,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _account The account to set the `_index` to.
     /// @param _index The index of the account in the heap to be set.
-    function setAccount(HeapArray storage _heap, Account memory _account, uint256 _index) private {
+    function _setAccount(HeapArray storage _heap, Account memory _account, uint256 _index) private {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
     }
@@ -155,7 +155,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftUp(HeapArray storage _heap, Account memory _accountToShift, uint256 _index) private {
+    function _shiftUp(HeapArray storage _heap, Account memory _accountToShift, uint256 _index) private {
         uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
@@ -165,12 +165,12 @@ library HeapOrdering {
             while (
                 _index > ROOT && valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
             ) {
-                setAccount(_heap, parentAccount, _index);
+                _setAccount(_heap, parentAccount, _index);
                 _index = parentIndex;
             }
         }
 
-        setAccount(_heap, _accountToShift, _index);
+        _setAccount(_heap, _accountToShift, _index);
     }
 
     /// @notice Moves an account down the heap until its value is greater than the ones of its children.
@@ -179,7 +179,7 @@ library HeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftDown(HeapArray storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index)
+    function _shiftDown(HeapArray storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index)
         private
     {
         uint256 valueToShift = _accountToShift.value;
@@ -203,7 +203,7 @@ library HeapOrdering {
             }
 
             if (childToSwap.value > valueToShift) {
-                setAccount(_heap, childToSwap, _index);
+                _setAccount(_heap, childToSwap, _index);
                 _index = childIndex;
                 childIndex = (childIndex << 1) + 1;
             } else {
@@ -211,7 +211,7 @@ library HeapOrdering {
             }
         }
 
-        setAccount(_heap, _accountToShift, _index);
+        _setAccount(_heap, _accountToShift, _index);
     }
 
     /// @notice Inserts an account in the `_heap`.
@@ -222,7 +222,7 @@ library HeapOrdering {
     /// @param _id The address of the account to insert.
     /// @param _value The value of the account to insert.
     /// @param _maxSortedUsers The maximum size of the heap.
-    function insert(HeapArray storage _heap, uint256 _size, address _id, uint96 _value, uint256 _maxSortedUsers)
+    function _insert(HeapArray storage _heap, uint256 _size, address _id, uint96 _value, uint256 _maxSortedUsers)
         private
     {
         // `_heap` cannot contain the 0 address.
@@ -232,10 +232,10 @@ library HeapOrdering {
 
         _heap.accounts.push();
 
-        if (_size != accountsLength) setAccount(_heap, _heap.accounts[_size], accountsLength);
+        if (_size != accountsLength) _setAccount(_heap, _heap.accounts[_size], accountsLength);
 
-        shiftUp(_heap, Account(_id, _value), _size);
-        _heap.size = computeSize(_size + 1, _maxSortedUsers);
+        _shiftUp(_heap, Account(_id, _value), _size);
+        _heap.size = _computeSize(_size + 1, _maxSortedUsers);
     }
 
     /// @notice Decreases the amount of an account in the `_heap`.
@@ -244,11 +244,11 @@ library HeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
-    function decrease(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue) private {
+    function _decrease(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue) private {
         uint256 index = _heap.indexOf[_id];
 
         // We only need to take care of sorting if there are nodes below in the heap.
-        if (index < _size >> 1) shiftDown(_heap, _size, Account(_id, _newValue), index);
+        if (index < _size >> 1) _shiftDown(_heap, _size, Account(_id, _newValue), index);
         else _heap.accounts[index].value = _newValue;
     }
 
@@ -259,17 +259,17 @@ library HeapOrdering {
     /// @param _id The address of the account to increase the amount.
     /// @param _newValue The new value of the account.
     /// @param _maxSortedUsers The maximum size of the heap.
-    function increase(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue, uint256 _maxSortedUsers)
+    function _increase(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue, uint256 _maxSortedUsers)
         private
     {
         uint256 index = _heap.indexOf[_id];
 
         if (index < _size) {
-            shiftUp(_heap, Account(_id, _newValue), index);
+            _shiftUp(_heap, Account(_id, _newValue), index);
         } else {
-            setAccount(_heap, _heap.accounts[_size], index);
-            shiftUp(_heap, Account(_id, _newValue), _size);
-            _heap.size = computeSize(_size + 1, _maxSortedUsers);
+            _setAccount(_heap, _heap.accounts[_size], index);
+            _shiftUp(_heap, Account(_id, _newValue), _size);
+            _heap.size = _computeSize(_size + 1, _maxSortedUsers);
         }
     }
 
@@ -279,7 +279,7 @@ library HeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
-    function remove(HeapArray storage _heap, uint256 _size, address _id, uint96 _removedValue) private {
+    function _remove(HeapArray storage _heap, uint256 _size, address _id, uint96 _removedValue) private {
         uint256 index = _heap.indexOf[_id];
         delete _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
@@ -295,10 +295,10 @@ library HeapOrdering {
 
         // If the removed account was in the heap, restore the invariant.
         if (index < _size) {
-            if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
-            else shiftUp(_heap, lastAccount, index);
+            if (_removedValue > lastAccount.value) _shiftDown(_heap, _size, lastAccount, index);
+            else _shiftUp(_heap, lastAccount, index);
         } else {
-            setAccount(_heap, lastAccount, index);
+            _setAccount(_heap, lastAccount, index);
         }
     }
 }
