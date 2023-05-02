@@ -37,7 +37,12 @@ contract Heap is HeapMock {
         if (accountValue == type(uint256).max) {
             return;
         }
-        increase(account, amount > accountValue ? amount : amount % (type(uint256).max - accountValue) + accountValue);
+        increase(
+            account,
+            amount > accountValue
+                ? amount
+                : (amount % (type(uint256).max - accountValue)) + accountValue
+        );
     }
 
     function decreaseCorrect(uint256 index, uint256 amount) external {
