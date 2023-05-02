@@ -48,15 +48,11 @@ library HeapOrdering {
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
-            if (newValue == 0) {
-                remove(_heap, newSize, _id, formerValue);
-            } else if (formerValue == 0) {
-                insert(_heap, newSize, _id, newValue, _maxSortedUsers);
-            } else if (formerValue < newValue) {
+            if (newValue == 0) remove(_heap, newSize, _id, formerValue);
+            else if (formerValue == 0) insert(_heap, newSize, _id, newValue, _maxSortedUsers);
+            else if (formerValue < newValue)
                 increase(_heap, newSize, _id, newValue, _maxSortedUsers);
-            } else {
-                decrease(_heap, newSize, _id, newValue);
-            }
+            else decrease(_heap, newSize, _id, newValue);
         }
     }
 
@@ -148,9 +144,7 @@ library HeapOrdering {
                 setAccount(_heap, childToSwap, _index);
                 _index = childIndex;
                 childIndex = (childIndex << 1) + 1;
-            } else {
-                break;
-            }
+            } else break;
         }
 
         setAccount(_heap, _accountToShift, _index);
@@ -219,9 +213,8 @@ library HeapOrdering {
     ) private {
         uint256 index = _heap.indexOf[_id];
 
-        if (index < _size) {
-            shiftUp(_heap, Account(_id, _newValue), index);
-        } else {
+        if (index < _size) shiftUp(_heap, Account(_id, _newValue), index);
+        else {
             setAccount(_heap, _heap.accounts[_size], index);
             shiftUp(_heap, Account(_id, _newValue), _size);
             _heap.size = computeSize(_size + 1, _maxSortedUsers);
@@ -257,9 +250,7 @@ library HeapOrdering {
         if (index < _size) {
             if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
-        } else {
-            setAccount(_heap, lastAccount, index);
-        }
+        } else setAccount(_heap, lastAccount, index);
     }
 
     /// GETTERS ///
@@ -318,10 +309,8 @@ library HeapOrdering {
     /// @return The address of the next account.
     function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 index = _heap.indexOf[_id];
-        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id) {
+        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
             return address(0);
-        } else {
-            return _heap.accounts[index + 1].id;
-        }
+        else return _heap.accounts[index + 1].id;
     }
 }
