@@ -225,11 +225,7 @@ contract TestHeap is Test {
         }
 
         for (uint256 i = 0; i < 10; i++) {
-            assertEq(
-                heap.accounts[10 + i].id,
-                accounts[TESTED_SIZE - 10 + i],
-                "order not expected, 2"
-            );
+            assertEq(heap.accounts[10 + i].id, accounts[TESTED_SIZE - 10 + i], "order not expected, 2");
         }
     }
 

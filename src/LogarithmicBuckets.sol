@@ -31,7 +31,12 @@ library LogarithmicBuckets {
     /// @param id The address of the account.
     /// @param newValue The new value of the account.
     /// @param head Indicates whether to insert the new values at the head or at the tail of the buckets list.
-    function update(Buckets storage buckets, address id, uint256 newValue, bool head) internal {
+    function update(
+        Buckets storage buckets,
+        address id,
+        uint256 newValue,
+        bool head
+    ) internal {
         if (id == address(0)) revert ZeroAddress();
         uint256 value = buckets.valueOf[id];
         buckets.valueOf[id] = newValue;
@@ -82,7 +87,11 @@ library LogarithmicBuckets {
     /// @param buckets The buckets to modify.
     /// @param id The address of the account to remove.
     /// @param bucket The mask of the bucket where to remove.
-    function _remove(Buckets storage buckets, address id, uint256 bucket) private {
+    function _remove(
+        Buckets storage buckets,
+        address id,
+        uint256 bucket
+    ) private {
         if (buckets.buckets[bucket].remove(id)) buckets.bucketsMask &= ~bucket;
     }
 
@@ -93,7 +102,12 @@ library LogarithmicBuckets {
     /// @param id The address of the account to update.
     /// @param bucket The mask of the bucket where to insert.
     /// @param head Whether to insert at the head or at the tail of the list.
-    function _insert(Buckets storage buckets, address id, uint256 bucket, bool head) private {
+    function _insert(
+        Buckets storage buckets,
+        address id,
+        uint256 bucket,
+        bool head
+    ) private {
         if (buckets.buckets[bucket].insert(id, head)) buckets.bucketsMask |= bucket;
     }
 
