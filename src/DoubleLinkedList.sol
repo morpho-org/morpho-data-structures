@@ -77,6 +77,7 @@ library DoubleLinkedList {
     /// @param id The address of the account.
     function remove(List storage list, address id) internal {
         Account memory account = list.accounts[id];
+        if (id == address(0)) revert AddressIsZero();
         if (account.value == 0) revert AccountDoesNotExist();
 
         list.accounts[account.prev].next = account.next;
