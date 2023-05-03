@@ -44,11 +44,11 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         assertEq(tree.keyToValue[key], value, "Incorrect value inserted");
     }
 
-    function FirstReturnAddressZeroIfEmpty() public {
+    function testFirstReturnAddressZeroIfEmpty() public {
         assertEq(tree.first(), ADDR_ZERO, "Address Not Null");
     }
 
-    function LastReturnAddressZeroIfEmpty() public {
+    function testLastReturnAddressZeroIfEmpty() public {
         assertEq(tree.last(), ADDR_ZERO, "Address Not Null");
     }
 
@@ -127,7 +127,6 @@ contract TestRedBlackBinaryTreeOptimized is Test {
 
     function testKeyExistsShouldWorkIfAccountInserted(uint256[] memory values) public {
         vm.assume(values.length > NDS);
-        
 
         for (uint256 i = 0; i < NDS; ++i) {
             values[i] = bound(values[i], 1, type(uint256).max);
@@ -142,7 +141,6 @@ contract TestRedBlackBinaryTreeOptimized is Test {
 
     function testNextAndPrevFunctionInTree(uint256[] memory values, uint256 seed) public {
         vm.assume(values.length > NDS);
-        
 
         for (uint256 i = 0; i < NDS; ++i) {
             values[i] = bound(values[i], 1, type(uint256).max);
