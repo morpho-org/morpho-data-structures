@@ -60,15 +60,7 @@ For the `RedBlackBinaryTree`, you can run the tests with hardhat with `yarn test
 
 ## Creating issues and PRs
 
-Guidelines for creating issues and PRs:
-
-- Issues must be created and labeled with relevant labels (type of issues, high/medium/low priority, etc.).
-- Nothing should be pushed directly to the `main` branch.
-- Pull requests must be created before and branch names must follow this pattern: `feat/<feature-name>`, `test/<test-name>` or `fix/<fix-name>`. `docs`, `ci` can also be used. The goal is to have clear branches' names and make easier their management.
-- PRs must be labeled with the relevant labels.
-- Issues must be linked to PRs so that once the PR is merged related issues are closed at the same time.
-- Reviewers must be added to the PR.
-- For commits, we use the bitmoji VS Code extension 🙃
+For issues and PR, please use conventional naming and add Morpho's contributors to review your code or tackle your issue.
 
 ## Before merging a PR
 
