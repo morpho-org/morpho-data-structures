@@ -54,7 +54,11 @@ library BucketDLL {
     /// @param id The address of the account.
     /// @param atHead Tells whether to insert at the head or at the tail of the list.
     /// @return Whether the bucket was empty before insertion.
-    function insert(List storage list, address id, bool atHead) internal returns (bool) {
+    function insert(
+        List storage list,
+        address id,
+        bool atHead
+    ) internal returns (bool) {
         if (atHead) {
             address head = list.accounts[address(0)].next;
             list.accounts[address(0)].next = id;
