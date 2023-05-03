@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {HeapOrdering} from "src/HeapOrdering.sol";
-import {IHeapOrderingMock} from "./IHeapOrderingMock.sol";
+import {IHeapOrderingMock} from "./interfaces/IHeapOrderingMock.sol";
 
 contract HeapOrderingMock is IHeapOrderingMock {
     using HeapOrdering for HeapOrdering.HeapArray;

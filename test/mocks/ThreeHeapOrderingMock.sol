@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
-import {IHeapOrderingMock} from "./IHeapOrderingMock.sol";
+import {IHeapOrderingMock} from "./interfaces/IHeapOrderingMock.sol";
 
 contract ThreeHeapOrderingMock is IHeapOrderingMock {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;

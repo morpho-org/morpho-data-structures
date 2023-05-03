@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Random} from "./Random.sol";
-import {IHeapOrderingMock} from "../mocks/IHeapOrderingMock.sol";
+import {IHeapOrderingMock} from "../mocks/interfaces/IHeapOrderingMock.sol";
 import {Test} from "forge-std/Test.sol";
 
 abstract contract RandomHeap is Test, Random {
