@@ -29,369 +29,363 @@ library RedBlackBinaryTreeOptimized {
 
     /* INTERNAL */
 
-    /// @dev Returns the address of the smallest value in the tree `_self`.
-    /// @param _self The tree to search in.
-    function first(Tree storage _self) internal view returns (address key) {
-        key = _self.root;
+    /// @dev Returns the address of the smallest value in the tree `self`.
+    /// @param self The tree to search in.
+    function first(Tree storage self) internal view returns (address key) {
+        key = self.root;
         if (key == address(0)) return address(0);
-        while (_self.nodes[key].leftChild != address(0)) {
-            key = _self.nodes[key].leftChild;
+        while (self.nodes[key].leftChild != address(0)) {
+            key = self.nodes[key].leftChild;
         }
     }
 
-    /// @dev Returns the address of the highest value in the tree `_self`.
-    /// @param _self The tree to search in.
-    function last(Tree storage _self) internal view returns (address key) {
-        key = _self.root;
+    /// @dev Returns the address of the highest value in the tree `self`.
+    /// @param self The tree to search in.
+    function last(Tree storage self) internal view returns (address key) {
+        key = self.root;
         if (key == address(0)) return address(0);
-        while (_self.nodes[key].rightChild != address(0)) {
-            key = _self.nodes[key].rightChild;
+        while (self.nodes[key].rightChild != address(0)) {
+            key = self.nodes[key].rightChild;
         }
     }
 
-    /// @dev Returns the address of the next user after `_key`.
-    /// @param _self The tree to search in.
-    /// @param _key The address to search after.
-    function next(Tree storage _self, address _key) internal view returns (address cursor) {
-        require(_key != address(0), "RBBT(1):key-is-nul-address");
-        if (_self.nodes[_key].rightChild != address(0)) {
-            cursor = _subTreeMin(_self, _self.nodes[_key].rightChild);
+    /// @dev Returns the address of the next user after `key`.
+    /// @param self The tree to search in.
+    /// @param key The address to search after.
+    function next(Tree storage self, address key) internal view returns (address cursor) {
+        require(key != address(0), "RBBT(1):key-is-nul-address");
+        if (self.nodes[key].rightChild != address(0)) {
+            cursor = _subTreeMin(self, self.nodes[key].rightChild);
         } else {
-            cursor = _self.nodes[_key].parent;
-            while (cursor != address(0) && _key == _self.nodes[cursor].rightChild) {
-                _key = cursor;
-                cursor = _self.nodes[cursor].parent;
+            cursor = self.nodes[key].parent;
+            while (cursor != address(0) && key == self.nodes[cursor].rightChild) {
+                key = cursor;
+                cursor = self.nodes[cursor].parent;
             }
         }
     }
 
-    /// @dev Returns the address of the previous user above `_key`.
-    /// @param _self The tree to search in.
-    /// @param _key The address to search before.
-    function prev(Tree storage _self, address _key) internal view returns (address cursor) {
-        require(_key != address(0), "RBBT(2):start-value=0");
-        if (_self.nodes[_key].leftChild != address(0)) {
-            cursor = _subTreeMax(_self, _self.nodes[_key].leftChild);
+    /// @dev Returns the address of the previous user above `key`.
+    /// @param self The tree to search in.
+    /// @param key The address to search before.
+    function prev(Tree storage self, address key) internal view returns (address cursor) {
+        require(key != address(0), "RBBT(2):start-value=0");
+        if (self.nodes[key].leftChild != address(0)) {
+            cursor = _subTreeMax(self, self.nodes[key].leftChild);
         } else {
-            cursor = _self.nodes[_key].parent;
-            while (cursor != address(0) && _key == _self.nodes[cursor].leftChild) {
-                _key = cursor;
-                cursor = _self.nodes[cursor].parent;
+            cursor = self.nodes[key].parent;
+            while (cursor != address(0) && key == self.nodes[cursor].leftChild) {
+                key = cursor;
+                cursor = self.nodes[cursor].parent;
             }
         }
     }
 
-    /// @dev Returns whether the `_key` exists in the tree or not.
-    /// @param _self The tree to search in.
-    /// @param _key The key to search.
-    /// @return Whether the `_key` exists in the tree or not.
-    function keyExists(Tree storage _self, address _key) internal view returns (bool) {
-        return _self.keyToValue[_key] != 0;
+    /// @dev Returns whether the `key` exists in the tree or not.
+    /// @param self The tree to search in.
+    /// @param key The key to search.
+    /// @return Whether the `key` exists in the tree or not.
+    function keyExists(Tree storage self, address key) internal view returns (bool) {
+        return self.keyToValue[key] != 0;
     }
 
     /// @dev Returns true if A>B according to the order relationship.
-    /// @param _valueA value for user A.
-    /// @param _addressA Address for user A.
-    /// @param _valueB value for user B.
-    /// @param _addressB Address for user B.
-    function compare(uint256 _valueA, address _addressA, uint256 _valueB, address _addressB)
-        internal
-        pure
-        returns (bool)
-    {
-        if (_valueA == _valueB) {
-            if (_addressA > _addressB) {
+    /// @param valueA value for user A.
+    /// @param addressA Address for user A.
+    /// @param valueB value for user B.
+    /// @param addressB Address for user B.
+    function compare(uint256 valueA, address addressA, uint256 valueB, address addressB) internal pure returns (bool) {
+        if (valueA == valueB) {
+            if (addressA > addressB) {
                 return true;
             }
         }
-        if (_valueA > _valueB) {
+        if (valueA > valueB) {
             return true;
         }
         return false;
     }
 
     /// @dev Returns whether or not there is any key in the tree.
-    /// @param _self The tree to search in.
+    /// @param self The tree to search in.
     /// @return Whether or not a key exist in the tree.
-    function isNotEmpty(Tree storage _self) internal view returns (bool) {
-        return _self.root != address(0);
+    function isNotEmpty(Tree storage self) internal view returns (bool) {
+        return self.root != address(0);
     }
 
-    /// @dev Inserts the `_key` with `_value` in the tree.
-    /// @param _self The tree in which to add the (key, value) pair.
-    /// @param _key The key to add.
-    /// @param _value The value to add.
-    function insert(Tree storage _self, address _key, uint256 _value) internal {
-        require(_value != 0, "RBBT:value-cannot-be-0");
-        require(_self.keyToValue[_key] == 0, "RBBT:account-already-in");
-        _self.keyToValue[_key] = _value;
+    /// @dev Inserts the `key` with `value` in the tree.
+    /// @param self The tree in which to add the (key, value) pair.
+    /// @param key The key to add.
+    /// @param value The value to add.
+    function insert(Tree storage self, address key, uint256 value) internal {
+        require(value != 0, "RBBT:value-cannot-be-0");
+        require(self.keyToValue[key] == 0, "RBBT:account-already-in");
+        self.keyToValue[key] = value;
         address cursor;
-        address probe = _self.root;
+        address probe = self.root;
         while (probe != address(0)) {
             cursor = probe;
-            if (compare(_self.keyToValue[probe], probe, _value, _key)) {
-                probe = _self.nodes[probe].leftChild;
+            if (compare(self.keyToValue[probe], probe, value, key)) {
+                probe = self.nodes[probe].leftChild;
             } else {
-                probe = _self.nodes[probe].rightChild;
+                probe = self.nodes[probe].rightChild;
             }
         }
-        Node storage nValue = _self.nodes[_key];
+        Node storage nValue = self.nodes[key];
         nValue.parent = cursor;
         nValue.leftChild = address(0);
         nValue.rightChild = address(0);
         nValue.red = true;
         if (cursor == address(0)) {
-            _self.root = _key;
-        } else if (compare(_self.keyToValue[cursor], cursor, _value, _key)) {
-            _self.nodes[cursor].leftChild = _key;
+            self.root = key;
+        } else if (compare(self.keyToValue[cursor], cursor, value, key)) {
+            self.nodes[cursor].leftChild = key;
         } else {
-            _self.nodes[cursor].rightChild = _key;
+            self.nodes[cursor].rightChild = key;
         }
-        _insertFixup(_self, _key);
+        _insertFixup(self, key);
     }
 
-    /// @dev Removes the `_key` in the tree and its related value if no-one shares the same value.
-    /// @param _self The tree in which to remove the (key, value) pair.
-    /// @param _key The key to remove.
-    function remove(Tree storage _self, address _key) internal {
-        require(_self.keyToValue[_key] != 0, "RBBT:account-not-exist");
-        _self.keyToValue[_key] = 0;
+    /// @dev Removes the `key` in the tree and its related value if no-one shares the same value.
+    /// @param self The tree in which to remove the (key, value) pair.
+    /// @param key The key to remove.
+    function remove(Tree storage self, address key) internal {
+        require(self.keyToValue[key] != 0, "RBBT:account-not-exist");
+        self.keyToValue[key] = 0;
         address probe;
         address cursor;
-        if (_self.nodes[_key].leftChild == address(0) || _self.nodes[_key].rightChild == address(0)) {
-            cursor = _key;
+        if (self.nodes[key].leftChild == address(0) || self.nodes[key].rightChild == address(0)) {
+            cursor = key;
         } else {
-            cursor = _self.nodes[_key].rightChild;
-            while (_self.nodes[cursor].leftChild != address(0)) {
-                cursor = _self.nodes[cursor].leftChild;
+            cursor = self.nodes[key].rightChild;
+            while (self.nodes[cursor].leftChild != address(0)) {
+                cursor = self.nodes[cursor].leftChild;
             }
         }
-        if (_self.nodes[cursor].leftChild != address(0)) {
-            probe = _self.nodes[cursor].leftChild;
+        if (self.nodes[cursor].leftChild != address(0)) {
+            probe = self.nodes[cursor].leftChild;
         } else {
-            probe = _self.nodes[cursor].rightChild;
+            probe = self.nodes[cursor].rightChild;
         }
-        address cursorParent = _self.nodes[cursor].parent;
-        _self.nodes[probe].parent = cursorParent;
+        address cursorParent = self.nodes[cursor].parent;
+        self.nodes[probe].parent = cursorParent;
         if (cursorParent != address(0)) {
-            if (cursor == _self.nodes[cursorParent].leftChild) {
-                _self.nodes[cursorParent].leftChild = probe;
+            if (cursor == self.nodes[cursorParent].leftChild) {
+                self.nodes[cursorParent].leftChild = probe;
             } else {
-                _self.nodes[cursorParent].rightChild = probe;
+                self.nodes[cursorParent].rightChild = probe;
             }
         } else {
-            _self.root = probe;
+            self.root = probe;
         }
-        bool doFixup = !_self.nodes[cursor].red;
-        if (cursor != _key) {
-            _replaceParent(_self, cursor, _key);
-            _self.nodes[cursor].leftChild = _self.nodes[_key].leftChild;
-            _self.nodes[_self.nodes[cursor].leftChild].parent = cursor;
-            _self.nodes[cursor].rightChild = _self.nodes[_key].rightChild;
-            _self.nodes[_self.nodes[cursor].rightChild].parent = cursor;
-            _self.nodes[cursor].red = _self.nodes[_key].red;
-            (cursor, _key) = (_key, cursor);
+        bool doFixup = !self.nodes[cursor].red;
+        if (cursor != key) {
+            _replaceParent(self, cursor, key);
+            self.nodes[cursor].leftChild = self.nodes[key].leftChild;
+            self.nodes[self.nodes[cursor].leftChild].parent = cursor;
+            self.nodes[cursor].rightChild = self.nodes[key].rightChild;
+            self.nodes[self.nodes[cursor].rightChild].parent = cursor;
+            self.nodes[cursor].red = self.nodes[key].red;
+            (cursor, key) = (key, cursor);
         }
         if (doFixup) {
-            _removeFixup(_self, probe);
+            _removeFixup(self, probe);
         }
-        delete _self.nodes[cursor];
+        delete self.nodes[cursor];
     }
 
     /* PRIVATE */
 
     /// @dev Returns the minimum of the subtree beginning at a given node.
-    /// @param _self The tree to search in.
-    /// @param _key The value of the node to start at.
-    function _subTreeMin(Tree storage _self, address _key) private view returns (address) {
-        while (_self.nodes[_key].leftChild != address(0)) {
-            _key = _self.nodes[_key].leftChild;
+    /// @param self The tree to search in.
+    /// @param key The value of the node to start at.
+    function _subTreeMin(Tree storage self, address key) private view returns (address) {
+        while (self.nodes[key].leftChild != address(0)) {
+            key = self.nodes[key].leftChild;
         }
-        return _key;
+        return key;
     }
 
     /// @dev Returns the maximum of the subtree beginning at a given node.
-    /// @param _self The tree to search in.
-    /// @param _key The address of the node to start at.
-    function _subTreeMax(Tree storage _self, address _key) private view returns (address) {
-        while (_self.nodes[_key].rightChild != address(0)) {
-            _key = _self.nodes[_key].rightChild;
+    /// @param self The tree to search in.
+    /// @param key The address of the node to start at.
+    function _subTreeMax(Tree storage self, address key) private view returns (address) {
+        while (self.nodes[key].rightChild != address(0)) {
+            key = self.nodes[key].rightChild;
         }
-        return _key;
+        return key;
     }
 
     /// @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's rightChild child), C (B's leftChild child).
     ///       After leftChild rotation: B (Root), A (B's leftChild child), C (B's rightChild child).
-    /// @param _self The tree to apply the rotation to.
-    /// @param _key The address of the node to rotate.
-    function _rotateLeft(Tree storage _self, address _key) private {
-        address cursor = _self.nodes[_key].rightChild;
-        address keyParent = _self.nodes[_key].parent;
-        address cursorLeft = _self.nodes[cursor].leftChild;
-        _self.nodes[_key].rightChild = cursorLeft;
+    /// @param self The tree to apply the rotation to.
+    /// @param key The address of the node to rotate.
+    function _rotateLeft(Tree storage self, address key) private {
+        address cursor = self.nodes[key].rightChild;
+        address keyParent = self.nodes[key].parent;
+        address cursorLeft = self.nodes[cursor].leftChild;
+        self.nodes[key].rightChild = cursorLeft;
 
         if (cursorLeft != address(0)) {
-            _self.nodes[cursorLeft].parent = _key;
+            self.nodes[cursorLeft].parent = key;
         }
-        _self.nodes[cursor].parent = keyParent;
+        self.nodes[cursor].parent = keyParent;
         if (keyParent == address(0)) {
-            _self.root = cursor;
-        } else if (_key == _self.nodes[keyParent].leftChild) {
-            _self.nodes[keyParent].leftChild = cursor;
+            self.root = cursor;
+        } else if (key == self.nodes[keyParent].leftChild) {
+            self.nodes[keyParent].leftChild = cursor;
         } else {
-            _self.nodes[keyParent].rightChild = cursor;
+            self.nodes[keyParent].rightChild = cursor;
         }
-        _self.nodes[cursor].leftChild = _key;
-        _self.nodes[_key].parent = cursor;
+        self.nodes[cursor].leftChild = key;
+        self.nodes[key].parent = cursor;
     }
 
     /// @dev Rotates the tree to keep the balance. Let's have three node, A (root), B (A's leftChild child), C (B's rightChild child).
     ///          After rightChild rotation: B (Root), A (B's rightChild child), C (B's leftChild child).
-    /// @param _self The tree to apply the rotation to.
-    /// @param _key The address of the node to rotate.
-    function _rotateRight(Tree storage _self, address _key) private {
-        address cursor = _self.nodes[_key].leftChild;
-        address keyParent = _self.nodes[_key].parent;
-        address cursorRight = _self.nodes[cursor].rightChild;
-        _self.nodes[_key].leftChild = cursorRight;
+    /// @param self The tree to apply the rotation to.
+    /// @param key The address of the node to rotate.
+    function _rotateRight(Tree storage self, address key) private {
+        address cursor = self.nodes[key].leftChild;
+        address keyParent = self.nodes[key].parent;
+        address cursorRight = self.nodes[cursor].rightChild;
+        self.nodes[key].leftChild = cursorRight;
         if (cursorRight != address(0)) {
-            _self.nodes[cursorRight].parent = _key;
+            self.nodes[cursorRight].parent = key;
         }
-        _self.nodes[cursor].parent = keyParent;
+        self.nodes[cursor].parent = keyParent;
         if (keyParent == address(0)) {
-            _self.root = cursor;
-        } else if (_key == _self.nodes[keyParent].rightChild) {
-            _self.nodes[keyParent].rightChild = cursor;
+            self.root = cursor;
+        } else if (key == self.nodes[keyParent].rightChild) {
+            self.nodes[keyParent].rightChild = cursor;
         } else {
-            _self.nodes[keyParent].leftChild = cursor;
+            self.nodes[keyParent].leftChild = cursor;
         }
-        _self.nodes[cursor].rightChild = _key;
-        _self.nodes[_key].parent = cursor;
+        self.nodes[cursor].rightChild = key;
+        self.nodes[key].parent = cursor;
     }
 
     /// @dev Makes sure there is no violation of the tree properties after an insertion.
-    /// @param _self The tree to check and correct if needed.
-    /// @param _key The address of the user that was inserted.
-    function _insertFixup(Tree storage _self, address _key) private {
+    /// @param self The tree to check and correct if needed.
+    /// @param key The address of the user that was inserted.
+    function _insertFixup(Tree storage self, address key) private {
         address cursor;
-        while (_key != _self.root && _self.nodes[_self.nodes[_key].parent].red) {
-            address keyParent = _self.nodes[_key].parent;
-            if (keyParent == _self.nodes[_self.nodes[keyParent].parent].leftChild) {
-                cursor = _self.nodes[_self.nodes[keyParent].parent].rightChild;
-                if (_self.nodes[cursor].red) {
-                    _self.nodes[keyParent].red = false;
-                    _self.nodes[cursor].red = false;
-                    _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    _key = _self.nodes[keyParent].parent;
+        while (key != self.root && self.nodes[self.nodes[key].parent].red) {
+            address keyParent = self.nodes[key].parent;
+            if (keyParent == self.nodes[self.nodes[keyParent].parent].leftChild) {
+                cursor = self.nodes[self.nodes[keyParent].parent].rightChild;
+                if (self.nodes[cursor].red) {
+                    self.nodes[keyParent].red = false;
+                    self.nodes[cursor].red = false;
+                    self.nodes[self.nodes[keyParent].parent].red = true;
+                    key = self.nodes[keyParent].parent;
                 } else {
-                    if (_key == _self.nodes[keyParent].rightChild) {
-                        _key = keyParent;
-                        _rotateLeft(_self, _key);
+                    if (key == self.nodes[keyParent].rightChild) {
+                        key = keyParent;
+                        _rotateLeft(self, key);
                     }
-                    keyParent = _self.nodes[_key].parent;
-                    _self.nodes[keyParent].red = false;
-                    _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    _rotateRight(_self, _self.nodes[keyParent].parent);
+                    keyParent = self.nodes[key].parent;
+                    self.nodes[keyParent].red = false;
+                    self.nodes[self.nodes[keyParent].parent].red = true;
+                    _rotateRight(self, self.nodes[keyParent].parent);
                 }
             } else {
-                cursor = _self.nodes[_self.nodes[keyParent].parent].leftChild;
-                if (_self.nodes[cursor].red) {
-                    _self.nodes[keyParent].red = false;
-                    _self.nodes[cursor].red = false;
-                    _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    _key = _self.nodes[keyParent].parent;
+                cursor = self.nodes[self.nodes[keyParent].parent].leftChild;
+                if (self.nodes[cursor].red) {
+                    self.nodes[keyParent].red = false;
+                    self.nodes[cursor].red = false;
+                    self.nodes[self.nodes[keyParent].parent].red = true;
+                    key = self.nodes[keyParent].parent;
                 } else {
-                    if (_key == _self.nodes[keyParent].leftChild) {
-                        _key = keyParent;
-                        _rotateRight(_self, _key);
+                    if (key == self.nodes[keyParent].leftChild) {
+                        key = keyParent;
+                        _rotateRight(self, key);
                     }
-                    keyParent = _self.nodes[_key].parent;
-                    _self.nodes[keyParent].red = false;
-                    _self.nodes[_self.nodes[keyParent].parent].red = true;
-                    _rotateLeft(_self, _self.nodes[keyParent].parent);
+                    keyParent = self.nodes[key].parent;
+                    self.nodes[keyParent].red = false;
+                    self.nodes[self.nodes[keyParent].parent].red = true;
+                    _rotateLeft(self, self.nodes[keyParent].parent);
                 }
             }
         }
-        _self.nodes[_self.root].red = false;
+        self.nodes[self.root].red = false;
     }
 
     /// @dev Replace the parent of A by B's parent.
-    /// @param _self The tree to work with.
-    /// @param _a The node that will get the new parents.
-    /// @param _b The node that gives its parent.
-    function _replaceParent(Tree storage _self, address _a, address _b) private {
-        address bParent = _self.nodes[_b].parent;
-        _self.nodes[_a].parent = bParent;
+    /// @param self The tree to work with.
+    /// @param a The node that will get the new parents.
+    /// @param b The node that gives its parent.
+    function _replaceParent(Tree storage self, address a, address b) private {
+        address bParent = self.nodes[b].parent;
+        self.nodes[a].parent = bParent;
         if (bParent == address(0)) {
-            _self.root = _a;
+            self.root = a;
         } else {
-            if (_b == _self.nodes[bParent].leftChild) {
-                _self.nodes[bParent].leftChild = _a;
+            if (b == self.nodes[bParent].leftChild) {
+                self.nodes[bParent].leftChild = a;
             } else {
-                _self.nodes[bParent].rightChild = _a;
+                self.nodes[bParent].rightChild = a;
             }
         }
     }
 
     /// @dev Makes sure there is no violation of the tree properties after removal.
-    /// @param _self The tree to check and correct if needed.
-    /// @param _key The address requested in the function remove.
-    function _removeFixup(Tree storage _self, address _key) private {
+    /// @param self The tree to check and correct if needed.
+    /// @param key The address requested in the function remove.
+    function _removeFixup(Tree storage self, address key) private {
         address cursor;
-        while (_key != _self.root && !_self.nodes[_key].red) {
-            address keyParent = _self.nodes[_key].parent;
-            if (_key == _self.nodes[keyParent].leftChild) {
-                cursor = _self.nodes[keyParent].rightChild;
-                if (_self.nodes[cursor].red) {
-                    _self.nodes[cursor].red = false;
-                    _self.nodes[keyParent].red = true;
-                    _rotateLeft(_self, keyParent);
-                    cursor = _self.nodes[keyParent].rightChild;
+        while (key != self.root && !self.nodes[key].red) {
+            address keyParent = self.nodes[key].parent;
+            if (key == self.nodes[keyParent].leftChild) {
+                cursor = self.nodes[keyParent].rightChild;
+                if (self.nodes[cursor].red) {
+                    self.nodes[cursor].red = false;
+                    self.nodes[keyParent].red = true;
+                    _rotateLeft(self, keyParent);
+                    cursor = self.nodes[keyParent].rightChild;
                 }
-                if (!_self.nodes[_self.nodes[cursor].leftChild].red && !_self.nodes[_self.nodes[cursor].rightChild].red)
-                {
-                    _self.nodes[cursor].red = true;
-                    _key = keyParent;
+                if (!self.nodes[self.nodes[cursor].leftChild].red && !self.nodes[self.nodes[cursor].rightChild].red) {
+                    self.nodes[cursor].red = true;
+                    key = keyParent;
                 } else {
-                    if (!_self.nodes[_self.nodes[cursor].rightChild].red) {
-                        _self.nodes[_self.nodes[cursor].leftChild].red = false;
-                        _self.nodes[cursor].red = true;
-                        _rotateRight(_self, cursor);
-                        cursor = _self.nodes[keyParent].rightChild;
+                    if (!self.nodes[self.nodes[cursor].rightChild].red) {
+                        self.nodes[self.nodes[cursor].leftChild].red = false;
+                        self.nodes[cursor].red = true;
+                        _rotateRight(self, cursor);
+                        cursor = self.nodes[keyParent].rightChild;
                     }
-                    _self.nodes[cursor].red = _self.nodes[keyParent].red;
-                    _self.nodes[keyParent].red = false;
-                    _self.nodes[_self.nodes[cursor].rightChild].red = false;
-                    _rotateLeft(_self, keyParent);
-                    _key = _self.root;
+                    self.nodes[cursor].red = self.nodes[keyParent].red;
+                    self.nodes[keyParent].red = false;
+                    self.nodes[self.nodes[cursor].rightChild].red = false;
+                    _rotateLeft(self, keyParent);
+                    key = self.root;
                 }
             } else {
-                cursor = _self.nodes[keyParent].leftChild;
-                if (_self.nodes[cursor].red) {
-                    _self.nodes[cursor].red = false;
-                    _self.nodes[keyParent].red = true;
-                    _rotateRight(_self, keyParent);
-                    cursor = _self.nodes[keyParent].leftChild;
+                cursor = self.nodes[keyParent].leftChild;
+                if (self.nodes[cursor].red) {
+                    self.nodes[cursor].red = false;
+                    self.nodes[keyParent].red = true;
+                    _rotateRight(self, keyParent);
+                    cursor = self.nodes[keyParent].leftChild;
                 }
-                if (!_self.nodes[_self.nodes[cursor].rightChild].red && !_self.nodes[_self.nodes[cursor].leftChild].red)
-                {
-                    _self.nodes[cursor].red = true;
-                    _key = keyParent;
+                if (!self.nodes[self.nodes[cursor].rightChild].red && !self.nodes[self.nodes[cursor].leftChild].red) {
+                    self.nodes[cursor].red = true;
+                    key = keyParent;
                 } else {
-                    if (!_self.nodes[_self.nodes[cursor].leftChild].red) {
-                        _self.nodes[_self.nodes[cursor].rightChild].red = false;
-                        _self.nodes[cursor].red = true;
-                        _rotateLeft(_self, cursor);
-                        cursor = _self.nodes[keyParent].leftChild;
+                    if (!self.nodes[self.nodes[cursor].leftChild].red) {
+                        self.nodes[self.nodes[cursor].rightChild].red = false;
+                        self.nodes[cursor].red = true;
+                        _rotateLeft(self, cursor);
+                        cursor = self.nodes[keyParent].leftChild;
                     }
-                    _self.nodes[cursor].red = _self.nodes[keyParent].red;
-                    _self.nodes[keyParent].red = false;
-                    _self.nodes[_self.nodes[cursor].leftChild].red = false;
-                    _rotateRight(_self, keyParent);
-                    _key = _self.root;
+                    self.nodes[cursor].red = self.nodes[keyParent].red;
+                    self.nodes[keyParent].red = false;
+                    self.nodes[self.nodes[cursor].leftChild].red = false;
+                    _rotateRight(self, keyParent);
+                    key = self.root;
                 }
             }
         }
-        _self.nodes[_key].red = false;
+        self.nodes[key].red = false;
     }
 }

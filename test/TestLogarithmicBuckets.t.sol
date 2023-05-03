@@ -20,8 +20,8 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
-    function testInsertOneSingleAccount(bool _head) public {
-        buckets.update(accounts[0], 3, _head);
+    function testInsertOneSingleAccount(bool head) public {
+        buckets.update(accounts[0], 3, head);
 
         assertEq(buckets.valueOf[accounts[0]], 3);
         assertEq(buckets.getMatch(0), accounts[0]);
@@ -29,14 +29,14 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(buckets.buckets[2].getHead(), accounts[0]);
     }
 
-    function testUpdatingFromZeroToZeroShouldRevert(bool _head) public {
+    function testUpdatingFromZeroToZeroShouldRevert(bool head) public {
         vm.expectRevert(abi.encodeWithSignature("ZeroValue()"));
-        buckets.update(accounts[0], 0, _head);
+        buckets.update(accounts[0], 0, head);
     }
 
-    function testShouldNotInsertZeroAddress(bool _head) public {
+    function testShouldNotInsertZeroAddress(bool head) public {
         vm.expectRevert(abi.encodeWithSignature("ZeroAddress()"));
-        buckets.update(address(0), 10, _head);
+        buckets.update(address(0), 10, head);
     }
 
     function testShouldHaveTheRightOrderWithinABucketFIFO() public {
@@ -67,18 +67,18 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
         assertEq(next2, accounts[0]);
     }
 
-    function testInsertRemoveOneSingleAccount(bool _head1, bool _head2) public {
-        buckets.update(accounts[0], 1, _head1);
-        buckets.update(accounts[0], 0, _head2);
+    function testInsertRemoveOneSingleAccount(bool head1, bool head2) public {
+        buckets.update(accounts[0], 1, head1);
+        buckets.update(accounts[0], 0, head2);
 
         assertEq(buckets.valueOf[accounts[0]], 0);
         assertEq(buckets.getMatch(0), address(0));
         assertEq(buckets.buckets[1].getHead(), address(0));
     }
 
-    function testShouldInsertTwoAccounts(bool _head1, bool _head2) public {
-        buckets.update(accounts[0], 16, _head1);
-        buckets.update(accounts[1], 4, _head2);
+    function testShouldInsertTwoAccounts(bool head1, bool head2) public {
+        buckets.update(accounts[0], 16, head1);
+        buckets.update(accounts[1], 4, head2);
 
         assertEq(buckets.getMatch(16), accounts[0]);
         assertEq(buckets.getMatch(2), accounts[1]);
@@ -124,19 +124,19 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
-    function testProveComputeBucket(uint256 _value) public {
-        uint256 bucket = LogarithmicBuckets.highestSetBit(_value);
+    function testProveComputeBucket(uint256 value) public {
+        uint256 bucket = LogarithmicBuckets.highestSetBit(value);
         unchecked {
-            // cross-check that bucket == 2^{floor(log_2 value)}, or 0 if value == 0
+            // cross-check that bucket == 2^{floor(log2 value)}, or 0 if value == 0
             assertTrue(bucket == 0 || isPowerOfTwo(bucket));
-            assertTrue(bucket <= _value);
-            assertTrue(_value <= 2 * bucket - 1); // abusing overflow when bucket == 2**255
+            assertTrue(bucket <= value);
+            assertTrue(value <= 2 * bucket - 1); // abusing overflow when bucket == 2**255
         }
     }
 
-    function testProveNextBucket(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.highestSetBit(_value);
-        uint256 next = nextBucketValue(_value);
+    function testProveNextBucket(uint256 value) public {
+        uint256 curr = LogarithmicBuckets.highestSetBit(value);
+        uint256 next = nextBucketValue(value);
         uint256 bucketsMask = buckets.bucketsMask;
         // Check that `next` is a power of two or zero.
         assertTrue(next == 0 || isPowerOfTwo(next));
@@ -168,9 +168,9 @@ contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
         }
     }
 
-    function testProveHighestPrevEquivalence(uint256 _value) public {
-        uint256 curr = LogarithmicBuckets.highestSetBit(_value);
-        uint256 next = nextBucketValue(_value);
+    function testProveHighestPrevEquivalence(uint256 value) public {
+        uint256 curr = LogarithmicBuckets.highestSetBit(value);
+        uint256 next = nextBucketValue(value);
 
         if (next == 0) {
             uint256 highest = highestBucketValue();

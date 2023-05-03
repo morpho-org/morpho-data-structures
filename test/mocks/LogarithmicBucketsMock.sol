@@ -10,12 +10,12 @@ contract LogarithmicBucketsMock {
 
     LogarithmicBuckets.Buckets public buckets;
 
-    function update(address _id, uint256 _newValue, bool _head) public virtual {
-        buckets.update(_id, _newValue, _head);
+    function update(address id, uint256 newValue, bool head) public virtual {
+        buckets.update(id, newValue, head);
     }
 
-    function getValueOf(address _id) public view returns (uint256) {
-        return buckets.valueOf[_id];
+    function getValueOf(address id) public view returns (uint256) {
+        return buckets.valueOf[id];
     }
 
     function maxBucket() public view returns (uint256) {
@@ -23,8 +23,8 @@ contract LogarithmicBucketsMock {
         return lowerMask ^ (lowerMask >> 1);
     }
 
-    function getMatch(uint256 _value) public view returns (address) {
-        return buckets.getMatch(_value);
+    function getMatch(uint256 value) public view returns (address) {
+        return buckets.getMatch(value);
     }
 
     function verifyStructure() public view returns (bool) {
@@ -45,9 +45,9 @@ contract LogarithmicBucketsMock {
         return true;
     }
 
-    function nextBucketValue(uint256 _value) internal view returns (uint256) {
+    function nextBucketValue(uint256 value) internal view returns (uint256) {
         uint256 bucketsMask = buckets.bucketsMask;
-        uint256 lowerMask = LogarithmicBuckets.setLowerBits(_value);
+        uint256 lowerMask = LogarithmicBuckets.setLowerBits(value);
         return LogarithmicBuckets.nextBucket(lowerMask, bucketsMask);
     }
 

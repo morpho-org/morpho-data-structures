@@ -9,16 +9,16 @@ import {HeapMock} from "./mocks/HeapMock.sol";
 contract Heap is HeapMock, StdUtils {
     address[] internal accountsUsed;
 
-    function accountsValue(uint256 _index) external view returns (uint256) {
-        return heap.accounts[_index].value;
+    function accountsValue(uint256 index) external view returns (uint256) {
+        return heap.accounts[index].value;
     }
 
-    function accountsId(uint256 _index) external view returns (address) {
-        return heap.accounts[_index].id;
+    function accountsId(uint256 index) external view returns (address) {
+        return heap.accounts[index].id;
     }
 
-    function indexOf(address _id) external view returns (uint256) {
-        return heap.indexOf[_id];
+    function indexOf(address id) external view returns (uint256) {
+        return heap.indexOf[id];
     }
 
     /// Functions to fuzz ///

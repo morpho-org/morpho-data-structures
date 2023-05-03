@@ -10,6 +10,7 @@ import "./BucketDLL.sol";
 library LogarithmicBuckets {
     using BucketDLL for BucketDLL.List;
 
+    /* STRUCTS */
     struct Buckets {
         mapping(uint256 => BucketDLL.List) buckets;
         mapping(address => uint256) valueOf;

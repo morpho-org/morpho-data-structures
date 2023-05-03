@@ -8,47 +8,47 @@ contract HeapMock {
 
     BasicHeap.Heap internal heap;
 
-    function insert(address _id, uint256 _value) public {
-        heap.insert(_id, _value);
+    function insert(address id, uint256 value) public {
+        heap.insert(id, value);
     }
 
-    function decrease(address _id, uint256 _newValue) public {
-        heap.decrease(_id, _newValue);
+    function decrease(address id, uint256 newValue) public {
+        heap.decrease(id, newValue);
     }
 
-    function increase(address _id, uint256 _newValue) public {
-        heap.increase(_id, _newValue);
+    function increase(address id, uint256 newValue) public {
+        heap.increase(id, newValue);
     }
 
-    function remove(address _id) public {
-        heap.remove(_id);
+    function remove(address id) public {
+        heap.remove(id);
     }
 
     function length() public view returns (uint256) {
         return heap.length();
     }
 
-    function containsAccount(address _id) public view returns (bool) {
-        return heap.containsAccount(_id);
+    function containsAccount(address id) public view returns (bool) {
+        return heap.containsAccount(id);
     }
 
-    function getValueOf(address _id) public view returns (uint256) {
-        return heap.getValueOf(_id);
+    function getValueOf(address id) public view returns (uint256) {
+        return heap.getValueOf(id);
     }
 
     function getRoot() public view returns (address) {
         return heap.getRoot();
     }
 
-    function getParent(address _id) public view returns (address) {
-        return heap.getParent(_id);
+    function getParent(address id) public view returns (address) {
+        return heap.getParent(id);
     }
 
-    function getLeftChild(address _id) public view returns (address) {
-        return heap.getLeftChild(_id);
+    function getLeftChild(address id) public view returns (address) {
+        return heap.getLeftChild(id);
     }
 
-    function getRightChild(address _id) public view returns (address) {
-        return heap.getRightChild(_id);
+    function getRightChild(address id) public view returns (address) {
+        return heap.getRightChild(id);
     }
 }

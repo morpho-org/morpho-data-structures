@@ -13,10 +13,10 @@ contract Heap is HeapOrderingMock {
 
     /// Functions to fuzz ///
 
-    function updateCorrect(address _id, uint96 _newValue) public {
-        uint256 oldValue = heap.getValueOf(_id);
-        if (oldValue != 0 || _newValue != 0) {
-            heap.update(_id, heap.getValueOf(_id), _newValue, MAX_SORTED_USERS);
+    function updateCorrect(address id, uint96 newValue) public {
+        uint256 oldValue = heap.getValueOf(id);
+        if (oldValue != 0 || newValue != 0) {
+            heap.update(id, heap.getValueOf(id), newValue, MAX_SORTED_USERS);
         }
     }
 }
