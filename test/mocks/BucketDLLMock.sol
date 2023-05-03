@@ -8,11 +8,7 @@ library BucketDLLMock {
         return BucketDLL.remove(_list, _id);
     }
 
-    function insert(
-        BucketDLL.List storage _list,
-        address _id,
-        bool _head
-    ) internal returns (bool) {
+    function insert(BucketDLL.List storage _list, address _id, bool _head) internal returns (bool) {
         return BucketDLL.insert(_list, _id, _head);
     }
 

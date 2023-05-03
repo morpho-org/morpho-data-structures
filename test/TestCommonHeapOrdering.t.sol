@@ -10,11 +10,7 @@ abstract contract TestCommonHeapOrdering is RandomHeap {
     uint256 public MAX_SORTED_USERS = 50;
     address public ADDR_ZERO = address(0);
 
-    function update(
-        address _id,
-        uint256 _formerValue,
-        uint256 _newValue
-    ) public {
+    function update(address _id, uint256 _formerValue, uint256 _newValue) public {
         heap.update(_id, _formerValue, _newValue, MAX_SORTED_USERS);
     }
 
