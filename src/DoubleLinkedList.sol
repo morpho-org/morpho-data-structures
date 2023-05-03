@@ -16,8 +16,6 @@ library DoubleLinkedList {
 
     struct List {
         mapping(address => Account) accounts;
-        address head;
-        address tail;
     }
 
     /* ERRORS */
@@ -48,14 +46,14 @@ library DoubleLinkedList {
     /// @param list The list to get the head.
     /// @return The address of the head.
     function getHead(List storage list) internal view returns (address) {
-        return list.head;
+        return list.accounts[address(0)].next;
     }
 
     /// @notice Returns the address at the tail of the `list`.
     /// @param list The list to get the tail.
     /// @return The address of the tail.
     function getTail(List storage list) internal view returns (address) {
-        return list.tail;
+        return list.accounts[address(0)].prev;
     }
 
     /// @notice Returns the next id address from the current `id`.
@@ -81,10 +79,8 @@ library DoubleLinkedList {
         Account memory account = list.accounts[id];
         if (account.value == 0) revert AccountDoesNotExist();
 
-        if (account.prev != address(0)) list.accounts[account.prev].next = account.next;
-        else list.head = account.next;
-        if (account.next != address(0)) list.accounts[account.next].prev = account.prev;
-        else list.tail = account.prev;
+        list.accounts[account.prev].next = account.next;
+        list.accounts[account.next].prev = account.prev;
 
         delete list.accounts[id];
     }
@@ -100,7 +96,7 @@ library DoubleLinkedList {
         if (list.accounts[id].value != 0) revert AccountAlreadyInserted();
 
         uint256 numberOfIterations;
-        address next = list.head; // If not added at the end of the list `id` will be inserted before `next`.
+        address next = list.accounts[address(0)].next; // If not added at the end of the list `id` will be inserted before `next`.
 
         while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
             next = list.accounts[next].next;
@@ -112,9 +108,9 @@ library DoubleLinkedList {
         // Account is not the new tail.
         if (numberOfIterations < maxIterations && next != address(0)) {
             // Account is the new head.
-            if (next == list.head) {
+            if (next == list.accounts[address(0)].next) {
                 list.accounts[id] = Account({prev: address(0), next: next, value: value});
-                list.head = id;
+                list.accounts[address(0)].next = id;
                 list.accounts[next].prev = id;
             }
             // Account is not the new head.
@@ -128,17 +124,17 @@ library DoubleLinkedList {
         // Account is the new tail.
         else {
             // Account is the new head.
-            if (list.head == address(0)) {
+            if (list.accounts[address(0)].next == address(0)) {
                 list.accounts[id] = Account({prev: address(0), next: address(0), value: value});
-                list.head = id;
-                list.tail = id;
+                list.accounts[address(0)].next = id;
+                list.accounts[address(0)].prev = id;
             }
             // Account is not the new head.
             else {
-                address tail = list.tail;
+                address tail = list.accounts[address(0)].prev;
                 list.accounts[id] = Account({prev: tail, next: address(0), value: value});
                 list.accounts[tail].next = id;
-                list.tail = id;
+                list.accounts[address(0)].prev = id;
             }
         }
     }
