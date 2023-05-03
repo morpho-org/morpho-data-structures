@@ -82,28 +82,6 @@ Before merging a PR:
 
 ## Code Formatting
 
-Configure your VSCode to automatically format a file on save, using `forge fmt`:
-
-- Install [emeraldwalk.runonsave](https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave)
-- Update your `settings.json`:
-
-```json
-{
-  "[solidity]": {
-    "editor.formatOnSave": false
-  },
-  "emeraldwalk.runonsave": {
-    "commands": [
-      {
-        "match": ".sol",
-        "isAsync": true,
-        "cmd": "forge fmt ${file}"
-      }
-    ]
-  }
-}
-```
-
 We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
 
 # Audits

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.13;
+pragma solidity ^0.8.0;
 
 import {Random} from "./Random.sol";
-import {IConcreteHeapOrdering} from "./interfaces/IConcreteHeapOrdering.sol";
+import {IHeapOrderingMock} from "../mocks/IHeapOrderingMock.sol";
 import {Test} from "forge-std/Test.sol";
 
-abstract contract TestRandomHeap is Test, Random {
-    IConcreteHeapOrdering public heap;
+abstract contract RandomHeap is Test, Random {
+    IHeapOrderingMock public heap;
 
     address[] public ids;
 
@@ -61,29 +61,6 @@ abstract contract TestRandomHeap is Test, Random {
         } else {
             value = heap.getValueOf(head);
             heap.update(head, value, 0, maxSortedUsers);
-        }
-    }
-
-    // Should give elements in decreasing order if maxSortedUsers is +infinity.
-    function testFullHeapSort() public {
-        maxSortedUsers = n;
-        for (uint256 i; i < n; i++) {
-            if (ids.length == 0) {
-                insert();
-            } else {
-                uint256 r = randomUint256(5);
-                if (r < 2) insert();
-                else if (r == 2) remove();
-                else if (r == 3) increase();
-                else decrease();
-            }
-        }
-
-        uint256 lastValue = type(uint256).max;
-        uint256 newValue;
-        while ((newValue = removeHead()) != 0) {
-            require(newValue <= lastValue, "Elements are not given back in a decreasing order.");
-            lastValue = newValue;
         }
     }
 }

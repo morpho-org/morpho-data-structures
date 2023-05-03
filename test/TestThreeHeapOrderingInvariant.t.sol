@@ -3,10 +3,10 @@ pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
 
-import {ConcreteThreeHeapOrdering} from "./helpers/ConcreteThreeHeapOrdering.sol";
+import {ThreeHeapOrderingMock} from "./mocks/ThreeHeapOrderingMock.sol";
 import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
 
-contract Heap is ConcreteThreeHeapOrdering {
+contract Heap is ThreeHeapOrderingMock {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
 
     uint256 public MAX_SORTED_USERS = 16;

@@ -3,10 +3,10 @@ pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
 
-import {ConcreteHeapOrdering} from "./helpers/ConcreteHeapOrdering.sol";
+import {HeapOrderingMock} from "./mocks/HeapOrderingMock.sol";
 import {HeapOrdering} from "src/HeapOrdering.sol";
 
-contract Heap is ConcreteHeapOrdering {
+contract Heap is HeapOrderingMock {
     using HeapOrdering for HeapOrdering.HeapArray;
 
     uint256 public MAX_SORTED_USERS = 16;
@@ -49,8 +49,8 @@ contract TestHeapOrderingInvariant is Test {
         uint256 length = heap.length();
 
         for (uint256 i; i < length; ++i) {
-            assertTrue((i * 2 + 1 >= length || i * 2 + 1 >= heap.size()|| heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)));// forgefmt: disable-line
-            assertTrue(( i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)));// forgefmt: disable-line
+            assertTrue((i * 2 + 1 >= length || i * 2 + 1 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)));// forgefmt: disable-line
+            assertTrue((i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)));// forgefmt: disable-line
         }
     }
 
