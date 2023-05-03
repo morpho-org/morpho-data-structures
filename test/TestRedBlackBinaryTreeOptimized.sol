@@ -44,11 +44,11 @@ contract TestRedBlackBinaryTreeOptimized is Test {
         assertEq(tree.keyToValue[key], value, "Incorrect value inserted");
     }
 
-    function FirstReturnAddressZeroIfEmpty() public {
+    function testFirstReturnAddressZeroIfEmpty() public {
         assertEq(tree.first(), ADDR_ZERO, "Address Not Null");
     }
 
-    function LastReturnAddressZeroIfEmpty() public {
+    function testLastReturnAddressZeroIfEmpty() public {
         assertEq(tree.last(), ADDR_ZERO, "Address Not Null");
     }
 

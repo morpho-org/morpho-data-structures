@@ -152,13 +152,13 @@ library BasicHeap {
         uint256 valueToShift = _accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
-        // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
 
-        while (childIndex < _size) {
-            Account memory childToSwap = _heap.accounts[childIndex];
+        unchecked {
+            while (childIndex < _size) {
+                // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
+                Account memory childToSwap = _heap.accounts[childIndex];
 
-            // Find the child with largest value.
-            unchecked {
+                // Find the child with largest value.
                 rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
 
                 if (rightChildIndex < _size) {
@@ -208,7 +208,7 @@ library BasicHeap {
     /// @notice Returns the number of users in the `_heap`.
     /// @param _heap The heap parameter.
     /// @return The length of the heap.
-    function getSize(Heap storage _heap) internal view returns (uint256) {
+    function length(Heap storage _heap) internal view returns (uint256) {
         return _heap.accounts.length;
     }
 
