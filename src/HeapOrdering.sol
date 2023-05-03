@@ -146,6 +146,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _account The account to set the `_index` to.
     /// @param _index The index of the account in the heap to be set.
+
     function _setAccount(HeapArray storage _heap, Account memory _account, uint256 _index) private {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
