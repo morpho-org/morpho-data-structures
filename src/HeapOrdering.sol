@@ -129,8 +129,9 @@ library HeapOrdering {
 
     /* PRIVATE */
 
-    /// @notice Computes a new suitable size from `_size` that is smaller than `_maxSortedUsers`.
-    /// @dev We use division by 2 to remove the leaves of the heap.
+    /// @notice Computes a new suitable size for the Heap from `_size` that is smaller than `_maxSortedUsers`.
+    /// @notice Computing the size this way is meant to avoid having all the liquidity in the same path.
+    /// @dev We divide by 2 the size to remove the leaves of the heap.
     /// @param _size The old size of the heap.
     /// @param _maxSortedUsers The maximum size of the heap.
     /// @return The new size computed.

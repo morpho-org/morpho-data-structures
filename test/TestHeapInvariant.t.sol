@@ -94,7 +94,7 @@ contract TestHeapInvariant is Test {
     // For all i in [[0, size]],
     // value[i] >= value[2i + 1] and value[i] >= value[2i + 2]
     function invariantHeap() public {
-        uint256 size = heap.getSize();
+        uint256 size = heap.length();
 
         for (uint256 i; i < size; ++i) {
             address account = heap.accountsId(i);
@@ -128,7 +128,7 @@ contract TestHeapInvariant is Test {
     // Rule:
     // For all i in [[0, length]], indexOf[accounts[i].id] == i
     function invariantIndexOf() public {
-        uint256 size = heap.getSize();
+        uint256 size = heap.length();
 
         for (uint256 i; i < size; ++i) {
             assertTrue(heap.indexOf(heap.accountsId(i)) == i);
