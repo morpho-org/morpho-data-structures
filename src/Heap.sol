@@ -153,12 +153,12 @@ library BasicHeap {
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
 
-        while (childIndex < _size) {
-            // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
-            Account memory childToSwap = _heap.accounts[childIndex];
+        unchecked {
+            while (childIndex < _size) {
+                // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
+                Account memory childToSwap = _heap.accounts[childIndex];
 
-            // Find the child with largest value.
-            unchecked {
+                // Find the child with largest value.
                 rightChildIndex = childIndex + 1; // This cannot overflow because childIndex < size.
 
                 if (rightChildIndex < _size) {
