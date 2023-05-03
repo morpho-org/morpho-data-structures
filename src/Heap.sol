@@ -152,9 +152,9 @@ library BasicHeap {
         uint256 valueToShift = _accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
-        // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
 
         while (childIndex < _size) {
+            // At this point, childIndex (resp. childIndex+1) is the index of the left (resp. right) child.
             Account memory childToSwap = _heap.accounts[childIndex];
 
             // Find the child with largest value.
