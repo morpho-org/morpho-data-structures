@@ -118,7 +118,7 @@ library ThreeHeapOrdering {
             } else if (formerValue < newValue) {
                 _increase(_heap, newSize, _id, newValue, _maxSortedUsers);
             } else {
-                _decrease(_heap, newSize, _id, newValue);ssssssssssssssssssssssssssssssssssssssssss
+                _decrease(_heap, newSize, _id, newValue);
             }
         }
     }
