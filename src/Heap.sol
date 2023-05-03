@@ -208,7 +208,7 @@ library BasicHeap {
     /// @notice Returns the number of users in the `_heap`.
     /// @param _heap The heap parameter.
     /// @return The length of the heap.
-    function getSize(Heap storage _heap) internal view returns (uint256) {
+    function length(Heap storage _heap) internal view returns (uint256) {
         return _heap.accounts.length;
     }
 

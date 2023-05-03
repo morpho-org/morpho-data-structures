@@ -25,7 +25,7 @@ contract TestHeap is Test {
     function testInsertOneSingleAccount() public {
         heap.insert(accounts[0], 1);
 
-        assertEq(heap.getSize(), 1);
+        assertEq(heap.length(), 1);
         assertEq(heap.getValueOf(accounts[0]), 1);
         assertEq(heap.getRoot(), accounts[0]);
         assertEq(heap.getLeftChild(accounts[0]), ADDR_ZERO);
@@ -70,7 +70,7 @@ contract TestHeap is Test {
         heap.insert(accounts[0], 1);
         heap.remove(accounts[0]);
 
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
         assertEq(heap.getRoot(), ADDR_ZERO);
         assertEq(heap.getValueOf(accounts[0]), 0);
         assertEq(heap.getLeftChild(accounts[0]), ADDR_ZERO);
@@ -85,7 +85,7 @@ contract TestHeap is Test {
         address leftChild = heap.getLeftChild(root);
         address rightChild = heap.getRightChild(root);
 
-        assertEq(heap.getSize(), 2);
+        assertEq(heap.length(), 2);
         assertEq(root, accounts[0]);
         assertEq(leftChild, accounts[1]);
         assertEq(rightChild, ADDR_ZERO);
@@ -104,7 +104,7 @@ contract TestHeap is Test {
         address leftChild = heap.getLeftChild(root);
         address rightChild = heap.getRightChild(root);
 
-        assertEq(heap.getSize(), 3);
+        assertEq(heap.length(), 3);
         assertEq(root, accounts[0]);
         assertEq(leftChild, accounts[1]);
         assertEq(rightChild, accounts[2]);
@@ -122,7 +122,7 @@ contract TestHeap is Test {
 
         address root = heap.getRoot();
 
-        assertEq(heap.getSize(), 1);
+        assertEq(heap.length(), 1);
         assertEq(root, accounts[1]);
         assertEq(heap.getValueOf(accounts[0]), 0);
         assertEq(heap.getValueOf(accounts[1]), 1);
@@ -138,7 +138,7 @@ contract TestHeap is Test {
         heap.remove(accounts[1]);
 
         assertEq(heap.getRoot(), ADDR_ZERO);
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
     }
 
     function testShouldInsertThreeAccountsAndRemoveThem() public {
@@ -148,7 +148,7 @@ contract TestHeap is Test {
 
         address root = heap.getRoot();
 
-        assertEq(heap.getSize(), 3);
+        assertEq(heap.length(), 3);
         assertEq(root, accounts[0]);
         assertEq(heap.getLeftChild(root), accounts[1]);
         assertEq(heap.getRightChild(root), accounts[2]);
@@ -158,7 +158,7 @@ contract TestHeap is Test {
 
         root = heap.getRoot();
 
-        assertEq(heap.getSize(), 2);
+        assertEq(heap.length(), 2);
         assertEq(root, accounts[1]);
         assertEq(heap.getLeftChild(root), accounts[2]);
         assertEq(heap.getRightChild(root), ADDR_ZERO);
@@ -168,7 +168,7 @@ contract TestHeap is Test {
 
         root = heap.getRoot();
 
-        assertEq(heap.getSize(), 1);
+        assertEq(heap.length(), 1);
         assertEq(root, accounts[2]);
         assertEq(heap.getLeftChild(root), ADDR_ZERO);
         assertEq(heap.getRightChild(root), ADDR_ZERO);
@@ -176,7 +176,7 @@ contract TestHeap is Test {
         // Remove account 2.
         heap.remove(accounts[2]);
 
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
         assertEq(heap.getRoot(), ADDR_ZERO);
     }
 
@@ -201,7 +201,7 @@ contract TestHeap is Test {
             heap.remove(accounts[i]);
         }
 
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
         assertEq(heap.getRoot(), ADDR_ZERO);
     }
 

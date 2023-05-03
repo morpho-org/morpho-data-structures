@@ -24,8 +24,8 @@ contract HeapMock {
         heap.remove(_id);
     }
 
-    function getSize() public view returns (uint256) {
-        return heap.getSize();
+    function length() public view returns (uint256) {
+        return heap.length();
     }
 
     function containsAccount(address _id) public view returns (bool) {
