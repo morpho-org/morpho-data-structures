@@ -75,30 +75,6 @@ library LogarithmicBuckets {
         return buckets.buckets[prev].getNext(address(0));
     }
 
-    /* PRIVATE */
-
-    /// @notice Removes an account in the `buckets`.
-    /// @dev Does not update the value.
-    /// @param buckets The buckets to modify.
-    /// @param id The address of the account to remove.
-    /// @param bucket The mask of the bucket where to remove.
-    function _remove(Buckets storage buckets, address id, uint256 bucket) private {
-        if (buckets.buckets[bucket].remove(id)) buckets.bucketsMask &= ~bucket;
-    }
-
-    /// @notice Inserts an account in the `buckets`.
-    /// @dev Expects that `id` != 0.
-    /// @dev Does not update the value.
-    /// @param buckets The buckets to modify.
-    /// @param id The address of the account to update.
-    /// @param bucket The mask of the bucket where to insert.
-    /// @param head Whether to insert at the head or at the tail of the list.
-    function _insert(Buckets storage buckets, address id, uint256 bucket, bool head) private {
-        if (buckets.buckets[bucket].insert(id, head)) buckets.bucketsMask |= bucket;
-    }
-
-    /* PURE HELPERS */
-
     /// @notice Returns the highest set bit.
     /// @dev Used to compute the bucket associated to a given `value`.
     /// @dev Used to compute the highest non empty bucket given the `bucketsMask`.
@@ -130,5 +106,27 @@ library LogarithmicBuckets {
             let higherBucketsMask := and(not(lowerMask), bucketsMask)
             bucket := and(higherBucketsMask, add(not(higherBucketsMask), 1))
         }
+    }
+
+    /* PRIVATE */
+
+    /// @notice Removes an account in the `buckets`.
+    /// @dev Does not update the value.
+    /// @param buckets The buckets to modify.
+    /// @param id The address of the account to remove.
+    /// @param bucket The mask of the bucket where to remove.
+    function _remove(Buckets storage buckets, address id, uint256 bucket) private {
+        if (buckets.buckets[bucket].remove(id)) buckets.bucketsMask &= ~bucket;
+    }
+
+    /// @notice Inserts an account in the `buckets`.
+    /// @dev Expects that `id` != 0.
+    /// @dev Does not update the value.
+    /// @param buckets The buckets to modify.
+    /// @param id The address of the account to update.
+    /// @param bucket The mask of the bucket where to insert.
+    /// @param head Whether to insert at the head or at the tail of the list.
+    function _insert(Buckets storage buckets, address id, uint256 bucket, bool head) private {
+        if (buckets.buckets[bucket].insert(id, head)) buckets.bucketsMask |= bucket;
     }
 }
