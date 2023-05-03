@@ -1,10 +1,11 @@
 name: Forge format
 
 on:
-  workflow_call:
-    secrets:
-      MACHINE_USER_PRIVATE_KEY:
-        required: true
+  push:
+    branches:
+      - main
+  pull_request:
+    
 
 jobs:
   forge-fmt:
