@@ -8,9 +8,13 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
+    /* STORAGE */
+
     uint256 public accountsLength = 50;
     address[] public accounts;
     address public ADDR_ZERO = address(0);
+
+    /* PUBLIC */
 
     function setUp() public {
         accounts = new address[](accountsLength);
@@ -118,6 +122,8 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
 }
 
 contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
+    /* PUBLIC */
+
     function isPowerOfTwo(uint256 x) public pure returns (bool) {
         unchecked {
             return x != 0 && (x & (x - 1)) == 0;

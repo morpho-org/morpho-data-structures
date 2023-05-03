@@ -4,6 +4,8 @@ pragma solidity ^0.8.0;
 import "src/BucketDLL.sol";
 
 library BucketDLLMock {
+    /* INTERNAL */
+
     function remove(BucketDLL.List storage list, address id) internal returns (bool) {
         return BucketDLL.remove(list, id);
     }

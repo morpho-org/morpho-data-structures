@@ -7,49 +7,49 @@ import {IHeapOrderingMock} from "./interfaces/IHeapOrderingMock.sol";
 contract ThreeHeapOrderingMock is IHeapOrderingMock {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
 
-    ThreeHeapOrdering.HeapArray internal heap;
+    ThreeHeapOrdering.HeapArray internal _heap;
 
     function accountsValue(uint256 index) external view returns (uint256) {
-        return heap.accounts[index].value;
+        return _heap.accounts[index].value;
     }
 
     function accountsId(uint256 index) external view returns (address) {
-        return heap.accounts[index].id;
+        return _heap.accounts[index].id;
     }
 
     function indexOf(address id) external view returns (uint256) {
-        return heap.indexOf[id];
+        return _heap.indexOf[id];
     }
 
     function update(address id, uint256 formerValue, uint256 newValue, uint256 maxSortedUsers) external {
-        heap.update(id, formerValue, newValue, maxSortedUsers);
+        _heap.update(id, formerValue, newValue, maxSortedUsers);
     }
 
     function length() external view returns (uint256) {
-        return heap.length();
+        return _heap.length();
     }
 
     function size() external view returns (uint256) {
-        return heap.size;
+        return _heap.size;
     }
 
     function getValueOf(address id) external view returns (uint256) {
-        return heap.getValueOf(id);
+        return _heap.getValueOf(id);
     }
 
     function getHead() external view returns (address) {
-        return heap.getHead();
+        return _heap.getHead();
     }
 
     function getTail() external view returns (address) {
-        return heap.getTail();
+        return _heap.getTail();
     }
 
     function getPrev(address id) external view returns (address) {
-        return heap.getPrev(id);
+        return _heap.getPrev(id);
     }
 
     function getNext(address id) external view returns (address) {
-        return heap.getNext(id);
+        return _heap.getNext(id);
     }
 }

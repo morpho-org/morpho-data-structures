@@ -8,11 +8,15 @@ import {RedBlackBinaryTreeOptimized} from "src/RedBlackBinaryTreeOptimized.sol";
 contract TestRedBlackBinaryTreeOptimized is Test {
     using RedBlackBinaryTreeOptimized for RedBlackBinaryTreeOptimized.Tree;
 
+    /* STORAGE */
+
     uint256 public NDS = 50;
     address[] public accounts;
     address public ADDR_ZERO = address(0);
 
     RedBlackBinaryTreeOptimized.Tree public tree;
+
+    /* PUBLIC */
 
     function setUp() public {
         accounts = new address[](NDS);

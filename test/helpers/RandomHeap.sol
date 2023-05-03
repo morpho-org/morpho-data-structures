@@ -6,12 +6,16 @@ import {IHeapOrderingMock} from "../mocks/interfaces/IHeapOrderingMock.sol";
 import {Test} from "forge-std/Test.sol";
 
 abstract contract RandomHeap is Test, Random {
+    /* STORAGE */
+
     IHeapOrderingMock public heap;
 
     address[] public ids;
 
     uint256 public n = 50000;
     uint256 public maxSortedUsers;
+
+    /* PUBLIC */
 
     function insert() public {
         address id = randomAddress();

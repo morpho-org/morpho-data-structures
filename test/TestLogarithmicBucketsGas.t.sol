@@ -7,17 +7,21 @@ import "src/LogarithmicBuckets.sol";
 contract TestLogarithmicBucketsGas is Test {
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
-    LogarithmicBuckets.Buckets internal buckets;
+    /* STORAGE */
+
+    LogarithmicBuckets.Buckets internal _buckets;
 
     // Gas accounting.
-    uint256 internal insertCost;
-    uint256 internal insertCount;
-    uint256 internal updateValueCost;
-    uint256 internal updateValueCount;
-    uint256 internal removeCost;
-    uint256 internal removeCount;
-    uint256 internal getMatchCost;
-    uint256 internal getMatchCount;
+    uint256 internal _insertCost;
+    uint256 internal _insertCount;
+    uint256 internal _updateValueCost;
+    uint256 internal _updateValueCount;
+    uint256 internal _removeCost;
+    uint256 internal _removeCount;
+    uint256 internal _getMatchCost;
+    uint256 internal _getMatchCount;
+
+    /* PUBLIC */
 
     function testGasUsage() public noGasMetering {
         for (uint256 i; i <= 10000; i++) {
@@ -33,45 +37,45 @@ contract TestLogarithmicBucketsGas is Test {
             if (amount % 4 < 2) {
                 // Measure insert.
                 startGasMetering();
-                buckets.update(address(uint160(amount)), amount, true);
-                insertCost += stopGasMetering();
-                insertCount++;
+                _buckets.update(address(uint160(amount)), amount, true);
+                _insertCost += stopGasMetering();
+                _insertCount++;
             }
             // Update value in same bucket (p=1/4).
             else if (amount % 4 == 2) {
                 // Get an account to update its value.
-                address toUpdate = buckets.getMatch(amount);
+                address toUpdate = _buckets.getMatch(amount);
 
                 if (toUpdate != address(0)) {
                     // Measure updateValue.
                     startGasMetering();
-                    buckets.update(toUpdate, amount, true);
-                    updateValueCost += stopGasMetering();
-                    updateValueCount++;
+                    _buckets.update(toUpdate, amount, true);
+                    _updateValueCost += stopGasMetering();
+                    _updateValueCount++;
                 }
             }
             // Remove from DS (p=1/4).
             else {
                 // Measure getMatch.
                 startGasMetering();
-                address toUpdate = buckets.getMatch(amount);
-                getMatchCost += stopGasMetering();
-                getMatchCount++;
+                address toUpdate = _buckets.getMatch(amount);
+                _getMatchCost += stopGasMetering();
+                _getMatchCount++;
 
                 if (toUpdate != address(0)) {
                     // Measure remove.
                     startGasMetering();
-                    buckets.update(buckets.getMatch(amount), 0, true);
-                    removeCost += stopGasMetering();
-                    removeCount++;
+                    _buckets.update(_buckets.getMatch(amount), 0, true);
+                    _removeCost += stopGasMetering();
+                    _removeCount++;
                 }
             }
         }
 
         // Print average cost of insert, updateValue, remove and getMatch.
-        console.log("insert average cost:", insertCost / insertCount);
-        console.log("update average cost:", updateValueCost / updateValueCount);
-        console.log("remove average cost:", removeCost / removeCount);
-        console.log("match average cost: ", getMatchCost / getMatchCount);
+        console.log("insert average cost:", _insertCost / _insertCount);
+        console.log("update average cost:", _updateValueCost / _updateValueCount);
+        console.log("remove average cost:", _removeCost / _removeCount);
+        console.log("match average cost: ", _getMatchCost / _getMatchCount);
     }
 }

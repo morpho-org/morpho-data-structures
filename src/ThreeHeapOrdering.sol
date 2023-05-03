@@ -19,7 +19,7 @@ library ThreeHeapOrdering {
 
     /* CONSTANTS */
 
-    uint256 private constant ROOT = 0;
+    uint256 private constant _ROOT = 0;
 
     /* ERRORS */
 
@@ -51,7 +51,7 @@ library ThreeHeapOrdering {
     /// @param heap The heap to get the head.
     /// @return The address of the head.
     function getHead(HeapArray storage heap) internal view returns (address) {
-        if (heap.accounts.length > 0) return heap.accounts[ROOT].id;
+        if (heap.accounts.length > 0) return heap.accounts[_ROOT].id;
         else return address(0);
     }
 
@@ -71,7 +71,7 @@ library ThreeHeapOrdering {
     /// @return The address of the previous account.
     function getPrev(HeapArray storage heap, address id) internal view returns (address) {
         uint256 index = heap.indexOf[id];
-        if (index > ROOT) return heap.accounts[index - 1].id;
+        if (index > _ROOT) return heap.accounts[index - 1].id;
         else return address(0);
     }
 
@@ -152,7 +152,7 @@ library ThreeHeapOrdering {
         Account memory parentAccount;
         uint256 parentIndex;
 
-        while (index > ROOT && valueToShift > (parentAccount = heap.accounts[parentIndex = (index - 1) / 3]).value) {
+        while (index > _ROOT && valueToShift > (parentAccount = heap.accounts[parentIndex = (index - 1) / 3]).value) {
             _setAccount(heap, parentAccount, index);
             index = parentIndex;
         }

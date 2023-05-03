@@ -5,9 +5,13 @@ import {TestCommonHeapOrdering} from "./TestCommonHeapOrdering.t.sol";
 import {ThreeHeapOrderingMock} from "./mocks/ThreeHeapOrderingMock.sol";
 
 contract TestThreeHeapOrdering is TestCommonHeapOrdering {
+    /* CONSTRUCTOR */
+
     constructor() {
         heap = new ThreeHeapOrderingMock();
     }
+
+    /* PUBLIC */
 
     function testComputeSizeSmall() public {
         update(accounts[0], 0, 10);

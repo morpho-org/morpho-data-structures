@@ -8,7 +8,11 @@ contract LogarithmicBucketsMock {
     using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
+    /* STORAGE */
+
     LogarithmicBuckets.Buckets public buckets;
+
+    /* PUBLIC */
 
     function update(address id, uint256 newValue, bool head) public virtual {
         buckets.update(id, newValue, head);
@@ -44,6 +48,8 @@ contract LogarithmicBucketsMock {
         }
         return true;
     }
+
+    /* INTERNAL*/
 
     function nextBucketValue(uint256 value) internal view returns (uint256) {
         uint256 bucketsMask = buckets.bucketsMask;

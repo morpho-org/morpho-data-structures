@@ -20,7 +20,7 @@ library BasicHeap {
 
     /* CONSTANTS */
 
-    uint256 private constant ROOT = 0;
+    uint256 private constant _ROOT = 0;
 
     /* ERRORS */
 
@@ -68,7 +68,7 @@ library BasicHeap {
     /// @param heap The heap to get the head.
     /// @return The address of the head.
     function getRoot(Heap storage heap) internal view returns (address) {
-        if (heap.accounts.length > 0) return heap.accounts[ROOT].id;
+        if (heap.accounts.length > 0) return heap.accounts[_ROOT].id;
         else return address(0);
     }
 
@@ -214,8 +214,9 @@ library BasicHeap {
 
         unchecked {
             // `index` is checked to be greater than 0 before subtracting 1.
-            while (index > ROOT && valueToShift > (parentAccount = heap.accounts[parentIndex = (index - 1) >> 1]).value)
-            {
+            while (
+                index > _ROOT && valueToShift > (parentAccount = heap.accounts[parentIndex = (index - 1) >> 1]).value
+            ) {
                 _setAccount(heap, parentAccount, index);
                 index = parentIndex;
             }

@@ -6,10 +6,14 @@ import {HeapOrdering} from "src/HeapOrdering.sol";
 import {HeapOrderingMock} from "./mocks/HeapOrderingMock.sol";
 
 abstract contract TestCommonHeapOrdering is RandomHeap {
+    /* STORAGE */
+
     address[] public accounts;
     uint256 public NB_ACCOUNTS = 50;
     uint256 public MAX_SORTED_USERS = 50;
     address public ADDR_ZERO = address(0);
+
+    /* PUBLIC */
 
     function update(address _id, uint256 _formerValue, uint256 _newValue) public {
         heap.update(_id, _formerValue, _newValue, MAX_SORTED_USERS);
