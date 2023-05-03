@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "src/Heap.sol";
+import {BasicHeap} from "src/Heap.sol";
 
 contract TestHeap is Test {
     using BasicHeap for BasicHeap.Heap;
@@ -25,26 +25,19 @@ contract TestHeap is Test {
     function testInsertOneSingleAccount() public {
         heap.insert(accounts[0], 1);
 
-        assertEq(heap.getSize(), 1);
+        assertEq(heap.length(), 1);
         assertEq(heap.getValueOf(accounts[0]), 1);
         assertEq(heap.getRoot(), accounts[0]);
         assertEq(heap.getLeftChild(accounts[0]), ADDR_ZERO);
         assertEq(heap.getRightChild(accounts[0]), ADDR_ZERO);
     }
 
-    function testShouldNotInsertAccountWithZeroValue() public {
-        vm.expectRevert(abi.encodeWithSignature("WrongValue()"));
-        heap.insert(accounts[0], 0);
-
-        assertEq(heap.getSize(), 0);
-    }
-
     function testShouldNotInsertZeroAddress() public {
         vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        heap.insert(address(0), 10);
+        heap.insert(ADDR_ZERO, 10);
     }
 
-    function testShouldInsertSeveralTimesTheSameAccount() public {
+    function testShouldNotInsertSeveralTimesTheSameAccount() public {
         heap.insert(accounts[0], 1);
         vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
         heap.insert(accounts[0], 2);
@@ -53,6 +46,15 @@ contract TestHeap is Test {
     function testShouldNotRemoveAccountThatDoesNotExist() public {
         vm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
         heap.remove(accounts[0]);
+    }
+
+    function testContainsAccount() public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(accounts[i], (i + TESTED_SIZE / 2) % TESTED_SIZE);
+            for (uint256 j; j < TESTED_SIZE; ++j) {
+                assertEq(heap.containsAccount(accounts[j]), j <= i);
+            }
+        }
     }
 
     function testShouldHaveTheRightOrder() public {
@@ -68,7 +70,7 @@ contract TestHeap is Test {
         heap.insert(accounts[0], 1);
         heap.remove(accounts[0]);
 
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
         assertEq(heap.getRoot(), ADDR_ZERO);
         assertEq(heap.getValueOf(accounts[0]), 0);
         assertEq(heap.getLeftChild(accounts[0]), ADDR_ZERO);
@@ -83,7 +85,7 @@ contract TestHeap is Test {
         address leftChild = heap.getLeftChild(root);
         address rightChild = heap.getRightChild(root);
 
-        assertEq(heap.getSize(), 2);
+        assertEq(heap.length(), 2);
         assertEq(root, accounts[0]);
         assertEq(leftChild, accounts[1]);
         assertEq(rightChild, ADDR_ZERO);
@@ -102,7 +104,7 @@ contract TestHeap is Test {
         address leftChild = heap.getLeftChild(root);
         address rightChild = heap.getRightChild(root);
 
-        assertEq(heap.getSize(), 3);
+        assertEq(heap.length(), 3);
         assertEq(root, accounts[0]);
         assertEq(leftChild, accounts[1]);
         assertEq(rightChild, accounts[2]);
@@ -120,7 +122,7 @@ contract TestHeap is Test {
 
         address root = heap.getRoot();
 
-        assertEq(heap.getSize(), 1);
+        assertEq(heap.length(), 1);
         assertEq(root, accounts[1]);
         assertEq(heap.getValueOf(accounts[0]), 0);
         assertEq(heap.getValueOf(accounts[1]), 1);
@@ -136,7 +138,7 @@ contract TestHeap is Test {
         heap.remove(accounts[1]);
 
         assertEq(heap.getRoot(), ADDR_ZERO);
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
     }
 
     function testShouldInsertThreeAccountsAndRemoveThem() public {
@@ -146,7 +148,7 @@ contract TestHeap is Test {
 
         address root = heap.getRoot();
 
-        assertEq(heap.getSize(), 3);
+        assertEq(heap.length(), 3);
         assertEq(root, accounts[0]);
         assertEq(heap.getLeftChild(root), accounts[1]);
         assertEq(heap.getRightChild(root), accounts[2]);
@@ -156,7 +158,7 @@ contract TestHeap is Test {
 
         root = heap.getRoot();
 
-        assertEq(heap.getSize(), 2);
+        assertEq(heap.length(), 2);
         assertEq(root, accounts[1]);
         assertEq(heap.getLeftChild(root), accounts[2]);
         assertEq(heap.getRightChild(root), ADDR_ZERO);
@@ -166,7 +168,7 @@ contract TestHeap is Test {
 
         root = heap.getRoot();
 
-        assertEq(heap.getSize(), 1);
+        assertEq(heap.length(), 1);
         assertEq(root, accounts[2]);
         assertEq(heap.getLeftChild(root), ADDR_ZERO);
         assertEq(heap.getRightChild(root), ADDR_ZERO);
@@ -174,7 +176,7 @@ contract TestHeap is Test {
         // Remove account 2.
         heap.remove(accounts[2]);
 
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
         assertEq(heap.getRoot(), ADDR_ZERO);
     }
 
@@ -199,7 +201,7 @@ contract TestHeap is Test {
             heap.remove(accounts[i]);
         }
 
-        assertEq(heap.getSize(), 0);
+        assertEq(heap.length(), 0);
         assertEq(heap.getRoot(), ADDR_ZERO);
     }
 
@@ -223,11 +225,7 @@ contract TestHeap is Test {
         }
 
         for (uint256 i = 0; i < 10; i++) {
-            assertEq(
-                heap.accounts[10 + i].id,
-                accounts[TESTED_SIZE - 10 + i],
-                "order not expected, 2"
-            );
+            assertEq(heap.accounts[10 + i].id, accounts[TESTED_SIZE - 10 + i], "order not expected, 2");
         }
     }
 
