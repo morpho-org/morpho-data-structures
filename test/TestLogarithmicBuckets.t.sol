@@ -1,20 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
-import "./mocks/LogarithmicBucketsMock.sol";
+import {Test} from "forge-std/Test.sol";
+import {
+    LogarithmicBucketsMock, BucketDLLMock, BucketDLL, LogarithmicBuckets
+} from "./mocks/LogarithmicBucketsMock.sol";
 
 contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     using BucketDLLMock for BucketDLL.List;
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;
 
-    /* STORAGE */
-
     uint256 public accountsLength = 50;
     address[] public accounts;
-    address public ADDR_ZERO = address(0);
-
-    /* PUBLIC */
 
     function setUp() public {
         accounts = new address[](accountsLength);

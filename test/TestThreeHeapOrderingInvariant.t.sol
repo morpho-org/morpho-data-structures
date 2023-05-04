@@ -9,34 +9,24 @@ import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
 contract Heap is ThreeHeapOrderingMock {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
 
-    /* STORAGE */
-
     uint256 public MAX_SORTED_USERS = 16;
-
-    /* PUBLIC */
 
     /// @dev Function to fuzz
     function updateCorrect(address id, uint96 newValue) public {
-        uint256 oldValue = _heap.getValueOf(id);
+        uint256 oldValue = heap.getValueOf(id);
         if (oldValue != 0 || newValue != 0) {
-            _heap.update(id, _heap.getValueOf(id), newValue, MAX_SORTED_USERS);
+            heap.update(id, heap.getValueOf(id), newValue, MAX_SORTED_USERS);
         }
     }
 }
 
 contract TestThreeHeapOrderingInvariant is Test {
-    /* STRUCTS */
-
     struct FuzzSelector {
         address addr;
         bytes4[] selectors;
     }
 
-    /* STORAGE */
-
     Heap public heap;
-
-    /* PUBLIC */
 
     function setUp() public {
         heap = new Heap();

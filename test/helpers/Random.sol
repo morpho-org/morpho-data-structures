@@ -4,12 +4,12 @@ pragma solidity ^0.8.0;
 contract Random {
     /* STORAGE */
 
-    uint256 private _seed = 0;
+    uint256 private seed = 0;
 
     /* INTERNAL */
 
     function randomBytes32() internal returns (bytes32) {
-        return keccak256(abi.encode(_seed++));
+        return keccak256(abi.encode(seed++));
     }
 
     function randomUint256() internal returns (uint256) {

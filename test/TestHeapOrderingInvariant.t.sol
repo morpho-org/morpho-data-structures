@@ -9,11 +9,7 @@ import {HeapOrdering} from "src/HeapOrdering.sol";
 contract Heap is HeapOrderingMock {
     using HeapOrdering for HeapOrdering.HeapArray;
 
-    /* STORAGE */
-
     uint256 public MAX_SORTED_USERS = 16;
-
-    /* PUBLIC */
 
     /// @dev Function to fuzz
     function updateCorrect(address id, uint96 newValue) public {
@@ -25,18 +21,12 @@ contract Heap is HeapOrderingMock {
 }
 
 contract TestHeapOrderingInvariant is Test {
-    /* STRUCTS */
-
     struct FuzzSelector {
         address addr;
         bytes4[] selectors;
     }
 
-    /* STORAGE */
-
     Heap public heap;
-
-    /* PUBLIC */
 
     function setUp() public {
         heap = new Heap();

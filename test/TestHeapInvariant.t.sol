@@ -7,37 +7,33 @@ import {Test} from "forge-std/Test.sol";
 import {HeapMock} from "./mocks/HeapMock.sol";
 
 contract Heap is HeapMock, StdUtils {
-    /* STORAGE */
-
-    address[] internal _accountsUsed;
-
-    /* EXTERNAL */
+    address[] internal accountsUsed;
 
     function accountsValue(uint256 index) external view returns (uint256) {
-        return _heap.accounts[index].value;
+        return heap.accounts[index].value;
     }
 
     function accountsId(uint256 index) external view returns (address) {
-        return _heap.accounts[index].id;
+        return heap.accounts[index].id;
     }
 
     function indexOf(address id) external view returns (uint256) {
-        return _heap.indexOf[id];
+        return heap.indexOf[id];
     }
 
     /// Functions to fuzz ///
 
     function insertCorrect(address account, uint256 amount) external {
         insert(account, amount);
-        _accountsUsed.push(account);
+        accountsUsed.push(account);
     }
 
     function increaseCorrect(uint256 index, uint256 amount) external {
-        if (_accountsUsed.length == 0) {
+        if (accountsUsed.length == 0) {
             return;
         }
-        index = bound(index, 0, _accountsUsed.length - 1);
-        address account = _accountsUsed[index];
+        index = bound(index, 0, accountsUsed.length - 1);
+        address account = accountsUsed[index];
         uint256 accountValue = getValueOf(account);
         if (accountValue == type(uint256).max) {
             return;
@@ -46,11 +42,11 @@ contract Heap is HeapMock, StdUtils {
     }
 
     function decreaseCorrect(uint256 index, uint256 amount) external {
-        if (_accountsUsed.length == 0) {
+        if (accountsUsed.length == 0) {
             return;
         }
-        index = bound(index, 0, _accountsUsed.length - 1);
-        address account = _accountsUsed[index];
+        index = bound(index, 0, accountsUsed.length - 1);
+        address account = accountsUsed[index];
         uint256 accountValue = getValueOf(account);
         if (accountValue == 0) {
             return;
@@ -59,13 +55,13 @@ contract Heap is HeapMock, StdUtils {
     }
 
     function removeCorrect(uint256 index) external {
-        if (_accountsUsed.length == 0) {
+        if (accountsUsed.length == 0) {
             return;
         }
-        index = bound(index, 0, _accountsUsed.length - 1);
-        remove(_accountsUsed[index]);
-        _accountsUsed[index] = _accountsUsed[_accountsUsed.length - 1];
-        _accountsUsed.pop();
+        index = bound(index, 0, accountsUsed.length - 1);
+        remove(accountsUsed[index]);
+        accountsUsed[index] = accountsUsed[accountsUsed.length - 1];
+        accountsUsed.pop();
     }
 }
 

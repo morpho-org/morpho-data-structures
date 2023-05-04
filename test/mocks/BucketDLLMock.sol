@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "src/BucketDLL.sol";
+import {BucketDLL} from "src/BucketDLL.sol";
 
 library BucketDLLMock {
     /* INTERNAL */

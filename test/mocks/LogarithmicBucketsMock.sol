@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "src/LogarithmicBuckets.sol";
-import "./BucketDLLMock.sol";
+import {LogarithmicBuckets} from "src/LogarithmicBuckets.sol";
+import {BucketDLLMock, BucketDLL} from "./BucketDLLMock.sol";
 
 contract LogarithmicBucketsMock {
     using BucketDLLMock for BucketDLL.List;

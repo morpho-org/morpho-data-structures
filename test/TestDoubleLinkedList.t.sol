@@ -7,15 +7,11 @@ import {DoubleLinkedList} from "src/DoubleLinkedList.sol";
 contract TestDoubleLinkedList is Test {
     using DoubleLinkedList for DoubleLinkedList.List;
 
-    /* STORAGE */
-
     uint256 public NDS = 50;
     address[] public accounts;
     address public ADDR_ZERO = address(0);
 
     DoubleLinkedList.List public list;
-
-    /* PUBLIC */
 
     function setUp() public {
         accounts = new address[](NDS);
