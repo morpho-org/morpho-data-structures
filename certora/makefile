@@ -7,7 +7,7 @@ munged-simple: $(wildcard ../src/*.sol) applyHarnessSimple.patch
 	@patch -p0 -d munged-simple < applyHarnessSimple.patch
 
 record-simple:
-	diff -ruN ../contracts munged-simple | sed 's+\.\./src/++g' | sed 's+munged-simple/++g' > applyHarnessSimple.patch
+	diff -ruN ../src munged-simple | sed 's+\.\./src/++g' | sed 's+munged-simple/++g' > applyHarnessSimple.patch
 
 munged-fifo: $(wildcard ../src/*.sol) applyHarnessFIFO.patch
 	@rm -rf munged-fifo

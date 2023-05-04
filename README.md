@@ -73,19 +73,6 @@ Before merging a PR:
 
 ## Code Formatting
 
-We use prettier with the default configuration mentioned in the [Solidity Prettier Plugin](https://github.com/prettier-solidity/prettier-plugin-solidity).
-We recommend developers using VS Code to set their local config as below:
-
-```
-{
-	"editor.formatOnSave": true,
-	"solidity.formatter": "prettier",
-	"editor.defaultFormatter": "esbenp.prettier-vscode"
-}
-```
-
-In doing so the code will be formatted on each save.
-
 We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
 
 # Audits

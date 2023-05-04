@@ -56,8 +56,9 @@ abstract contract RandomHeap is Test, Random {
 
     function removeHead() public returns (uint256 value) {
         address head = heap.getHead();
-        if (head == address(0)) return 0;
-        else {
+        if (head == address(0)) {
+            return 0;
+        } else {
             value = heap.getValueOf(head);
             heap.update(head, value, 0, maxSortedUsers);
         }

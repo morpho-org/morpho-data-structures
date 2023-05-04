@@ -222,7 +222,9 @@ contract TestThreeHeapOrdering is TestCommonHeapOrdering {
 
     function testInsertWrap() public {
         MAX_SORTED_USERS = 30;
-        for (uint256 i = 0; i < 30; i++) update(accounts[i], 0, NB_ACCOUNTS - i);
+        for (uint256 i = 0; i < 30; i++) {
+            update(accounts[i], 0, NB_ACCOUNTS - i);
+        }
 
         update(accounts[30], 0, 1);
 

@@ -42,11 +42,7 @@ contract TestBucketDLL is Test {
         assertEq(list.getNext(_account), address(0));
     }
 
-    function testShouldInsertTwoAccounts(
-        address _account0,
-        address _account1,
-        bool _head
-    ) public {
+    function testShouldInsertTwoAccounts(address _account0, address _account1, bool _head) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
@@ -128,12 +124,7 @@ contract TestBucketDLL is Test {
         assertEq(list.getNext(_account1), address(0));
     }
 
-    function testShouldRemoveBothAccounts(
-        address _account0,
-        address _account1,
-        bool _head1,
-        bool _head2
-    ) public {
+    function testShouldRemoveBothAccounts(address _account0, address _account1, bool _head1, bool _head2) public {
         vm.assume(_account0 != address(0) && _account1 != address(0));
         vm.assume(_account0 != _account1);
 
@@ -146,11 +137,9 @@ contract TestBucketDLL is Test {
         assertEq(list.getTail(), address(0));
     }
 
-    function testShouldInsertThreeAccountsAndRemoveThem(
-        address _account0,
-        address _account1,
-        address _account2
-    ) public {
+    function testShouldInsertThreeAccountsAndRemoveThem(address _account0, address _account1, address _account2)
+        public
+    {
         vm.assume(_account0 != address(0) && _account1 != address(0) && _account2 != address(0));
         vm.assume(_account0 != _account1 && _account1 != _account2 && _account2 != _account0);
 

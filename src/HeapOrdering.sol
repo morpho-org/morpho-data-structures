@@ -48,11 +48,15 @@ library HeapOrdering {
         if (size != newSize) _heap.size = newSize;
 
         if (formerValue != newValue) {
-            if (newValue == 0) remove(_heap, newSize, _id, formerValue);
-            else if (formerValue == 0) insert(_heap, newSize, _id, newValue, _maxSortedUsers);
-            else if (formerValue < newValue)
+            if (newValue == 0) {
+                remove(_heap, newSize, _id, formerValue);
+            } else if (formerValue == 0) {
+                insert(_heap, newSize, _id, newValue, _maxSortedUsers);
+            } else if (formerValue < newValue) {
                 increase(_heap, newSize, _id, newValue, _maxSortedUsers);
-            else decrease(_heap, newSize, _id, newValue);
+            } else {
+                decrease(_heap, newSize, _id, newValue);
+            }
         }
     }
 
@@ -75,11 +79,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _account The account to set the `_index` to.
     /// @param _index The index of the account in the heap to be set.
-    function setAccount(
-        HeapArray storage _heap,
-        Account memory _account,
-        uint256 _index
-    ) private {
+    function setAccount(HeapArray storage _heap, Account memory _account, uint256 _index) private {
         _heap.accounts[_index] = _account;
         _heap.indexOf[_account.id] = _index;
     }
@@ -89,11 +89,7 @@ library HeapOrdering {
     /// @param _heap The heap to modify.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftUp(
-        HeapArray storage _heap,
-        Account memory _accountToShift,
-        uint256 _index
-    ) private {
+    function shiftUp(HeapArray storage _heap, Account memory _accountToShift, uint256 _index) private {
         uint256 valueToShift = _accountToShift.value;
         Account memory parentAccount;
         uint256 parentIndex;
@@ -101,8 +97,7 @@ library HeapOrdering {
         unchecked {
             // _index is checked to be greater than 0 before subtracting 1
             while (
-                _index > ROOT &&
-                valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
+                _index > ROOT && valueToShift > (parentAccount = _heap.accounts[parentIndex = (_index - 1) >> 1]).value
             ) {
                 setAccount(_heap, parentAccount, _index);
                 _index = parentIndex;
@@ -118,12 +113,9 @@ library HeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _accountToShift The account to move.
     /// @param _index The index of the account to move.
-    function shiftDown(
-        HeapArray storage _heap,
-        uint256 _size,
-        Account memory _accountToShift,
-        uint256 _index
-    ) private {
+    function shiftDown(HeapArray storage _heap, uint256 _size, Account memory _accountToShift, uint256 _index)
+        private
+    {
         uint256 valueToShift = _accountToShift.value;
         uint256 childIndex = (_index << 1) + 1;
         uint256 rightChildIndex;
@@ -148,7 +140,9 @@ library HeapOrdering {
                 setAccount(_heap, childToSwap, _index);
                 _index = childIndex;
                 childIndex = (childIndex << 1) + 1;
-            } else break;
+            } else {
+                break;
+            }
         }
 
         setAccount(_heap, _accountToShift, _index);
@@ -162,13 +156,9 @@ library HeapOrdering {
     /// @param _id The address of the account to insert.
     /// @param _value The value of the account to insert.
     /// @param _maxSortedUsers The maximum size of the heap.
-    function insert(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _value,
-        uint256 _maxSortedUsers
-    ) private {
+    function insert(HeapArray storage _heap, uint256 _size, address _id, uint96 _value, uint256 _maxSortedUsers)
+        private
+    {
         // `_heap` cannot contain the 0 address.
         if (_id == address(0)) revert AddressIsZero();
 
@@ -188,12 +178,7 @@ library HeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to decrease the amount.
     /// @param _newValue The new value of the account.
-    function decrease(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _newValue
-    ) private {
+    function decrease(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue) private {
         uint256 index = _heap.indexOf[_id];
 
         // We only need to take care of sorting if there are nodes below in the heap.
@@ -208,17 +193,14 @@ library HeapOrdering {
     /// @param _id The address of the account to increase the amount.
     /// @param _newValue The new value of the account.
     /// @param _maxSortedUsers The maximum size of the heap.
-    function increase(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _newValue,
-        uint256 _maxSortedUsers
-    ) private {
+    function increase(HeapArray storage _heap, uint256 _size, address _id, uint96 _newValue, uint256 _maxSortedUsers)
+        private
+    {
         uint256 index = _heap.indexOf[_id];
 
-        if (index < _size) shiftUp(_heap, Account(_id, _newValue), index);
-        else {
+        if (index < _size) {
+            shiftUp(_heap, Account(_id, _newValue), index);
+        } else {
             setAccount(_heap, _heap.accounts[_size], index);
             shiftUp(_heap, Account(_id, _newValue), _size);
             _heap.size = computeSize(_size + 1, _maxSortedUsers);
@@ -231,12 +213,7 @@ library HeapOrdering {
     /// @param _size The computed size of the heap.
     /// @param _id The address of the account to remove.
     /// @param _removedValue The value of the account to remove.
-    function remove(
-        HeapArray storage _heap,
-        uint256 _size,
-        address _id,
-        uint96 _removedValue
-    ) private {
+    function remove(HeapArray storage _heap, uint256 _size, address _id, uint96 _removedValue) private {
         uint256 index = _heap.indexOf[_id];
         delete _heap.indexOf[_id];
         uint256 accountsLength = _heap.accounts.length;
@@ -254,7 +231,9 @@ library HeapOrdering {
         if (index < _size) {
             if (_removedValue > lastAccount.value) shiftDown(_heap, _size, lastAccount, index);
             else shiftUp(_heap, lastAccount, index);
-        } else setAccount(_heap, lastAccount, index);
+        } else {
+            setAccount(_heap, lastAccount, index);
+        }
     }
 
     /// GETTERS ///
@@ -313,8 +292,10 @@ library HeapOrdering {
     /// @return The address of the next account.
     function getNext(HeapArray storage _heap, address _id) internal view returns (address) {
         uint256 index = _heap.indexOf[_id];
-        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id)
+        if (index + 1 >= _heap.accounts.length || _heap.accounts[index].id != _id) {
             return address(0);
-        else return _heap.accounts[index + 1].id;
+        } else {
+            return _heap.accounts[index + 1].id;
+        }
     }
 }

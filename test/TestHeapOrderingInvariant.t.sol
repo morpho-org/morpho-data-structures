@@ -15,8 +15,9 @@ contract Heap is HeapOrderingMock {
 
     function updateCorrect(address _id, uint96 _newValue) public {
         uint256 oldValue = heap.getValueOf(_id);
-        if (oldValue != 0 || _newValue != 0)
+        if (oldValue != 0 || _newValue != 0) {
             heap.update(_id, heap.getValueOf(_id), _newValue, MAX_SORTED_USERS);
+        }
     }
 }
 
@@ -48,8 +49,8 @@ contract TestHeapOrderingInvariant is Test {
         uint256 length = heap.length();
 
         for (uint256 i; i < length; ++i) {
-            assertTrue((i * 2 + 1 >= length || i * 2 + 1 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1))); // prettier-ignore
-            assertTrue((i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2))); // prettier-ignore
+            assertTrue((i * 2 + 1 >= length || i * 2 + 1 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)));// forgefmt: disable-line
+            assertTrue((i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)));// forgefmt: disable-line
         }
     }
 

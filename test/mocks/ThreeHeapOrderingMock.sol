@@ -21,12 +21,7 @@ contract ThreeHeapOrderingMock is IHeapOrderingMock {
         return heap.indexOf[_id];
     }
 
-    function update(
-        address _id,
-        uint256 _formerValue,
-        uint256 _newValue,
-        uint256 _maxSortedUsers
-    ) external {
+    function update(address _id, uint256 _formerValue, uint256 _newValue, uint256 _maxSortedUsers) external {
         heap.update(_id, _formerValue, _newValue, _maxSortedUsers);
     }
 

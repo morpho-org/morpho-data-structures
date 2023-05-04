@@ -10,11 +10,7 @@ contract LogarithmicBucketsMock {
 
     LogarithmicBuckets.Buckets public buckets;
 
-    function update(
-        address _id,
-        uint256 _newValue,
-        bool _head
-    ) public virtual {
+    function update(address _id, uint256 _newValue, bool _head) public virtual {
         buckets.update(_id, _newValue, _head);
     }
 
@@ -33,10 +29,10 @@ contract LogarithmicBucketsMock {
 
     function verifyStructure() public view returns (bool) {
         for (uint256 i; i < 256; i++) {
-            uint256 lowerValue = 2**i;
+            uint256 lowerValue = 2 ** i;
             uint256 higherValue;
             unchecked {
-                higherValue = 2**(i + 1) - 1;
+                higherValue = 2 ** (i + 1) - 1;
             }
 
             BucketDLL.List storage list = buckets.buckets[lowerValue];
