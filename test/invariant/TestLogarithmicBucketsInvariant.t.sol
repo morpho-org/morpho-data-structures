@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import {Random} from "./helpers/Random.sol";
-import {LogarithmicBucketsMock, LogarithmicBuckets} from "./mocks/LogarithmicBucketsMock.sol";
-import {BucketDLLMock, BucketDLL} from "./mocks/BucketDLLMock.sol";
+import {Random} from "../helpers/Random.sol";
+import {LogarithmicBucketsMock, LogarithmicBuckets} from "../mocks/LogarithmicBucketsMock.sol";
+import {BucketDLLMock, BucketDLL} from "../mocks/BucketDLLMock.sol";
 import {Test} from "forge-std/Test.sol";
 
 contract TestLogarithmicBucketsInvariant is Test, Random {

@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {TestCommonHeapOrdering} from "./TestCommonHeapOrdering.t.sol";
-import {HeapOrderingMock} from "./mocks/HeapOrderingMock.sol";
+import {HeapOrderingMock} from "../mocks/HeapOrderingMock.sol";
 
 contract TestHeapOrdering is TestCommonHeapOrdering {
     constructor() {

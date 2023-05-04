@@ -3,24 +3,24 @@ pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
 
-import {ThreeHeapOrderingMock} from "./mocks/ThreeHeapOrderingMock.sol";
-import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
+import {HeapOrderingMock} from "../mocks/HeapOrderingMock.sol";
+import {HeapOrdering} from "src/HeapOrdering.sol";
 
-contract Heap is ThreeHeapOrderingMock {
-    using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
+contract Heap is HeapOrderingMock {
+    using HeapOrdering for HeapOrdering.HeapArray;
 
     uint256 public MAX_SORTED_USERS = 16;
 
     /// @dev Function to fuzz
     function updateCorrect(address id, uint96 newValue) public {
-        uint256 oldValue = heap.getValueOf(id);
+        uint256 oldValue = _heap.getValueOf(id);
         if (oldValue != 0 || newValue != 0) {
-            heap.update(id, heap.getValueOf(id), newValue, MAX_SORTED_USERS);
+            _heap.update(id, _heap.getValueOf(id), newValue, MAX_SORTED_USERS);
         }
     }
 }
 
-contract TestThreeHeapOrderingInvariant is Test {
+contract TestHeapOrderingInvariant is Test {
     struct FuzzSelector {
         address addr;
         bytes4[] selectors;
@@ -43,14 +43,13 @@ contract TestThreeHeapOrderingInvariant is Test {
 
     // Rule:
     // For all i in [[0, size]],
-    // value[i] >= value[3i + 1] and value[i] >= value[3i + 2] and value[i] >= value[3i + 3]
+    // value[i] >= value[2i + 1] and value[i] >= value[2i + 2]
     function invariantHeap() public {
         uint256 length = heap.length();
 
         for (uint256 i; i < length; ++i) {
-            assertTrue((i * 3 + 1 >= length || i * 3 + 1 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 3 + 1)));// forgefmt: disable-line
-            assertTrue((i * 3 + 2 >= length || i * 3 + 2 >= heap.size()|| heap.accountsValue(i) >= heap.accountsValue(i * 3 + 2)));// forgefmt: disable-line
-            assertTrue((i * 3 + 3 >= length || i * 3 + 3 >= heap.size()|| heap.accountsValue(i) >= heap.accountsValue(i * 3 + 3)));// forgefmt: disable-line
+            assertTrue((i * 2 + 1 >= length || i * 2 + 1 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 1)));// forgefmt: disable-line
+            assertTrue((i * 2 + 2 >= length || i * 2 + 2 >= heap.size() || heap.accountsValue(i) >= heap.accountsValue(i * 2 + 2)));// forgefmt: disable-line
         }
     }
 
@@ -65,8 +64,8 @@ contract TestThreeHeapOrderingInvariant is Test {
     }
 
     // Rule:
-    // size <= 3 * MAX_SORTED_USERS
+    // size <= 2 * MAX_SORTED_USERS
     function invariantSize() public {
-        assertTrue(heap.size() <= 3 * heap.MAX_SORTED_USERS());
+        assertTrue(heap.size() <= 2 * heap.MAX_SORTED_USERS());
     }
 }
