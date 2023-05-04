@@ -105,38 +105,11 @@ library DoubleLinkedList {
                 ++numberOfIterations;
             }
         }
-
-        // Account is not the new tail.
-        if (numberOfIterations < maxIterations && next != address(0)) {
-            // Account is the new head.
-            if (next == list.accounts[address(0)].next) {
-                list.accounts[id] = Account({prev: address(0), next: next, value: value});
-                list.accounts[address(0)].next = id;
-                list.accounts[next].prev = id;
-            }
-            // Account is not the new head.
-            else {
-                address prev = list.accounts[next].prev;
-                list.accounts[id] = Account({prev: prev, next: next, value: value});
-                list.accounts[prev].next = id;
-                list.accounts[next].prev = id;
-            }
+        if (numberOfIterations == maxIterations) {
+            next = address(0);
         }
-        // Account is the new tail.
-        else {
-            // Account is the new head.
-            if (list.accounts[address(0)].next == address(0)) {
-                list.accounts[id] = Account({prev: address(0), next: address(0), value: value});
-                list.accounts[address(0)].next = id;
-                list.accounts[address(0)].prev = id;
-            }
-            // Account is not the new head.
-            else {
-                address tail = list.accounts[address(0)].prev;
-                list.accounts[id] = Account({prev: tail, next: address(0), value: value});
-                list.accounts[tail].next = id;
-                list.accounts[address(0)].prev = id;
-            }
-        }
+        list.accounts[id] = Account(list.accounts[next].prev, next, value);
+        list.accounts[list.accounts[next].prev].next = id;
+        list.accounts[next].prev = id;
     }
 }
