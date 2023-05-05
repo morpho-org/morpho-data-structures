@@ -257,7 +257,7 @@ contract TestHeap is Test {
         }
     }
 
-    function testShouldRemovalsBeSorted(bytes32 seed, uint256[TESTED_SIZE] calldata values) public {
+    function testRemovalsShouldBeSorted(bytes32 seed, uint256[TESTED_SIZE] calldata values) public {
         address[] memory ids = _createAccounts(seed, TESTED_SIZE);
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(ids[i], values[i]);
@@ -306,7 +306,7 @@ contract TestHeap is Test {
         }
     }
 
-    function testShouldHalfAccountsHaveTwoChildren(bytes32 seed, uint256[TESTED_SIZE] memory values) public {
+    function testHalfOfAccountsShouldHaveTwoChildren(bytes32 seed, uint256[TESTED_SIZE] memory values) public {
         address[] memory ids = _createAccounts(seed, TESTED_SIZE);
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(ids[i], values[i]);

@@ -12,7 +12,7 @@ contract Heap is ThreeHeapOrderingMock, StdUtils {
 
     uint256 public constant MAX_SORTED_USERS = 16;
 
-    /// Functions to fuzz ///
+    /* Functions to fuzz */
 
     function insertNewUser(address account, uint96 amount) external {
         if (account == address(0) || isUsed[account]) {
@@ -50,9 +50,7 @@ contract Heap is ThreeHeapOrderingMock, StdUtils {
     }
 
     function removeExistingUser(uint256 index) external {
-        if (accountsUsed.length == 0) {
-            return;
-        }
+        if (accountsUsed.length == 0) return;
         index = bound(index, 0, accountsUsed.length - 1);
         address account = accountsUsed[index];
         update(account, getValueOf(account), 0, MAX_SORTED_USERS);
