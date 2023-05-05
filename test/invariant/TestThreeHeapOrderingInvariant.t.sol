@@ -2,21 +2,63 @@
 pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
+import {StdUtils} from "forge-std/StdUtils.sol";
 
 import {ThreeHeapOrderingMock} from "../mocks/ThreeHeapOrderingMock.sol";
-import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
 
-contract Heap is ThreeHeapOrderingMock {
-    using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
+contract Heap is ThreeHeapOrderingMock, StdUtils {
+    address[] internal accountsUsed;
+    mapping(address => bool) internal isUsed;
 
-    uint256 public MAX_SORTED_USERS = 16;
+    uint256 public constant MAX_SORTED_USERS = 16;
 
-    /// @dev Function to fuzz
-    function updateCorrect(address id, uint96 newValue) public {
-        uint256 oldValue = heap.getValueOf(id);
-        if (oldValue != 0 || newValue != 0) {
-            heap.update(id, heap.getValueOf(id), newValue, MAX_SORTED_USERS);
+    /// Functions to fuzz ///
+
+    function insertNewUser(address account, uint96 amount) external {
+        if (account == address(0) || isUsed[account]) {
+            return;
         }
+        update(account, 0, bound(amount, 1, type(uint96).max), MAX_SORTED_USERS);
+        accountsUsed.push(account);
+        isUsed[account] = true;
+    }
+
+    function increaseExistingUser(uint256 index, uint96 amount) external {
+        if (accountsUsed.length == 0) {
+            return;
+        }
+        index = bound(index, 0, accountsUsed.length - 1);
+        address account = accountsUsed[index];
+        uint256 accountValue = getValueOf(account);
+        if (accountValue >= type(uint96).max) {
+            return;
+        }
+        update(account, accountValue, bound(amount, accountValue + 1, type(uint96).max), MAX_SORTED_USERS);
+    }
+
+    function decreaseExistingUser(uint256 index, uint96 amount) external {
+        if (accountsUsed.length == 0) {
+            return;
+        }
+        index = bound(index, 0, accountsUsed.length - 1);
+        address account = accountsUsed[index];
+        uint256 accountValue = getValueOf(account);
+        if (accountValue <= 1) {
+            return;
+        }
+        update(account, accountValue, bound(amount, 1, accountValue - 1), MAX_SORTED_USERS);
+    }
+
+    function removeExistingUser(uint256 index) external {
+        if (accountsUsed.length == 0) {
+            return;
+        }
+        index = bound(index, 0, accountsUsed.length - 1);
+        address account = accountsUsed[index];
+        update(account, getValueOf(account), 0, MAX_SORTED_USERS);
+        isUsed[account] = false;
+        accountsUsed[index] = accountsUsed[accountsUsed.length - 1];
+        accountsUsed.pop();
     }
 }
 
@@ -35,8 +77,12 @@ contract TestThreeHeapOrderingInvariant is Test {
     // Target specific selectors for invariant testing
     function targetSelectors() public view returns (FuzzSelector[] memory) {
         FuzzSelector[] memory targets = new FuzzSelector[](1);
-        bytes4[] memory selectors = new bytes4[](1);
-        selectors[0] = Heap.updateCorrect.selector;
+        bytes4[] memory selectors = new bytes4[](5);
+        selectors[0] = Heap.insertNewUser.selector;
+        selectors[1] = Heap.insertNewUser.selector; // more insertions that removals
+        selectors[2] = Heap.increaseExistingUser.selector;
+        selectors[3] = Heap.decreaseExistingUser.selector;
+        selectors[4] = Heap.removeExistingUser.selector;
         targets[0] = FuzzSelector(address(heap), selectors);
         return targets;
     }

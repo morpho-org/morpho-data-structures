@@ -8,6 +8,7 @@ import {HeapMock} from "../mocks/HeapMock.sol";
 
 contract Heap is HeapMock, StdUtils {
     address[] internal accountsUsed;
+    mapping(address => bool) internal isUsed;
 
     function accountsValue(uint256 index) external view returns (uint256) {
         return heap.accounts[index].value;
@@ -23,12 +24,16 @@ contract Heap is HeapMock, StdUtils {
 
     /// Functions to fuzz ///
 
-    function insertCorrect(address account, uint256 amount) external {
+    function insertNewUser(address account, uint256 amount) external {
+        if (account == address(0) || isUsed[account]) {
+            return;
+        }
         insert(account, amount);
         accountsUsed.push(account);
+        isUsed[account] = true;
     }
 
-    function increaseCorrect(uint256 index, uint256 amount) external {
+    function increaseExistingUser(uint256 index, uint256 amount) external {
         if (accountsUsed.length == 0) {
             return;
         }
@@ -41,7 +46,7 @@ contract Heap is HeapMock, StdUtils {
         increase(account, bound(amount, accountValue + 1, type(uint256).max));
     }
 
-    function decreaseCorrect(uint256 index, uint256 amount) external {
+    function decreaseExistingUser(uint256 index, uint256 amount) external {
         if (accountsUsed.length == 0) {
             return;
         }
@@ -54,12 +59,13 @@ contract Heap is HeapMock, StdUtils {
         decrease(account, bound(amount, 0, accountValue - 1));
     }
 
-    function removeCorrect(uint256 index) external {
+    function removeExistingUser(uint256 index) external {
         if (accountsUsed.length == 0) {
             return;
         }
         index = bound(index, 0, accountsUsed.length - 1);
         remove(accountsUsed[index]);
+        isUsed[accountsUsed[index]] = false;
         accountsUsed[index] = accountsUsed[accountsUsed.length - 1];
         accountsUsed.pop();
     }
@@ -87,11 +93,11 @@ contract TestHeapInvariant is Test {
     function targetSelectors() public view returns (FuzzSelector[] memory) {
         FuzzSelector[] memory targets = new FuzzSelector[](1);
         bytes4[] memory selectors = new bytes4[](5);
-        selectors[0] = Heap.insertCorrect.selector;
-        selectors[1] = Heap.insertCorrect.selector; // more insertions that removals
-        selectors[2] = Heap.increaseCorrect.selector;
-        selectors[3] = Heap.decreaseCorrect.selector;
-        selectors[4] = Heap.removeCorrect.selector;
+        selectors[0] = Heap.insertNewUser.selector;
+        selectors[1] = Heap.insertNewUser.selector; // more insertions that removals
+        selectors[2] = Heap.increaseExistingUser.selector;
+        selectors[3] = Heap.decreaseExistingUser.selector;
+        selectors[4] = Heap.removeExistingUser.selector;
         targets[0] = FuzzSelector(address(heap), selectors);
         return targets;
     }

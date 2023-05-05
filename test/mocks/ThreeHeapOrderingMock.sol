@@ -11,49 +11,49 @@ contract ThreeHeapOrderingMock is IHeapOrderingMock {
 
     ThreeHeapOrdering.HeapArray internal heap;
 
-    /* EXTERNAL */
+    /* PUBLIC */
 
-    function accountsValue(uint256 index) external view returns (uint256) {
+    function accountsValue(uint256 index) public view returns (uint256) {
         return heap.accounts[index].value;
     }
 
-    function accountsId(uint256 index) external view returns (address) {
+    function accountsId(uint256 index) public view returns (address) {
         return heap.accounts[index].id;
     }
 
-    function indexOf(address id) external view returns (uint256) {
+    function indexOf(address id) public view returns (uint256) {
         return heap.indexOf[id];
     }
 
-    function update(address id, uint256 formerValue, uint256 newValue, uint256 maxSortedUsers) external {
+    function update(address id, uint256 formerValue, uint256 newValue, uint256 maxSortedUsers) public {
         heap.update(id, formerValue, newValue, maxSortedUsers);
     }
 
-    function length() external view returns (uint256) {
+    function length() public view returns (uint256) {
         return heap.length();
     }
 
-    function size() external view returns (uint256) {
+    function size() public view returns (uint256) {
         return heap.size;
     }
 
-    function getValueOf(address id) external view returns (uint256) {
+    function getValueOf(address id) public view returns (uint256) {
         return heap.getValueOf(id);
     }
 
-    function getHead() external view returns (address) {
+    function getHead() public view returns (address) {
         return heap.getHead();
     }
 
-    function getTail() external view returns (address) {
+    function getTail() public view returns (address) {
         return heap.getTail();
     }
 
-    function getPrev(address id) external view returns (address) {
+    function getPrev(address id) public view returns (address) {
         return heap.getPrev(id);
     }
 
-    function getNext(address id) external view returns (address) {
+    function getNext(address id) public view returns (address) {
         return heap.getNext(id);
     }
 }
