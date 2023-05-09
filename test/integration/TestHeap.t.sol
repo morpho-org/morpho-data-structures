@@ -12,29 +12,9 @@ contract TestHeap is Test {
 
     uint256 public constant TESTED_SIZE = 50;
 
+    address[TESTED_SIZE] internal ids;
+    uint256[TESTED_SIZE] internal increasingValues;
     HeapMock internal heap;
-
-    function _createAccounts(bytes32 seed, uint256 n) internal pure returns (address[] memory accounts) {
-        accounts = new address[](n);
-        for (uint256 i; i < n; ++i) {
-            seed = keccak256(abi.encode(seed));
-            accounts[i] = address(bytes20(seed));
-        }
-    }
-
-    function _createIncreasingValues(bytes32 seed, uint256 min, uint256 max, uint256 n)
-        internal
-        view
-        returns (uint256[] memory values)
-    {
-        values = new uint256[](n);
-        uint256 minValue = min;
-        for (uint256 i; i < n; ++i) {
-            seed = keccak256(abi.encode(seed));
-            values[i] = bound(uint256(seed), minValue, max - (n - i));
-            minValue = values[i] + 1;
-        }
-    }
 
     function _compareUnorderedTuples(address addrA, address addrB, address addr0, address addr1)
         internal
@@ -65,6 +45,19 @@ contract TestHeap is Test {
 
     function setUp() public {
         heap = new HeapMock();
+        uint256 startIndex = uint256(keccak256("TestHeap"));
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            ids[i] = vm.addr(startIndex + i);
+            uint256 value = uint256(keccak256(abi.encode(startIndex + i)));
+            for (uint256 j = i; j > 0; --j) {
+                if (increasingValues[j - 1] > value) {
+                    increasingValues[j] = increasingValues[j - 1];
+                } else {
+                    increasingValues[j] = value;
+                    break;
+                }
+            }
+        }
     }
 
     function testEmpty(address id) public {
@@ -115,12 +108,9 @@ contract TestHeap is Test {
         assertEq(heap.getRightChild(id), address(0));
     }
 
-    function testInsertTwoAccounts(bytes32 accountsSeed, bytes32 valuesSeed) public {
-        address[] memory ids = _createAccounts(accountsSeed, 2);
-        uint256[] memory values = _createIncreasingValues(valuesSeed, 0, type(uint256).max, 2);
-
+    function testInsertTwoAccounts() public {
         for (uint256 i; i < 2; ++i) {
-            heap.insert(ids[i], values[i]);
+            heap.insert(ids[i], increasingValues[i]);
         }
 
         assertEq(heap.length(), 2);
@@ -129,12 +119,9 @@ contract TestHeap is Test {
         assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[1]), heap.getRightChild(ids[1]), ids[0], address(0)));
     }
 
-    function testInsertThreeAccounts(bytes32 accountsSeed, bytes32 valuesSeed) public {
-        address[] memory ids = _createAccounts(accountsSeed, 3);
-        uint256[] memory values = _createIncreasingValues(valuesSeed, 0, type(uint256).max, 3);
-
+    function testInsertThreeAccounts() public {
         for (uint256 i; i < 3; ++i) {
-            heap.insert(ids[i], values[i]);
+            heap.insert(ids[i], increasingValues[i]);
         }
 
         assertEq(heap.length(), 3);
@@ -144,12 +131,9 @@ contract TestHeap is Test {
         assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[2]), heap.getRightChild(ids[2]), ids[0], ids[1]));
     }
 
-    function testRemoveFirstAccount(bytes32 accountsSeed, bytes32 valuesSeed) public {
-        address[] memory ids = _createAccounts(accountsSeed, 3);
-        uint256[] memory values = _createIncreasingValues(valuesSeed, 0, type(uint256).max, 3);
-
+    function testRemoveFirstAccount() public {
         for (uint256 i; i < 3; ++i) {
-            heap.insert(ids[i], values[i]);
+            heap.insert(ids[i], increasingValues[i]);
         }
         heap.remove(ids[2]);
 
@@ -159,12 +143,9 @@ contract TestHeap is Test {
         assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[1]), heap.getRightChild(ids[1]), ids[0], address(0)));
     }
 
-    function testDecreaseFirstAccount(bytes32 accountsSeed, bytes32 valuesSeed) public {
-        address[] memory ids = _createAccounts(accountsSeed, 3);
-        uint256[] memory values = _createIncreasingValues(valuesSeed, 0, type(uint256).max, 3);
-
+    function testDecreaseFirstAccount() public {
         for (uint256 i; i < 3; ++i) {
-            heap.insert(ids[i], values[i]);
+            heap.insert(ids[i], increasingValues[i]);
         }
         heap.decrease(ids[2], 0);
 
@@ -175,12 +156,9 @@ contract TestHeap is Test {
         assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[1]), heap.getRightChild(ids[1]), ids[0], ids[2]));
     }
 
-    function testIncreaseLastAccount(bytes32 accountsSeed, bytes32 valuesSeed) public {
-        address[] memory ids = _createAccounts(accountsSeed, 3);
-        uint256[] memory values = _createIncreasingValues(valuesSeed, 0, type(uint256).max - 1, 3);
-
+    function testIncreaseLastAccount() public {
         for (uint256 i; i < 3; ++i) {
-            heap.insert(ids[i], values[i]);
+            heap.insert(ids[i], increasingValues[i]);
         }
         heap.increase(ids[0], type(uint256).max);
 
@@ -191,16 +169,14 @@ contract TestHeap is Test {
         assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[0]), heap.getRightChild(ids[0]), ids[1], ids[2]));
     }
 
-    function testInsertMany(bytes32 seed, uint256[TESTED_SIZE] calldata values) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
+    function testInsertMany(uint256[TESTED_SIZE] calldata values) public {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(ids[i], values[i]);
             _assertNodeCorrect(ids[i], values[i]);
         }
     }
 
-    function testRemoveMany(bytes32 seed, uint256[TESTED_SIZE] calldata values) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
+    function testRemoveMany(uint256[TESTED_SIZE] calldata values) public {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(ids[i], values[i]);
         }
@@ -215,12 +191,9 @@ contract TestHeap is Test {
         }
     }
 
-    function testIncreaseMany(
-        bytes32 seed,
-        uint256[TESTED_SIZE] memory initialValues,
-        uint256[TESTED_SIZE] memory increasedValues
-    ) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
+    function testIncreaseMany(uint256[TESTED_SIZE] memory initialValues, uint256[TESTED_SIZE] memory increasedValues)
+        public
+    {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             initialValues[i] = bound(initialValues[i], 0, type(uint256).max - 1);
             increasedValues[i] = bound(increasedValues[i], initialValues[i] + 1, type(uint256).max);
@@ -236,12 +209,9 @@ contract TestHeap is Test {
         }
     }
 
-    function testDecreaseMany(
-        bytes32 seed,
-        uint256[TESTED_SIZE] memory initialValues,
-        uint256[TESTED_SIZE] memory decreasedValues
-    ) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
+    function testDecreaseMany(uint256[TESTED_SIZE] memory initialValues, uint256[TESTED_SIZE] memory decreasedValues)
+        public
+    {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             initialValues[i] = bound(initialValues[i], 1, type(uint256).max);
             decreasedValues[i] = bound(decreasedValues[i], 0, initialValues[i] - 1);
@@ -257,8 +227,7 @@ contract TestHeap is Test {
         }
     }
 
-    function testRemovalsShouldBeSorted(bytes32 seed, uint256[TESTED_SIZE] calldata values) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
+    function testRemovalsShouldBeSorted(uint256[TESTED_SIZE] calldata values) public {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(ids[i], values[i]);
         }
@@ -274,12 +243,10 @@ contract TestHeap is Test {
     }
 
     function testLength(
-        bytes32 seed,
         uint256[TESTED_SIZE] memory initialValues,
         uint256[TESTED_SIZE] memory decreasedValues,
         uint256[TESTED_SIZE] memory increasedValues
     ) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
         for (uint256 i; i < TESTED_SIZE; ++i) {
             initialValues[i] = bound(initialValues[i], 1, type(uint256).max);
             decreasedValues[i] = bound(decreasedValues[i], 0, initialValues[i] - 1);
@@ -306,8 +273,7 @@ contract TestHeap is Test {
         }
     }
 
-    function testHalfOfAccountsShouldHaveTwoChildren(bytes32 seed, uint256[TESTED_SIZE] memory values) public {
-        address[] memory ids = _createAccounts(seed, TESTED_SIZE);
+    function testHalfOfAccountsShouldHaveTwoChildren(uint256[TESTED_SIZE] memory values) public {
         for (uint256 i; i < TESTED_SIZE; ++i) {
             heap.insert(ids[i], values[i]);
         }
