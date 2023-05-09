@@ -280,6 +280,6 @@ contract TestHeap is Test {
                 accountsWhithTwoChildren++;
             }
         }
-        assertGe(accountsWhithTwoChildren, (TESTED_SIZE - 1) / 2);
+        assertEq(accountsWhithTwoChildren, (TESTED_SIZE - 1) / 2);
     }
 }
