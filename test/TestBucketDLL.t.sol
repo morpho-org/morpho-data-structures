@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
-import {BucketDLL, BucketDLLMock} from "../mocks/BucketDLLMock.sol";
+import {BucketDLL, BucketDLLMock} from "./mocks/BucketDLLMock.sol";
 
 contract TestBucketDLL is Test {
     using BucketDLLMock for BucketDLL.List;

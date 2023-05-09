@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {StdUtils} from "forge-std/StdUtils.sol";
 import {Test} from "forge-std/Test.sol";
 
-import {HeapMock} from "../mocks/HeapMock.sol";
+import {HeapMock} from "./mocks/HeapMock.sol";
 
 contract Heap is HeapMock, StdUtils {
     address[] internal accountsUsed;

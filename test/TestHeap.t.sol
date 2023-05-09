@@ -5,7 +5,7 @@ import {Test} from "forge-std/Test.sol";
 
 import {BasicHeap} from "src/Heap.sol";
 
-import {HeapMock} from "../mocks/HeapMock.sol";
+import {HeapMock} from "./mocks/HeapMock.sol";
 
 contract TestHeap is Test {
     uint256 public constant TESTED_SIZE = 50;

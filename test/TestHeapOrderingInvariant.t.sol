@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
 
-import {HeapOrderingMock} from "../mocks/HeapOrderingMock.sol";
+import {HeapOrderingMock} from "./mocks/HeapOrderingMock.sol";
 import {HeapOrdering} from "src/HeapOrdering.sol";
 
 contract Heap is HeapOrderingMock {

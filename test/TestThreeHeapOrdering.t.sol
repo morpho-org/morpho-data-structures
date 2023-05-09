@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {TestCommonHeapOrdering} from "./TestCommonHeapOrdering.t.sol";
-import {ThreeHeapOrderingMock} from "../mocks/ThreeHeapOrderingMock.sol";
+import {ThreeHeapOrderingMock} from "./mocks/ThreeHeapOrderingMock.sol";
 
 contract TestThreeHeapOrdering is TestCommonHeapOrdering {
     constructor() {

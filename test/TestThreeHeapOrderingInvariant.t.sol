@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import {Test} from "forge-std/Test.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 
-import {ThreeHeapOrderingMock} from "../mocks/ThreeHeapOrderingMock.sol";
+import {ThreeHeapOrderingMock} from "./mocks/ThreeHeapOrderingMock.sol";
 
 contract Heap is ThreeHeapOrderingMock, StdUtils {
     address[] internal accountsUsed;
