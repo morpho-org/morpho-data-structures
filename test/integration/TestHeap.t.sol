@@ -8,8 +8,6 @@ import {BasicHeap} from "src/Heap.sol";
 import {HeapMock} from "../mocks/HeapMock.sol";
 
 contract TestHeap is Test {
-    /* STORAGE */
-
     uint256 public constant TESTED_SIZE = 50;
 
     address[TESTED_SIZE] internal ids;
@@ -40,8 +38,6 @@ contract TestHeap is Test {
             rightChild == address(0) || (heap.containsAccount(rightChild) && heap.getValueOf(rightChild) <= value)
         );
     }
-
-    /* PUBLIC */
 
     function setUp() public {
         heap = new HeapMock();
