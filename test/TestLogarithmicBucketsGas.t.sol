@@ -19,8 +19,6 @@ contract TestLogarithmicBucketsGas is Test {
     uint256 internal getMatchCost;
     uint256 internal getMatchCount;
 
-    /* PUBLIC */
-
     function testGasUsage() public noGasMetering {
         for (uint256 i; i <= 10000; i++) {
             // Get a random amount.
