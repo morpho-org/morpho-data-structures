@@ -3,7 +3,6 @@ pragma solidity ^0.8.0;
 
 import {RandomHeap} from "../helpers/RandomHeap.sol";
 import {HeapOrdering} from "src/HeapOrdering.sol";
-import {HeapOrderingMock} from "../mocks/HeapOrderingMock.sol";
 
 abstract contract TestCommonHeapOrdering is RandomHeap {
     address[] public accounts;

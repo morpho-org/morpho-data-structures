@@ -119,8 +119,6 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
 }
 
 contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
-    /* PUBLIC */
-
     function isPowerOfTwo(uint256 x) public pure returns (bool) {
         unchecked {
             return x != 0 && (x & (x - 1)) == 0;

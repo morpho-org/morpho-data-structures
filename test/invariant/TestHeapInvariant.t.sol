@@ -66,18 +66,12 @@ contract Heap is HeapMock, StdUtils {
 }
 
 contract TestHeapInvariant is Test {
-    /* STRUCTS */
-
     struct FuzzSelector {
         address addr;
         bytes4[] selectors;
     }
 
-    /* STORAGE */
-
     Heap public heap;
-
-    /* PUBLIC */
 
     function setUp() public {
         heap = new Heap();
