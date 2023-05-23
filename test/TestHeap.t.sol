@@ -5,314 +5,281 @@ import {Test} from "forge-std/Test.sol";
 
 import {BasicHeap} from "src/Heap.sol";
 
+import {HeapMock} from "./mocks/HeapMock.sol";
+
 contract TestHeap is Test {
-    using BasicHeap for BasicHeap.Heap;
+    uint256 public constant TESTED_SIZE = 50;
 
-    uint256 public TESTED_SIZE = 50;
-    address[] public accounts;
-    address public ADDR_ZERO = address(0);
+    address[TESTED_SIZE] internal ids;
+    uint256[TESTED_SIZE] internal increasingValues;
+    HeapMock internal heap;
 
-    BasicHeap.Heap internal heap;
+    function _compareUnorderedTuples(address addrA, address addrB, address addr0, address addr1)
+        internal
+        pure
+        returns (bool)
+    {
+        return (addrA == addr0 && addrB == addr1) || (addrA == addr1 && addrB == addr0);
+    }
+
+    function _assertNodeCorrect(address id, uint256 expectedValue) internal {
+        uint256 value = heap.getValueOf(id);
+        assertEq(value, expectedValue);
+
+        address root = heap.getRoot();
+        address parent = heap.getParent(id);
+        address leftChild = heap.getLeftChild(id);
+        address rightChild = heap.getRightChild(id);
+        assertGe(heap.getValueOf(root), value);
+        assertTrue(heap.containsAccount(id));
+        assertTrue(id == root || (heap.containsAccount(parent) && heap.getValueOf(parent) >= value));
+        assertTrue(leftChild == address(0) || (heap.containsAccount(leftChild) && heap.getValueOf(leftChild) <= value));
+        assertTrue(
+            rightChild == address(0) || (heap.containsAccount(rightChild) && heap.getValueOf(rightChild) <= value)
+        );
+    }
 
     function setUp() public {
-        accounts = new address[](TESTED_SIZE);
-        accounts[0] = address(bytes20(keccak256("TestHeap.accounts")));
-        for (uint256 i = 1; i < TESTED_SIZE; i++) {
-            accounts[i] = address(uint160(accounts[i - 1]) + 1);
-        }
-    }
-
-    function testInsertOneSingleAccount() public {
-        heap.insert(accounts[0], 1);
-
-        assertEq(heap.length(), 1);
-        assertEq(heap.getValueOf(accounts[0]), 1);
-        assertEq(heap.getRoot(), accounts[0]);
-        assertEq(heap.getLeftChild(accounts[0]), ADDR_ZERO);
-        assertEq(heap.getRightChild(accounts[0]), ADDR_ZERO);
-    }
-
-    function testShouldNotInsertZeroAddress() public {
-        vm.expectRevert(abi.encodeWithSignature("AddressIsZero()"));
-        heap.insert(ADDR_ZERO, 10);
-    }
-
-    function testShouldNotInsertSeveralTimesTheSameAccount() public {
-        heap.insert(accounts[0], 1);
-        vm.expectRevert(abi.encodeWithSignature("AccountAlreadyInserted()"));
-        heap.insert(accounts[0], 2);
-    }
-
-    function testShouldNotRemoveAccountThatDoesNotExist() public {
-        vm.expectRevert(abi.encodeWithSignature("AccountDoesNotExist()"));
-        heap.remove(accounts[0]);
-    }
-
-    function testContainsAccount() public {
+        heap = new HeapMock();
+        uint256 startIndex = uint256(keccak256("TestHeap"));
         for (uint256 i; i < TESTED_SIZE; ++i) {
-            heap.insert(accounts[i], (i + TESTED_SIZE / 2) % TESTED_SIZE);
-            for (uint256 j; j < TESTED_SIZE; ++j) {
-                assertEq(heap.containsAccount(accounts[j]), j <= i);
+            ids[i] = vm.addr(startIndex + i);
+            uint256 value = uint256(keccak256(abi.encode(startIndex + i)));
+            for (uint256 j = i; j > 0; --j) {
+                if (increasingValues[j - 1] > value) {
+                    increasingValues[j] = increasingValues[j - 1];
+                } else {
+                    increasingValues[j] = value;
+                    break;
+                }
             }
         }
     }
 
-    function testShouldHaveTheRightOrder() public {
-        heap.insert(accounts[0], 20);
-        heap.insert(accounts[1], 40);
-        address root = heap.getRoot();
-        address leftChild = heap.getLeftChild(root);
-        assertEq(root, accounts[1]);
-        assertEq(leftChild, accounts[0]);
-    }
-
-    function testShouldRemoveOneSingleAccount() public {
-        heap.insert(accounts[0], 1);
-        heap.remove(accounts[0]);
-
+    function testEmpty(address id) public {
         assertEq(heap.length(), 0);
-        assertEq(heap.getRoot(), ADDR_ZERO);
-        assertEq(heap.getValueOf(accounts[0]), 0);
-        assertEq(heap.getLeftChild(accounts[0]), ADDR_ZERO);
-        assertEq(heap.getRightChild(accounts[0]), ADDR_ZERO);
+        assertEq(heap.getRoot(), address(0));
+        assertEq(heap.getParent(id), address(0));
+        assertEq(heap.getLeftChild(id), address(0));
+        assertEq(heap.getRightChild(id), address(0));
+        assertEq(heap.getValueOf(id), 0);
+        assertFalse(heap.containsAccount(id));
     }
 
-    function testShouldInsertTwoAccounts() public {
-        heap.insert(accounts[0], 2);
-        heap.insert(accounts[1], 1);
-
-        address root = heap.getRoot();
-        address leftChild = heap.getLeftChild(root);
-        address rightChild = heap.getRightChild(root);
-
-        assertEq(heap.length(), 2);
-        assertEq(root, accounts[0]);
-        assertEq(leftChild, accounts[1]);
-        assertEq(rightChild, ADDR_ZERO);
-        assertEq(heap.getParent(leftChild), root);
-        assertEq(heap.getParent(rightChild), ADDR_ZERO);
-        assertEq(heap.getValueOf(accounts[0]), 2);
-        assertEq(heap.getValueOf(accounts[1]), 1);
+    function testShouldNotInsertZeroAddress(uint256 value) public {
+        vm.expectRevert(BasicHeap.AddressIsZero.selector);
+        heap.insert(address(0), value);
     }
 
-    function testShouldInsertThreeAccounts() public {
-        heap.insert(accounts[0], 3);
-        heap.insert(accounts[1], 2);
-        heap.insert(accounts[2], 1);
+    function testShouldNotInsertSeveralTimesTheSameAccount(address id, uint256 value1, uint256 value2) public {
+        vm.assume(id != address(0));
 
-        address root = heap.getRoot();
-        address leftChild = heap.getLeftChild(root);
-        address rightChild = heap.getRightChild(root);
-
-        assertEq(heap.length(), 3);
-        assertEq(root, accounts[0]);
-        assertEq(leftChild, accounts[1]);
-        assertEq(rightChild, accounts[2]);
-        assertEq(heap.getParent(leftChild), root);
-        assertEq(heap.getParent(rightChild), root);
-        assertEq(heap.getValueOf(accounts[0]), 3);
-        assertEq(heap.getValueOf(accounts[1]), 2);
-        assertEq(heap.getValueOf(accounts[2]), 1);
+        heap.insert(id, value1);
+        vm.expectRevert(BasicHeap.AccountAlreadyInserted.selector);
+        heap.insert(id, value2);
     }
 
-    function testShouldRemoveOneAccountOverTwo() public {
-        heap.insert(accounts[0], 2);
-        heap.insert(accounts[1], 1);
-        heap.remove(accounts[0]);
+    function testShouldNotModifyAccountThatDoesNotExist(address id, uint256 value) public {
+        vm.assume(id != address(0));
 
-        address root = heap.getRoot();
+        vm.expectRevert(BasicHeap.AccountDoesNotExist.selector);
+        heap.remove(id);
+        vm.expectRevert(BasicHeap.AccountDoesNotExist.selector);
+        heap.increase(id, value);
+        vm.expectRevert(BasicHeap.AccountDoesNotExist.selector);
+        heap.decrease(id, value);
+    }
+
+    function testInsertOneAccount(address id, uint256 value) public {
+        vm.assume(id != address(0));
+
+        heap.insert(id, value);
 
         assertEq(heap.length(), 1);
-        assertEq(root, accounts[1]);
-        assertEq(heap.getValueOf(accounts[0]), 0);
-        assertEq(heap.getValueOf(accounts[1]), 1);
-        assertEq(heap.getParent(root), ADDR_ZERO);
-        assertEq(heap.getRightChild(root), ADDR_ZERO);
-        assertEq(heap.getLeftChild(root), ADDR_ZERO);
+        assertTrue(heap.containsAccount(id));
+        assertEq(heap.getValueOf(id), value);
+        assertEq(heap.getRoot(), id);
+        assertEq(heap.getParent(id), address(0));
+        assertEq(heap.getLeftChild(id), address(0));
+        assertEq(heap.getRightChild(id), address(0));
     }
 
-    function testShouldRemoveBothAccounts() public {
-        heap.insert(accounts[0], 2);
-        heap.insert(accounts[1], 1);
-        heap.remove(accounts[0]);
-        heap.remove(accounts[1]);
-
-        assertEq(heap.getRoot(), ADDR_ZERO);
-        assertEq(heap.length(), 0);
-    }
-
-    function testShouldInsertThreeAccountsAndRemoveThem() public {
-        heap.insert(accounts[0], 3);
-        heap.insert(accounts[1], 2);
-        heap.insert(accounts[2], 1);
-
-        address root = heap.getRoot();
-
-        assertEq(heap.length(), 3);
-        assertEq(root, accounts[0]);
-        assertEq(heap.getLeftChild(root), accounts[1]);
-        assertEq(heap.getRightChild(root), accounts[2]);
-
-        // Remove account 0.
-        heap.remove(accounts[0]);
-
-        root = heap.getRoot();
+    function testInsertTwoAccounts() public {
+        for (uint256 i; i < 2; ++i) {
+            heap.insert(ids[i], increasingValues[i]);
+        }
 
         assertEq(heap.length(), 2);
-        assertEq(root, accounts[1]);
-        assertEq(heap.getLeftChild(root), accounts[2]);
-        assertEq(heap.getRightChild(root), ADDR_ZERO);
-
-        // Remove account 1.
-        heap.remove(accounts[1]);
-
-        root = heap.getRoot();
-
-        assertEq(heap.length(), 1);
-        assertEq(root, accounts[2]);
-        assertEq(heap.getLeftChild(root), ADDR_ZERO);
-        assertEq(heap.getRightChild(root), ADDR_ZERO);
-
-        // Remove account 2.
-        heap.remove(accounts[2]);
-
-        assertEq(heap.length(), 0);
-        assertEq(heap.getRoot(), ADDR_ZERO);
+        assertEq(heap.getRoot(), ids[1]);
+        assertEq(heap.getParent(ids[0]), ids[1]);
+        assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[1]), heap.getRightChild(ids[1]), ids[0], address(0)));
     }
 
-    function testShouldInsertAccountsAllSorted() public {
-        for (uint256 i = 0; i < accounts.length; i++) {
-            heap.insert(accounts[i], TESTED_SIZE - i);
+    function testInsertThreeAccounts() public {
+        for (uint256 i; i < 3; ++i) {
+            heap.insert(ids[i], increasingValues[i]);
         }
 
-        assertEq(heap.getRoot(), accounts[0]);
-
-        for (uint256 i = 0; i < accounts.length; i++) {
-            assertEq(heap.accounts[i].id, accounts[i]);
-        }
+        assertEq(heap.length(), 3);
+        assertEq(heap.getRoot(), ids[2]);
+        assertEq(heap.getParent(ids[0]), ids[2]);
+        assertEq(heap.getParent(ids[1]), ids[2]);
+        assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[2]), heap.getRightChild(ids[2]), ids[0], ids[1]));
     }
 
-    function testShouldRemoveAllSortedAccount() public {
-        for (uint256 i = 0; i < accounts.length; i++) {
-            heap.insert(accounts[i], TESTED_SIZE - i);
+    function testRemoveFirstAccount() public {
+        for (uint256 i; i < 3; ++i) {
+            heap.insert(ids[i], increasingValues[i]);
         }
+        heap.remove(ids[2]);
 
-        for (uint256 i = 0; i < accounts.length; i++) {
-            heap.remove(accounts[i]);
-        }
-
-        assertEq(heap.length(), 0);
-        assertEq(heap.getRoot(), ADDR_ZERO);
+        assertEq(heap.length(), 2);
+        assertEq(heap.getRoot(), ids[1]);
+        assertEq(heap.getParent(ids[0]), ids[1]);
+        assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[1]), heap.getRightChild(ids[1]), ids[0], address(0)));
     }
 
-    function testShouldInsertAccountSortedAtTheBeginning() public {
-        uint256 value = 50;
-
-        // Add first 10 accounts with decreasing value.
-        for (uint256 i = 0; i < 10; i++) {
-            heap.insert(accounts[i], value - i);
+    function testDecreaseFirstAccount() public {
+        for (uint256 i; i < 3; ++i) {
+            heap.insert(ids[i], increasingValues[i]);
         }
+        heap.decrease(ids[2], 0);
 
-        // Add last 10 accounts at the same value.
-        for (uint256 i = TESTED_SIZE - 10; i < TESTED_SIZE; i++) {
-            heap.insert(accounts[i], 10);
+        assertEq(heap.length(), 3);
+        assertEq(heap.getRoot(), ids[1]);
+        assertEq(heap.getParent(ids[0]), ids[1]);
+        assertEq(heap.getParent(ids[2]), ids[1]);
+        assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[1]), heap.getRightChild(ids[1]), ids[0], ids[2]));
+    }
+
+    function testIncreaseLastAccount() public {
+        for (uint256 i; i < 3; ++i) {
+            heap.insert(ids[i], increasingValues[i]);
         }
+        heap.increase(ids[0], type(uint256).max);
 
-        assertEq(heap.getRoot(), accounts[0], "root not expected");
+        assertEq(heap.length(), 3);
+        assertEq(heap.getRoot(), ids[0]);
+        assertEq(heap.getParent(ids[1]), ids[0]);
+        assertEq(heap.getParent(ids[2]), ids[0]);
+        assertTrue(_compareUnorderedTuples(heap.getLeftChild(ids[0]), heap.getRightChild(ids[0]), ids[1], ids[2]));
+    }
 
-        for (uint256 i = 0; i < 10; i++) {
-            assertEq(heap.accounts[i].id, accounts[i], "order not expected, 1");
-        }
-
-        for (uint256 i = 0; i < 10; i++) {
-            assertEq(heap.accounts[10 + i].id, accounts[TESTED_SIZE - 10 + i], "order not expected, 2");
+    function testInsertMany(uint256[TESTED_SIZE] calldata values) public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], values[i]);
+            _assertNodeCorrect(ids[i], values[i]);
         }
     }
 
-    function testDecreaseOrder1() public {
-        heap.insert(accounts[0], 4);
-        heap.insert(accounts[1], 3);
-        heap.insert(accounts[2], 2);
-        heap.decrease(accounts[0], 1);
+    function testRemoveMany(uint256[TESTED_SIZE] calldata values) public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], values[i]);
+        }
 
-        assertEq(heap.accounts[0].value, 3);
-        assertEq(heap.accounts[1].value, 1);
-        assertEq(heap.accounts[2].value, 2);
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            address id = ids[i];
+            heap.remove(id);
+            assertFalse(heap.containsAccount(id));
+            assertEq(heap.getParent(id), address(0));
+            assertEq(heap.getLeftChild(id), address(0));
+            assertEq(heap.getRightChild(id), address(0));
+        }
     }
 
-    function testDecreaseOrder2() public {
-        heap.insert(accounts[0], 4);
-        heap.insert(accounts[1], 2);
-        heap.insert(accounts[2], 3);
-        heap.decrease(accounts[0], 1);
+    function testIncreaseMany(uint256[TESTED_SIZE] memory initialValues, uint256[TESTED_SIZE] memory increasedValues)
+        public
+    {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            initialValues[i] = bound(initialValues[i], 0, type(uint256).max - 1);
+            increasedValues[i] = bound(increasedValues[i], initialValues[i] + 1, type(uint256).max);
+        }
 
-        assertEq(heap.accounts[0].value, 3);
-        assertEq(heap.accounts[1].value, 2);
-        assertEq(heap.accounts[2].value, 1);
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], initialValues[i]);
+        }
+
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.increase(ids[i], increasedValues[i]);
+            _assertNodeCorrect(ids[i], increasedValues[i]);
+        }
     }
 
-    function testIncreaseOrder() public {
-        heap.insert(accounts[0], 4);
-        heap.insert(accounts[1], 3);
-        heap.insert(accounts[2], 2);
-        heap.increase(accounts[2], 5);
+    function testDecreaseMany(uint256[TESTED_SIZE] memory initialValues, uint256[TESTED_SIZE] memory decreasedValues)
+        public
+    {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            initialValues[i] = bound(initialValues[i], 1, type(uint256).max);
+            decreasedValues[i] = bound(decreasedValues[i], 0, initialValues[i] - 1);
+        }
 
-        assertEq(heap.accounts[0].value, 5);
-        assertEq(heap.accounts[1].value, 3);
-        assertEq(heap.accounts[2].value, 4);
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], initialValues[i]);
+        }
+
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.decrease(ids[i], decreasedValues[i]);
+            _assertNodeCorrect(ids[i], decreasedValues[i]);
+        }
     }
 
-    function testRemoveShiftDown() public {
-        heap.insert(accounts[0], 10);
-        heap.insert(accounts[1], 9);
-        heap.insert(accounts[2], 3);
-        heap.insert(accounts[3], 8);
-        heap.insert(accounts[4], 7);
-        heap.insert(accounts[5], 2);
-        heap.insert(accounts[6], 1);
+    function testRemovalsShouldBeSorted(uint256[TESTED_SIZE] calldata values) public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], values[i]);
+        }
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 9);
-        assertEq(heap.accounts[2].value, 3);
-        assertEq(heap.accounts[3].value, 8);
-        assertEq(heap.accounts[4].value, 7);
-        assertEq(heap.accounts[5].value, 2);
-        assertEq(heap.accounts[6].value, 1);
-
-        heap.remove(accounts[1]);
-
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 8);
-        assertEq(heap.accounts[2].value, 3);
-        assertEq(heap.accounts[3].value, 1);
-        assertEq(heap.accounts[4].value, 7);
-        assertEq(heap.accounts[5].value, 2);
+        uint256 previousRootValue = type(uint256).max;
+        while (heap.length() > 0) {
+            address root = heap.getRoot();
+            uint256 rootValue = heap.getValueOf(root);
+            assertLe(rootValue, previousRootValue);
+            heap.remove(root);
+            previousRootValue = rootValue;
+        }
     }
 
-    function testRemoveShiftUp() public {
-        heap.insert(accounts[0], 10);
-        heap.insert(accounts[1], 3);
-        heap.insert(accounts[2], 9);
-        heap.insert(accounts[3], 2);
-        heap.insert(accounts[4], 1);
-        heap.insert(accounts[5], 8);
-        heap.insert(accounts[6], 7);
+    function testLength(
+        uint256[TESTED_SIZE] memory initialValues,
+        uint256[TESTED_SIZE] memory decreasedValues,
+        uint256[TESTED_SIZE] memory increasedValues
+    ) public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            initialValues[i] = bound(initialValues[i], 1, type(uint256).max);
+            decreasedValues[i] = bound(decreasedValues[i], 0, initialValues[i] - 1);
+            increasedValues[i] = bound(increasedValues[i], decreasedValues[i] + 1, type(uint256).max);
+        }
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 3);
-        assertEq(heap.accounts[2].value, 9);
-        assertEq(heap.accounts[3].value, 2);
-        assertEq(heap.accounts[4].value, 1);
-        assertEq(heap.accounts[5].value, 8);
-        assertEq(heap.accounts[6].value, 7);
+        uint256 expectedLength = 0;
+        assertEq(heap.length(), expectedLength);
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], initialValues[i]);
+            assertEq(heap.length(), ++expectedLength);
+        }
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.decrease(ids[i], decreasedValues[i]);
+            assertEq(heap.length(), expectedLength);
+        }
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.increase(ids[i], increasedValues[i]);
+            assertEq(heap.length(), expectedLength);
+        }
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.remove(ids[i]);
+            assertEq(heap.length(), --expectedLength);
+        }
+    }
 
-        heap.remove(accounts[4]);
+    function testHalfOfAccountsShouldHaveTwoChildren(uint256[TESTED_SIZE] memory values) public {
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            heap.insert(ids[i], values[i]);
+        }
 
-        assertEq(heap.accounts[0].value, 10);
-        assertEq(heap.accounts[1].value, 7);
-        assertEq(heap.accounts[2].value, 9);
-        assertEq(heap.accounts[3].value, 2);
-        assertEq(heap.accounts[4].value, 3);
-        assertEq(heap.accounts[5].value, 8);
+        uint256 accountsWhithTwoChildren;
+        for (uint256 i; i < TESTED_SIZE; ++i) {
+            if (heap.getLeftChild(ids[i]) != address(0) && heap.getRightChild(ids[i]) != address(0)) {
+                accountsWhithTwoChildren++;
+            }
+        }
+        assertEq(accountsWhithTwoChildren, (TESTED_SIZE - 1) / 2);
     }
 }
