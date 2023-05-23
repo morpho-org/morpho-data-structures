@@ -1,35 +1,35 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
+import {Test} from "forge-std/Test.sol";
 
-import "./mocks/ThreeHeapOrderingMock.sol";
+import {ThreeHeapOrderingMock} from "./mocks/ThreeHeapOrderingMock.sol";
+import {ThreeHeapOrdering} from "src/ThreeHeapOrdering.sol";
 
 contract Heap is ThreeHeapOrderingMock {
     using ThreeHeapOrdering for ThreeHeapOrdering.HeapArray;
 
     uint256 public MAX_SORTED_USERS = 16;
 
-    /// Functions to fuzz ///
-
-    function updateCorrect(address _id, uint96 _newValue) public {
-        uint256 oldValue = heap.getValueOf(_id);
-        if (oldValue != 0 || _newValue != 0) {
-            heap.update(_id, heap.getValueOf(_id), _newValue, MAX_SORTED_USERS);
+    /// @dev Function to fuzz
+    function updateCorrect(address id, uint96 newValue) public {
+        uint256 oldValue = heap.getValueOf(id);
+        if (oldValue != 0 || newValue != 0) {
+            heap.update(id, heap.getValueOf(id), newValue, MAX_SORTED_USERS);
         }
     }
 }
 
 contract TestThreeHeapOrderingInvariant is Test {
+    struct FuzzSelector {
+        address addr;
+        bytes4[] selectors;
+    }
+
     Heap public heap;
 
     function setUp() public {
         heap = new Heap();
-    }
-
-    struct FuzzSelector {
-        address addr;
-        bytes4[] selectors;
     }
 
     // Target specific selectors for invariant testing

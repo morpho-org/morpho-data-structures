@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "./Random.sol";
-import "../mocks/IHeapOrderingMock.sol";
-import "forge-std/Test.sol";
+import {Random} from "./Random.sol";
+import {IHeapOrderingMock} from "../mocks/interfaces/IHeapOrderingMock.sol";
+import {Test} from "forge-std/Test.sol";
 
 abstract contract RandomHeap is Test, Random {
+    /* STORAGE */
+
     IHeapOrderingMock public heap;
 
     address[] public ids;
 
     uint256 public n = 50000;
     uint256 public maxSortedUsers;
+
+    /* PUBLIC */
 
     function insert() public {
         address id = randomAddress();

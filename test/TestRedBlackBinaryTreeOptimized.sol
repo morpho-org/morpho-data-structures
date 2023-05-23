@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
-import "forge-std/console.sol";
 
 import {RedBlackBinaryTreeOptimized} from "src/RedBlackBinaryTreeOptimized.sol";
 

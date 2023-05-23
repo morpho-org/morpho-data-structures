@@ -2,13 +2,13 @@
 pragma solidity ^0.8.0;
 
 interface IHeapOrderingMock {
-    function update(address _id, uint256 _formerValue, uint256 _newValue, uint256 _maxSortedUsers) external;
+    function update(address id, uint256 formerValue, uint256 newValue, uint256 maxSortedUsers) external;
 
-    function accountsValue(uint256 _index) external view returns (uint256);
+    function accountsValue(uint256 index) external view returns (uint256);
 
-    function accountsId(uint256 _index) external view returns (address);
+    function accountsId(uint256 index) external view returns (address);
 
-    function indexOf(address _id) external view returns (uint256);
+    function indexOf(address id) external view returns (uint256);
 
     function length() external view returns (uint256);
 

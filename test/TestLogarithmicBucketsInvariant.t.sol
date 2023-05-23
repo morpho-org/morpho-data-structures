@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "./helpers/Random.sol";
-import "./mocks/LogarithmicBucketsMock.sol";
-import "./mocks/BucketDLLMock.sol";
-import "forge-std/Test.sol";
+import {Random} from "./helpers/Random.sol";
+import {LogarithmicBucketsMock, LogarithmicBuckets} from "./mocks/LogarithmicBucketsMock.sol";
+import {BucketDLLMock, BucketDLL} from "./mocks/BucketDLLMock.sol";
+import {Test} from "forge-std/Test.sol";
 
 contract TestLogarithmicBucketsInvariant is Test, Random {
     LogarithmicBucketsMock public buckets;
@@ -42,21 +42,21 @@ contract LogarithmicBucketsSeenMock is LogarithmicBucketsMock {
         return seen.length;
     }
 
-    function update(address _id, uint256 _newValue, bool _head) public override {
-        if (!isSeen[_id]) {
-            isSeen[_id] = true;
-            seen.push(_id);
+    function update(address id, uint256 newValue, bool head) public override {
+        if (!isSeen[id]) {
+            isSeen[id] = true;
+            seen.push(id);
         }
 
-        super.update(_id, _newValue, _head);
+        super.update(id, newValue, head);
     }
 
-    function getPrev(uint256 _bucket, address _id) public view returns (address) {
-        return buckets.buckets[_bucket].getPrev(_id);
+    function getPrev(uint256 bucket, address id) public view returns (address) {
+        return buckets.buckets[bucket].getPrev(id);
     }
 
-    function getNext(uint256 _bucket, address _id) public view returns (address) {
-        return buckets.buckets[_bucket].getNext(_id);
+    function getNext(uint256 bucket, address id) public view returns (address) {
+        return buckets.buckets[bucket].getNext(id);
     }
 }
 

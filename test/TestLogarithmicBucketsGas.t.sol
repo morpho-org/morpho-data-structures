@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
-import "src/LogarithmicBuckets.sol";
+import {Test, console} from "forge-std/Test.sol";
+import {LogarithmicBuckets} from "src/LogarithmicBuckets.sol";
 
 contract TestLogarithmicBucketsGas is Test {
     using LogarithmicBuckets for LogarithmicBuckets.Buckets;

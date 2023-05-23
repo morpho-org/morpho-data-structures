@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "forge-std/Test.sol";
-import "./mocks/BucketDLLMock.sol";
+import {Test} from "forge-std/Test.sol";
+import {BucketDLL, BucketDLLMock} from "./mocks/BucketDLLMock.sol";
 
 contract TestBucketDLL is Test {
     using BucketDLLMock for BucketDLL.List;
@@ -20,49 +20,49 @@ contract TestBucketDLL is Test {
         }
     }
 
-    function testInsertOneSingleAccount(address _account, bool _head) public {
-        vm.assume(_account != address(0));
+    function testInsertOneSingleAccount(address account, bool head) public {
+        vm.assume(account != address(0));
 
-        list.insert(_account, _head);
-        assertEq(list.getHead(), _account);
-        assertEq(list.getTail(), _account);
-        assertEq(list.getPrev(_account), address(0));
-        assertEq(list.getNext(_account), address(0));
+        list.insert(account, head);
+        assertEq(list.getHead(), account);
+        assertEq(list.getTail(), account);
+        assertEq(list.getPrev(account), address(0));
+        assertEq(list.getNext(account), address(0));
     }
 
-    function testShouldRemoveOneSingleAccount(address _account) public {
-        vm.assume(_account != address(0));
+    function testShouldRemoveOneSingleAccount(address account) public {
+        vm.assume(account != address(0));
 
-        list.insert(_account, false);
-        list.remove(_account);
+        list.insert(account, false);
+        list.remove(account);
 
         assertEq(list.getHead(), address(0));
         assertEq(list.getTail(), address(0));
-        assertEq(list.getPrev(_account), address(0));
-        assertEq(list.getNext(_account), address(0));
+        assertEq(list.getPrev(account), address(0));
+        assertEq(list.getNext(account), address(0));
     }
 
-    function testShouldInsertTwoAccounts(address _account0, address _account1, bool _head) public {
-        vm.assume(_account0 != address(0) && _account1 != address(0));
-        vm.assume(_account0 != _account1);
+    function testShouldInsertTwoAccounts(address account0, address account1, bool head) public {
+        vm.assume(account0 != address(0) && account1 != address(0));
+        vm.assume(account0 != account1);
 
-        list.insert(_account0, false);
-        list.insert(_account1, _head);
+        list.insert(account0, false);
+        list.insert(account1, head);
 
-        if (_head) {
-            assertEq(list.getHead(), _account1);
-            assertEq(list.getTail(), _account0);
-            assertEq(list.getPrev(_account1), address(0));
-            assertEq(list.getNext(_account1), _account0);
-            assertEq(list.getPrev(_account0), _account1);
-            assertEq(list.getNext(_account0), address(0));
+        if (head) {
+            assertEq(list.getHead(), account1);
+            assertEq(list.getTail(), account0);
+            assertEq(list.getPrev(account1), address(0));
+            assertEq(list.getNext(account1), account0);
+            assertEq(list.getPrev(account0), account1);
+            assertEq(list.getNext(account0), address(0));
         } else {
-            assertEq(list.getHead(), _account0);
-            assertEq(list.getTail(), _account1);
-            assertEq(list.getPrev(_account0), address(0));
-            assertEq(list.getNext(_account0), _account1);
-            assertEq(list.getPrev(_account1), _account0);
-            assertEq(list.getNext(_account1), address(0));
+            assertEq(list.getHead(), account0);
+            assertEq(list.getTail(), account1);
+            assertEq(list.getPrev(account0), address(0));
+            assertEq(list.getNext(account0), account1);
+            assertEq(list.getPrev(account1), account0);
+            assertEq(list.getNext(account1), address(0));
         }
     }
 
@@ -108,67 +108,65 @@ contract TestBucketDLL is Test {
         }
     }
 
-    function testShouldRemoveOneAccountOverTwo(address _account0, address _account1) public {
-        vm.assume(_account0 != address(0) && _account1 != address(0));
-        vm.assume(_account0 != _account1);
+    function testShouldRemoveOneAccountOverTwo(address account0, address account1) public {
+        vm.assume(account0 != address(0) && account1 != address(0));
+        vm.assume(account0 != account1);
 
-        list.insert(_account0, false);
-        list.insert(_account1, false);
-        list.remove(_account0);
+        list.insert(account0, false);
+        list.insert(account1, false);
+        list.remove(account0);
 
-        assertEq(list.getHead(), _account1);
-        assertEq(list.getTail(), _account1);
-        assertEq(list.getPrev(_account0), address(0));
-        assertEq(list.getNext(_account0), address(0));
-        assertEq(list.getPrev(_account1), address(0));
-        assertEq(list.getNext(_account1), address(0));
+        assertEq(list.getHead(), account1);
+        assertEq(list.getTail(), account1);
+        assertEq(list.getPrev(account0), address(0));
+        assertEq(list.getNext(account0), address(0));
+        assertEq(list.getPrev(account1), address(0));
+        assertEq(list.getNext(account1), address(0));
     }
 
-    function testShouldRemoveBothAccounts(address _account0, address _account1, bool _head1, bool _head2) public {
-        vm.assume(_account0 != address(0) && _account1 != address(0));
-        vm.assume(_account0 != _account1);
+    function testShouldRemoveBothAccounts(address account0, address account1, bool head1, bool head2) public {
+        vm.assume(account0 != address(0) && account1 != address(0));
+        vm.assume(account0 != account1);
 
-        list.insert(_account0, _head1);
-        list.insert(_account1, _head2);
-        list.remove(_account0);
-        list.remove(_account1);
+        list.insert(account0, head1);
+        list.insert(account1, head2);
+        list.remove(account0);
+        list.remove(account1);
 
         assertEq(list.getHead(), address(0));
         assertEq(list.getTail(), address(0));
     }
 
-    function testShouldInsertThreeAccountsAndRemoveThem(address _account0, address _account1, address _account2)
-        public
-    {
-        vm.assume(_account0 != address(0) && _account1 != address(0) && _account2 != address(0));
-        vm.assume(_account0 != _account1 && _account1 != _account2 && _account2 != _account0);
+    function testShouldInsertThreeAccountsAndRemoveThem(address account0, address account1, address account2) public {
+        vm.assume(account0 != address(0) && account1 != address(0) && account2 != address(0));
+        vm.assume(account0 != account1 && account1 != account2 && account2 != account0);
 
-        list.insert(_account0, false);
-        list.insert(_account1, false);
-        list.insert(_account2, false);
+        list.insert(account0, false);
+        list.insert(account1, false);
+        list.insert(account2, false);
 
-        assertEq(list.getHead(), _account0);
-        assertEq(list.getTail(), _account2);
+        assertEq(list.getHead(), account0);
+        assertEq(list.getTail(), account2);
 
         // Remove account 1.
-        list.remove(_account1);
-        assertEq(list.getHead(), _account0);
-        assertEq(list.getTail(), _account2);
-        assertEq(list.getPrev(_account0), address(0));
-        assertEq(list.getNext(_account0), _account2);
+        list.remove(account1);
+        assertEq(list.getHead(), account0);
+        assertEq(list.getTail(), account2);
+        assertEq(list.getPrev(account0), address(0));
+        assertEq(list.getNext(account0), account2);
 
-        assertEq(list.getPrev(_account2), _account0);
-        assertEq(list.getNext(_account2), address(0));
+        assertEq(list.getPrev(account2), account0);
+        assertEq(list.getNext(account2), address(0));
 
         // Remove account 0.
-        list.remove(_account0);
-        assertEq(list.getHead(), _account2);
-        assertEq(list.getTail(), _account2);
-        assertEq(list.getPrev(_account2), address(0));
-        assertEq(list.getNext(_account2), address(0));
+        list.remove(account0);
+        assertEq(list.getHead(), account2);
+        assertEq(list.getTail(), account2);
+        assertEq(list.getPrev(account2), address(0));
+        assertEq(list.getNext(account2), address(0));
 
         // Remove account 2.
-        list.remove(_account2);
+        list.remove(account2);
         assertEq(list.getHead(), address(0));
         assertEq(list.getTail(), address(0));
     }

@@ -1,55 +1,59 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.0;
 
-import "src/HeapOrdering.sol";
-import "./IHeapOrderingMock.sol";
+import {HeapOrdering} from "src/HeapOrdering.sol";
+import {IHeapOrderingMock} from "./interfaces/IHeapOrderingMock.sol";
 
 contract HeapOrderingMock is IHeapOrderingMock {
     using HeapOrdering for HeapOrdering.HeapArray;
 
-    HeapOrdering.HeapArray internal heap;
+    /* STORAGE */
 
-    function accountsValue(uint256 _index) external view returns (uint256) {
-        return heap.accounts[_index].value;
+    HeapOrdering.HeapArray internal _heap;
+
+    /* EXTERNAL */
+
+    function accountsValue(uint256 index) external view returns (uint256) {
+        return _heap.accounts[index].value;
     }
 
-    function accountsId(uint256 _index) external view returns (address) {
-        return heap.accounts[_index].id;
+    function accountsId(uint256 index) external view returns (address) {
+        return _heap.accounts[index].id;
     }
 
-    function indexOf(address _id) external view returns (uint256) {
-        return heap.indexOf[_id];
+    function indexOf(address id) external view returns (uint256) {
+        return _heap.indexOf[id];
     }
 
-    function update(address _id, uint256 _formerValue, uint256 _newValue, uint256 _maxSortedUsers) external {
-        heap.update(_id, _formerValue, _newValue, _maxSortedUsers);
+    function update(address id, uint256 formerValue, uint256 newValue, uint256 maxSortedUsers) external {
+        _heap.update(id, formerValue, newValue, maxSortedUsers);
     }
 
     function length() external view returns (uint256) {
-        return heap.length();
+        return _heap.length();
     }
 
     function size() external view returns (uint256) {
-        return heap.size;
+        return _heap.size;
     }
 
-    function getValueOf(address _id) external view returns (uint256) {
-        return heap.getValueOf(_id);
+    function getValueOf(address id) external view returns (uint256) {
+        return _heap.getValueOf(id);
     }
 
     function getHead() external view returns (address) {
-        return heap.getHead();
+        return _heap.getHead();
     }
 
     function getTail() external view returns (address) {
-        return heap.getTail();
+        return _heap.getTail();
     }
 
-    function getPrev(address _id) external view returns (address) {
-        return heap.getPrev(_id);
+    function getPrev(address id) external view returns (address) {
+        return _heap.getPrev(id);
     }
 
-    function getNext(address _id) external view returns (address) {
-        return heap.getNext(_id);
+    function getNext(address id) external view returns (address) {
+        return _heap.getNext(id);
     }
 }
