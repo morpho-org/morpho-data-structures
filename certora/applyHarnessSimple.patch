@@ -1,6 +1,6 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 --- DoubleLinkedList.sol	2023-05-23 16:01:50.888803463 +0200
-+++ DoubleLinkedList.sol	2023-05-23 16:13:50.472584927 +0200
++++ DoubleLinkedList.sol	2023-05-23 16:34:10.324900474 +0200
 @@ -18,6 +18,8 @@
          mapping(address => Account) accounts;
          address head;
@@ -10,7 +10,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
      }
  
      /* ERRORS */
-@@ -93,24 +95,22 @@
+@@ -93,24 +95,23 @@
      /// @param list The list to search in.
      /// @param id The address of the account.
      /// @param value The value of the account.
@@ -28,6 +28,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
  
 -        while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
 +        while (next != address(0) && list.accounts[next].value >= value) {
++            list.insertedAfter = next;
              next = list.accounts[next].next;
 -            unchecked {
 -                ++numberOfIterations;
@@ -44,7 +45,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
                  list.accounts[id] = Account({prev: address(0), next: next, value: value});
 diff -ruN MockDLL.sol MockDLL.sol
 --- MockDLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ MockDLL.sol	2023-05-23 16:08:40.341297402 +0200
++++ MockDLL.sol	2023-05-23 16:16:00.233326262 +0200
 @@ -0,0 +1,91 @@
 +// SPDX-License-Identifier: AGPL-3.0-only
 +pragma solidity ^0.8.0;
