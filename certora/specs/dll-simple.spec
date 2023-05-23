@@ -40,7 +40,7 @@ definition hasNoPrevIsHead(address addr) returns bool =
 definition hasNoNextIsTail(address addr) returns bool =
     isInDLL(addr) && getNext(addr) == 0 => addr == getTail();
 
-function safeAssumptions() { 
+function safeAssumptions() {
     requireInvariant zeroEmpty();
     requireInvariant headWellFormed();
     requireInvariant tailWellFormed();
@@ -49,7 +49,7 @@ function safeAssumptions() {
 
 // INVARIANTS & RULES
 // Notice that some invariants have the preservation proof separated for some public functions,
-// or even all of the public functions (in that last case they are still relevant for proving 
+// or even all of the public functions (in that last case they are still relevant for proving
 // the property at initial state).
 
 invariant zeroEmpty()
@@ -100,10 +100,10 @@ rule tailWellFormedPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant twoWayLinked(prev, getNext(prev));
 
     insertSorted(_id, _value);
-    
+
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
-    
+
     assert isTailWellFormed();
 }
 
@@ -138,10 +138,10 @@ rule noPrevIsHeadPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant noNextIsTail(prev);
 
     insertSorted(_id, _value);
-    
+
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
-    
+
     assert hasNoPrevIsHead(addr);
 }
 
@@ -167,10 +167,10 @@ rule noNextisTailPreservedInsertSorted(address _id, uint256 _value) {
     requireInvariant forwardLinked(getTail());
 
     insertSorted(_id, _value);
-    
+
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
-    
+
     assert hasNoNextIsTail(addr);
 }
 
@@ -215,7 +215,7 @@ invariant twoWayLinked(address first, address second)
     }
 
 rule twoWayLinkedPreservedInsertSorted(address _id, uint256 _value) {
-    address first; address second; address next; 
+    address first; address second; address next;
 
     require isTwoWayLinked(first, second);
     require isTwoWayLinked(getPrev(next), next);
@@ -313,4 +313,4 @@ invariant decrSorted()
 // result: there are no cycles that do not contain the 0 address
 // explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead()
 // is part of the cycle. This is absurd because we know from headWellFormed() that the previous element of
-// getHead() is the 0 address. 
+// getHead() is the 0 address.
