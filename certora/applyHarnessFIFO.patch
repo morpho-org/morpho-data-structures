@@ -1,6 +1,6 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2023-05-02 17:54:29.263627516 +0200
-+++ DoubleLinkedList.sol	2023-05-02 17:58:08.998603106 +0200
+--- DoubleLinkedList.sol	2023-05-23 16:01:50.888803463 +0200
++++ DoubleLinkedList.sol	2023-05-23 16:44:01.777091764 +0200
 @@ -18,6 +18,8 @@
          mapping(address => Account) accounts;
          address head;
@@ -9,29 +9,29 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 +        address insertedAfter; // HARNESS: address of the account after which the account was inserted at last insertion.
      }
  
-     /// ERRORS ///
+     /* ERRORS */
 @@ -101,14 +103,18 @@
  
          uint256 numberOfIterations;
-         address next = _list.head; // If not added at the end of the list `_id` will be inserted before `next`.
-+        _list.insertedAfter = address(0); // HARNESS
+         address next = list.head; // If not added at the end of the list `id` will be inserted before `next`.
++        list.insertedAfter = address(0); // HARNESS
  
-         while (numberOfIterations < _maxIterations && next != address(0) && _list.accounts[next].value >= _value) {
-+            _list.insertedAfter = next; // HARNESS
-             next = _list.accounts[next].next;
+         while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
++            list.insertedAfter = next; // HARNESS
+             next = list.accounts[next].next;
              unchecked {
                  ++numberOfIterations;
              }
          }
  
-+        _list.insertedBefore = next; // HARNESS
++        list.insertedBefore = next; // HARNESS
 +
          // Account is not the new tail.
-         if (numberOfIterations < _maxIterations && next != address(0)) {
+         if (numberOfIterations < maxIterations && next != address(0)) {
              // Account is the new head.
 diff -ruN MockDLL.sol MockDLL.sol
 --- MockDLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ MockDLL.sol	2023-05-02 17:56:20.246096568 +0200
++++ MockDLL.sol	2023-05-23 16:42:32.913885637 +0200
 @@ -0,0 +1,111 @@
 +// SPDX-License-Identifier: AGPL-3.0-only
 +pragma solidity ^0.8.0;
