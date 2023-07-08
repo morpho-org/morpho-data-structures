@@ -2,7 +2,9 @@ name: Certora
 
 on:
   push:
-  workflow_dispatch:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   verify:
