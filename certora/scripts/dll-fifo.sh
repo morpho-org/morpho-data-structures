@@ -8,4 +8,4 @@ certoraRun \
     --loop_iter 4 \
     --optimistic_loop \
     --msg "FIFO DLL verification" \
-    $@
+    "$@"

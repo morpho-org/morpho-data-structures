@@ -8,4 +8,4 @@ certoraRun \
     --loop_iter 7 \
     --optimistic_loop \
     --msg "Simple DLL verification" \
-    $@
+    "$@"
