@@ -47,4 +47,4 @@ jobs:
         run: python3 -m pip install --upgrade halmos
 
       - name: Run halmos
-        run: halmos --function testProve --loop 4 --symbolic-storage
+        run: halmos --function testProve --loop 4 --symbolic-storage --error-unknown --test-parallel --solver-parallel --solver-timeout-assertion 0
