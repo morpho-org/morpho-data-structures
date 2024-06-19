@@ -41,6 +41,6 @@ jobs:
           echo "key length" ${#CERTORAKEY}
           make -C certora munged-simple
           make -C certora munged-fifo
-          certora certora/confs/${{ matrix.conf }}.conf
+          certoraRun certora/confs/${{ matrix.conf }}.conf
         env:
           CERTORAKEY: ${{ secrets.CERTORAKEY }}
