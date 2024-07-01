@@ -11,6 +11,14 @@ jobs:
   verify:
     runs-on: ubuntu-latest
 
+    strategy:
+      fail-fast: false
+
+      matrix:
+        conf:
+          - DllFifo
+          - DllSimple
+
     steps:
       - uses: actions/checkout@v3
 
@@ -26,20 +34,13 @@ jobs:
         run: |
           wget https://github.com/ethereum/solidity/releases/download/v0.8.17/solc-static-linux
           chmod +x solc-static-linux
-          sudo mv solc-static-linux /usr/local/bin/solc8.17
+          sudo mv solc-static-linux /usr/local/bin/solc-0.8.17
 
       - name: Verify rule ${{ matrix.script }}
         run: |
           echo "key length" ${#CERTORAKEY}
-          bash certora/scripts/${{ matrix.script }} --solc solc8.17
+          make -C certora munged-simple
+          make -C certora munged-fifo
+          certoraRun certora/confs/${{ matrix.conf }}.conf
         env:
           CERTORAKEY: ${{ secrets.CERTORAKEY }}
-
-    strategy:
-      fail-fast: false
-      max-parallel: 4
-
-      matrix:
-        script:
-          - dll-fifo.sh
-          - dll-simple.sh
