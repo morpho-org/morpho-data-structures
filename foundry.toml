@@ -1,6 +1,7 @@
 [profile.default]
 solc_version = "0.8.17"
 no_match_test = "testGasUsage"
+gas_limit = "18446744073709551615" # 2^64 - 1, to remove the gas limit
 
 [profile.gas]
 no_match_test = "None"
