@@ -1,16 +1,16 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2023-05-23 16:01:50.888803463 +0200
-+++ DoubleLinkedList.sol	2023-05-23 16:34:10.324900474 +0200
-@@ -18,6 +18,8 @@
+--- DoubleLinkedList.sol	2024-07-10 12:25:51.055549876 +0200
++++ DoubleLinkedList.sol	2024-07-10 12:34:45.178218509 +0200
+@@ -16,6 +16,8 @@
+ 
+     struct List {
          mapping(address => Account) accounts;
-         address head;
-         address tail;
 +        address insertedBefore; // HARNESS: address of the account before which the account was inserted at last insertion.
 +        address insertedAfter; // HARNESS: address of the account after which the account was inserted at last insertion.
      }
  
      /* ERRORS */
-@@ -93,24 +95,23 @@
+@@ -90,23 +92,20 @@
      /// @param list The list to search in.
      /// @param id The address of the account.
      /// @param value The value of the account.
@@ -22,9 +22,9 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
          if (list.accounts[id].value != 0) revert AccountAlreadyInserted();
  
 -        uint256 numberOfIterations;
--        address next = list.head; // If not added at the end of the list `id` will be inserted before `next`.
+-        address next = list.accounts[address(0)].next; // If not added at the end of the list `id` will be inserted before `next`.
 +        list.insertedAfter = address(0);
-+        address next = list.head; // `id` will be inserted before `next`.
++        address next = list.accounts[address(0)].next; // `id` will be inserted before `next`.
  
 -        while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
 +        while (next != address(0) && list.accounts[next].value >= value) {
@@ -35,17 +35,14 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 -            }
          }
  
+-        if (numberOfIterations == maxIterations) next = address(0);
 +        list.insertedBefore = next;
-+
-         // Account is not the new tail.
--        if (numberOfIterations < maxIterations && next != address(0)) {
-+        if (next != address(0)) {
-             // Account is the new head.
-             if (next == list.head) {
-                 list.accounts[id] = Account({prev: address(0), next: next, value: value});
+ 
+         address prev = list.accounts[next].prev;
+         list.accounts[id] = Account(prev, next, value);
 diff -ruN MockDLL.sol MockDLL.sol
 --- MockDLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ MockDLL.sol	2023-05-23 16:16:00.233326262 +0200
++++ MockDLL.sol	2024-07-10 12:26:25.130305388 +0200
 @@ -0,0 +1,91 @@
 +// SPDX-License-Identifier: AGPL-3.0-only
 +pragma solidity ^0.8.0;
