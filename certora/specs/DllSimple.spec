@@ -57,6 +57,9 @@ function safeAssumptions() {
 // or even all of the public functions (in that last case they are still relevant for proving
 // the property at initial state).
 
+invariant emptyZero()
+    ! isInDll(0);
+
 invariant emptyEquiv()
     isEmptyEquiv()
     { preserved remove(address id) {

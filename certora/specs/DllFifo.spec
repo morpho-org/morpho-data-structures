@@ -51,6 +51,7 @@ definition hasNoNextIsTail(address addr) returns bool =
     isInDll(addr) && getNext(addr) == 0 => addr == getTail();
 
 function safeAssumptions() {
+    requireInvariant emptyZero();
     requireInvariant emptyEquiv();
     requireInvariant headWellFormed();
     requireInvariant tailWellFormed();
@@ -61,6 +62,9 @@ function safeAssumptions() {
 // Notice that some invariants have the preservation proof separated for some public functions,
 // or even all of the public functions (in that last case they are still relevant for proving
 // the property at initial state).
+
+invariant emptyZero()
+    ! isInDll(0);
 
 invariant emptyEquiv()
     isEmptyEquiv()
