@@ -97,7 +97,7 @@ library DoubleLinkedList {
         if (list.accounts[id].value != 0) revert AccountAlreadyInserted();
 
         uint256 numberOfIterations;
-        address next = list.accounts[address(0)].next; // If not added at the end of the list `id` will be inserted before `next`.
+        address next = list.accounts[address(0)].next; // `id` will be inserted before `next`.
 
         while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
             next = list.accounts[next].next;
