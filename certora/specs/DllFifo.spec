@@ -48,7 +48,6 @@ definition hasNoNextIsTail(address addr) returns bool =
     isInDll(addr) && getNext(addr) == 0 => addr == getTail();
 
 function safeAssumptions() {
-    requireInvariant zeroEmpty();
     requireInvariant headWellFormed();
     requireInvariant tailWellFormed();
     requireInvariant tipsZero();
@@ -90,27 +89,10 @@ rule linkedToZeroPreservedInsertSorted(address id, uint256 value) {
     assert isLinkedToZero(addr);
 }
 
-rule zeroEmptyPreservedInsertSorted(address id, uint256 value) {
-    address prev;
-
-    require isEmpty(0);
-
-    requireInvariant twoWayLinked(prev, getNext(prev));
-    requireInvariant noNextIsTail(prev);
-    requireInvariant tipsZero();
-
-    insertSorted(id, value, maxIterations());
-
-    require prev == getInsertedAfter();
-
-    assert isEmpty(0);
-}
-
 invariant headWellFormed()
     isHeadWellFormed()
     filtered { f -> f.selector != sig:insertSorted(address, uint256).selector }
     { preserved remove(address id) {
-        requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(id), id);
         requireInvariant twoWayLinked(id, getNext(id));
         requireInvariant linkedIsInDll(getNext(id));
@@ -138,7 +120,6 @@ invariant tailWellFormed()
     isTailWellFormed()
     filtered { f -> f.selector != sig:insertSorted(address, uint256, uint256).selector }
     { preserved remove(address id) {
-        requireInvariant zeroEmpty();
         requireInvariant twoWayLinked(getPrev(id), id);
         requireInvariant twoWayLinked(id, getNext(id));
         requireInvariant linkedIsInDll(getPrev(id));
@@ -151,7 +132,6 @@ rule tailWellFormedPreservedInsertSorted(address id, uint256 value) {
 
     require isTailWellFormed();
 
-    requireInvariant zeroEmpty();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
 
@@ -166,7 +146,6 @@ rule tailWellFormedPreservedInsertSorted(address id, uint256 value) {
 invariant tipsZero()
     getTail() == 0 <=> getHead() == 0
     { preserved remove(address id) {
-        requireInvariant zeroEmpty();
         requireInvariant noNextIsTail(id);
         requireInvariant noPrevIsHead(id);
       }
