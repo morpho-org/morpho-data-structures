@@ -22,6 +22,9 @@ definition isInDll(address id) returns bool =
 definition isLinked(address id) returns bool =
     id != 0 && (getPrev(id) != 0 || getNext(id) != 0 || getPrev(0) == id || getNext(0) == id);
 
+definition isEmptyEquiv() returns bool =
+    getNext(0) == 0 <=> getPrev(0) == 0;
+
 definition isLinkedToZero(address id) returns bool =
     isLinked(id) =>
     (getNext(id) == 0 => getPrev(0) == id) &&
@@ -53,6 +56,17 @@ function safeAssumptions() {
 // Notice that some invariants have the preservation proof separated for some public functions,
 // or even all of the public functions (in that last case they are still relevant for proving
 // the property at initial state).
+
+invariant emptyEquiv()
+    isEmptyEquiv()
+    { preserved remove(address id) {
+        safeAssumptions();
+        requireInvariant twoWayLinked(getPrev(id), id);
+        requireInvariant twoWayLinked(id, getNext(id));
+        requireInvariant linkedToZero(id);
+        requireInvariant inDllIsLinked(id);
+      }
+    }
 
 invariant linkedToZero(address addr)
     isLinkedToZero(addr)
@@ -279,7 +293,7 @@ rule twoWayLinkedPreservedInsertSorted(address id, uint256 value) {
 
     require isTwoWayLinked(first, second);
     require isTwoWayLinked(getPrev(next), next);
-    requireInvariant twoWayLinked(prev, getNext(prev));
+    require isTwoWayLinked(prev, getNext(prev));
 
     safeAssumptions();
     requireInvariant linkedIsInDll(id);

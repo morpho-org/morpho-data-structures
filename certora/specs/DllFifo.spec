@@ -26,6 +26,9 @@ definition isInDll(address id) returns bool =
 definition isLinked(address id) returns bool =
     id != 0 && (getPrev(id) != 0 || getNext(id) != 0 || getPrev(0) == id || getNext(0) == id);
 
+definition isEmptyEquiv() returns bool =
+    getNext(0) == 0 <=> getPrev(0) == 0;
+
 definition isLinkedToZero(address id) returns bool =
     isLinked(id) =>
     (getNext(id) == 0 => getPrev(0) == id) &&
@@ -48,6 +51,7 @@ definition hasNoNextIsTail(address addr) returns bool =
     isInDll(addr) && getNext(addr) == 0 => addr == getTail();
 
 function safeAssumptions() {
+    requireInvariant emptyEquiv();
     requireInvariant headWellFormed();
     requireInvariant tailWellFormed();
     requireInvariant tipsZero();
@@ -57,6 +61,17 @@ function safeAssumptions() {
 // Notice that some invariants have the preservation proof separated for some public functions,
 // or even all of the public functions (in that last case they are still relevant for proving
 // the property at initial state).
+
+invariant emptyEquiv()
+    isEmptyEquiv()
+    { preserved remove(address id) {
+        safeAssumptions();
+        requireInvariant twoWayLinked(getPrev(id), id);
+        requireInvariant twoWayLinked(id, getNext(id));
+        requireInvariant linkedToZero(id);
+        requireInvariant inDllIsLinked(id);
+      }
+    }
 
 invariant linkedToZero(address addr)
     isLinkedToZero(addr)
@@ -76,6 +91,7 @@ rule linkedToZeroPreservedInsertSorted(address id, uint256 value) {
 
     require isLinkedToZero(addr);
 
+    safeAssumptions();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant linkedToZero(prev);
@@ -225,6 +241,7 @@ rule inDllIsLinkedPreservedInsertSorted(address id, uint256 value) {
 
     require isInDll(addr) => isLinked(addr);
 
+    safeAssumptions();
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
     requireInvariant linkedToZero(prev);
@@ -279,16 +296,18 @@ invariant twoWayLinked(address first, address second)
     }
 
 rule twoWayLinkedPreservedInsertSorted(address id, uint256 value) {
-    address first; address second; address next;
+    address first; address second; address prev; address next;
 
     require isTwoWayLinked(first, second);
     require isTwoWayLinked(getPrev(next), next);
+    require isTwoWayLinked(prev, getNext(prev));
 
     safeAssumptions();
     requireInvariant linkedIsInDll(id);
 
     insertSorted(id, value, maxIterations());
 
+    require prev == getInsertedAfter();
     require next == getInsertedBefore();
 
     assert isTwoWayLinked(first, second);
@@ -365,7 +384,6 @@ rule insertSortedDecreasingOrder(address id, uint256 value) {
     require prev == getInsertedAfter();
 
     uint256 positionInDll = lenUpTo(id);
-
     assert positionInDll > maxIter => greaterThanUpTo(value, 0, maxIter) && id == getTail();
     assert positionInDll <= maxIter => greaterThanUpTo(value, id, getLength()) && value > getValueOf(getNext(id));
 }
