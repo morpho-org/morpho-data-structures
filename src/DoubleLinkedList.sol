@@ -34,7 +34,7 @@ library DoubleLinkedList {
 
     /* INTERNAL */
 
-    /// @notice Returns the `account` linked to `id`.
+    /// @notice Returns the value of the account linked to `id`.
     /// @param list The list to search in.
     /// @param id The address of the account.
     /// @return The value of the account.
