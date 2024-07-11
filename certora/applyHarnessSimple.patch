@@ -1,6 +1,6 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
 --- DoubleLinkedList.sol	2024-07-10 12:25:51.055549876 +0200
-+++ DoubleLinkedList.sol	2024-07-10 12:34:45.178218509 +0200
++++ DoubleLinkedList.sol	2024-07-11 13:19:00.201544572 +0200
 @@ -16,6 +16,8 @@
  
      struct List {
@@ -10,7 +10,7 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
      }
  
      /* ERRORS */
-@@ -90,23 +92,20 @@
+@@ -90,23 +92,19 @@
      /// @param list The list to search in.
      /// @param id The address of the account.
      /// @param value The value of the account.
@@ -23,12 +23,11 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
  
 -        uint256 numberOfIterations;
 -        address next = list.accounts[address(0)].next; // If not added at the end of the list `id` will be inserted before `next`.
-+        list.insertedAfter = address(0);
 +        address next = list.accounts[address(0)].next; // `id` will be inserted before `next`.
  
 -        while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
 +        while (next != address(0) && list.accounts[next].value >= value) {
-+            list.insertedAfter = next;
++            list.insertedAfter = next; // HARNESS
              next = list.accounts[next].next;
 -            unchecked {
 -                ++numberOfIterations;
@@ -36,13 +35,13 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
          }
  
 -        if (numberOfIterations == maxIterations) next = address(0);
-+        list.insertedBefore = next;
++        list.insertedBefore = next; // HARNESS
  
          address prev = list.accounts[next].prev;
          list.accounts[id] = Account(prev, next, value);
 diff -ruN MockDLL.sol MockDLL.sol
 --- MockDLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ MockDLL.sol	2024-07-10 12:26:25.130305388 +0200
++++ MockDLL.sol	2024-07-11 12:42:15.108949766 +0200
 @@ -0,0 +1,91 @@
 +// SPDX-License-Identifier: AGPL-3.0-only
 +pragma solidity ^0.8.0;
