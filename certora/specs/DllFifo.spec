@@ -409,5 +409,5 @@ rule insertSortedDecreasingOrder(address id, uint256 value) {
 // explanation: it comes from the fact that every non zero address that is in the DLL is linked to getHead().
 
 // result: there are no cycles that do not contain the 0 address
-// explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead()/ is part of the cycle.
+// explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead() is part of the cycle.
 // The result follows because we know from headWellFormed() that the previous element of getHead() is the 0 address.
