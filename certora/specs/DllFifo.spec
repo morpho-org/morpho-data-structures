@@ -60,7 +60,7 @@ function safeAssumptions() {
 
 invariant linkedToZero(address addr)
     isLinkedToZero(addr)
-    filtered { f -> f.selector != sig:insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != sig:insertSorted(address, uint256, uint256).selector }
     { preserved remove(address id) {
         requireInvariant twoWayLinked(getPrev(id), id);
         requireInvariant twoWayLinked(id, getNext(id));
@@ -81,7 +81,7 @@ rule linkedToZeroPreservedInsertSorted(address id, uint256 value) {
     requireInvariant linkedToZero(prev);
     requireInvariant inDllIsLinked(prev);
 
-    insertSorted(id, value);
+    insertSorted(id, value, maxIterations());
 
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
@@ -91,7 +91,7 @@ rule linkedToZeroPreservedInsertSorted(address id, uint256 value) {
 
 invariant headWellFormed()
     isHeadWellFormed()
-    filtered { f -> f.selector != sig:insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != sig:insertSorted(address, uint256, uint256).selector }
     { preserved remove(address id) {
         requireInvariant twoWayLinked(getPrev(id), id);
         requireInvariant twoWayLinked(id, getNext(id));
@@ -108,7 +108,7 @@ rule headWellFormedPreservedInsertSorted(address id, uint256 value) {
     requireInvariant twoWayLinked(getPrev(next), next);
     requireInvariant twoWayLinked(prev, getNext(prev));
 
-    insertSorted(id, value);
+    insertSorted(id, value, maxIterations());
 
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
@@ -211,7 +211,7 @@ rule noNextisTailPreservedInsertSorted(address id, uint256 value) {
 
 invariant inDllIsLinked(address addr)
     isInDll(addr) => isLinked(addr)
-    filtered { f -> f.selector != sig:insertSorted(address, uint256).selector }
+    filtered { f -> f.selector != sig:insertSorted(address, uint256, uint256).selector }
     { preserved remove(address id) {
         requireInvariant twoWayLinked(getPrev(id), id);
         requireInvariant twoWayLinked(id, getNext(id));
@@ -230,7 +230,7 @@ rule inDllIsLinkedPreservedInsertSorted(address id, uint256 value) {
     requireInvariant linkedToZero(prev);
     requireInvariant inDllIsLinked(prev);
 
-    insertSorted(id, value);
+    insertSorted(id, value, maxIterations());
 
     require prev == getInsertedAfter();
     require next == getInsertedBefore();
