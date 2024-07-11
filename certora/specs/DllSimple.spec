@@ -359,10 +359,10 @@ invariant decrSorted()
 // DERIVED RESULTS
 
 // result: isForwardLinkedBetween(getHead(), getTail())
-// explanation: if getTail() == 0, then from tipsZero() we know that getHead() == 0 so the result follows
-// otherwise, from tailWellFormed(), we know that isInDll(getTail()) so the result follows from forwardLinked(getTail()).
+// explanation: if getTail() == 0, then from tipsZero() we know that getHead() == 0 so the result follows.
+// Otherwise, from tailWellFormed(), we know that isInDll(getTail()) so the result follows from forwardLinked(getTail()).
 
-// result: forall addr. isForwardLinkedBetween(addr, getTail())
+// result: forall addr. isInDll(addr) => isForwardLinkedBetween(addr, getTail())
 // explanation: it can be obtained from the previous result and forwardLinked.
 // Going from head to tail should lead to addr in between (otherwise addr is never reached because there is nothing after the tail).
 
@@ -373,6 +373,5 @@ invariant decrSorted()
 // explanation: it comes from the fact that every non zero address that is in the DLL is linked to getHead().
 
 // result: there are no cycles that do not contain the 0 address
-// explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead()
-// is part of the cycle. This is absurd because we know from headWellFormed() that the previous element of
-// getHead() is the 0 address.
+// explanation: let N be a node in a cycle. Since there is a link from getHead() to N, it means that getHead() is part of the cycle.
+// The result follows because we know from headWellFormed() that the previous element of getHead() is the 0 address.
