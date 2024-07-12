@@ -96,14 +96,12 @@ library DoubleLinkedList {
         if (id == address(0)) revert AddressIsZero();
         if (list.accounts[id].value != 0) revert AccountAlreadyInserted();
 
-        uint256 numberOfIterations;
         address next = list.accounts[address(0)].next; // `id` will be inserted before `next`.
 
-        while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
+        uint256 numberOfIterations;
+        for (; numberOfIterations < maxIterations; numberOfIterations++) {
+            if (next == address(0) || list.accounts[next].value < value) break;
             next = list.accounts[next].next;
-            unchecked {
-                ++numberOfIterations;
-            }
         }
 
         if (numberOfIterations == maxIterations) next = address(0);

@@ -1,6 +1,6 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2024-07-11 13:38:21.976522997 +0200
-+++ DoubleLinkedList.sol	2024-07-11 13:40:22.469518264 +0200
+--- DoubleLinkedList.sol	2024-07-12 09:49:49.899261374 +0200
++++ DoubleLinkedList.sol	2024-07-12 09:53:11.964303440 +0200
 @@ -16,6 +16,8 @@
  
      struct List {
@@ -10,15 +10,12 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
      }
  
      /* ERRORS */
-@@ -100,6 +102,7 @@
-         address next = list.accounts[address(0)].next; // `id` will be inserted before `next`.
- 
-         while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
+@@ -101,10 +103,12 @@
+         uint256 numberOfIterations;
+         for (; numberOfIterations < maxIterations; numberOfIterations++) {
+             if (next == address(0) || list.accounts[next].value < value) break;
 +            list.insertedAfter = next; // HARNESS
              next = list.accounts[next].next;
-             unchecked {
-                 ++numberOfIterations;
-@@ -107,6 +110,7 @@
          }
  
          if (numberOfIterations == maxIterations) next = address(0);
