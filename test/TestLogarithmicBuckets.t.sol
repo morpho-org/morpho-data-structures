@@ -120,7 +120,7 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
 }
 
 contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test, SymTest {
-    function setUp() public {
+    function setUpSymbolic() public {
         svm.enableSymbolicStorage(address(this));
     }
 
