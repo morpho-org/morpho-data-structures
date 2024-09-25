@@ -47,4 +47,4 @@ jobs:
         run: python3 -m pip install --upgrade halmos
 
       - name: Run halmos
-        run: halmos --function testProve --loop 4 --test-parallel --solver-timeout-assertion 0
+        run: halmos --function testProve --loop 4 --solver-timeout-assertion 0
