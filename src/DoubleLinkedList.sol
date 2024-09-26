@@ -16,8 +16,6 @@ library DoubleLinkedList {
 
     struct List {
         mapping(address => Account) accounts;
-        address head;
-        address tail;
     }
 
     /* ERRORS */
@@ -36,7 +34,7 @@ library DoubleLinkedList {
 
     /* INTERNAL */
 
-    /// @notice Returns the `account` linked to `id`.
+    /// @notice Returns the value of the account linked to `id`.
     /// @param list The list to search in.
     /// @param id The address of the account.
     /// @return The value of the account.
@@ -48,14 +46,14 @@ library DoubleLinkedList {
     /// @param list The list to get the head.
     /// @return The address of the head.
     function getHead(List storage list) internal view returns (address) {
-        return list.head;
+        return list.accounts[address(0)].next;
     }
 
     /// @notice Returns the address at the tail of the `list`.
     /// @param list The list to get the tail.
     /// @return The address of the tail.
     function getTail(List storage list) internal view returns (address) {
-        return list.tail;
+        return list.accounts[address(0)].prev;
     }
 
     /// @notice Returns the next id address from the current `id`.
@@ -79,12 +77,11 @@ library DoubleLinkedList {
     /// @param id The address of the account.
     function remove(List storage list, address id) internal {
         Account memory account = list.accounts[id];
+        if (id == address(0)) revert AddressIsZero();
         if (account.value == 0) revert AccountDoesNotExist();
 
-        if (account.prev != address(0)) list.accounts[account.prev].next = account.next;
-        else list.head = account.next;
-        if (account.next != address(0)) list.accounts[account.next].prev = account.prev;
-        else list.tail = account.prev;
+        list.accounts[account.prev].next = account.next;
+        list.accounts[account.next].prev = account.prev;
 
         delete list.accounts[id];
     }
@@ -99,47 +96,19 @@ library DoubleLinkedList {
         if (id == address(0)) revert AddressIsZero();
         if (list.accounts[id].value != 0) revert AccountAlreadyInserted();
 
+        address next = getHead(list); // `id` will be inserted before `next`.
+
         uint256 numberOfIterations;
-        address next = list.head; // If not added at the end of the list `id` will be inserted before `next`.
-
-        while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
-            next = list.accounts[next].next;
-            unchecked {
-                ++numberOfIterations;
-            }
+        for (; numberOfIterations < maxIterations; numberOfIterations++) {
+            if (next == address(0) || list.accounts[next].value < value) break;
+            next = getNext(list, next);
         }
 
-        // Account is not the new tail.
-        if (numberOfIterations < maxIterations && next != address(0)) {
-            // Account is the new head.
-            if (next == list.head) {
-                list.accounts[id] = Account({prev: address(0), next: next, value: value});
-                list.head = id;
-                list.accounts[next].prev = id;
-            }
-            // Account is not the new head.
-            else {
-                address prev = list.accounts[next].prev;
-                list.accounts[id] = Account({prev: prev, next: next, value: value});
-                list.accounts[prev].next = id;
-                list.accounts[next].prev = id;
-            }
-        }
-        // Account is the new tail.
-        else {
-            // Account is the new head.
-            if (list.head == address(0)) {
-                list.accounts[id] = Account({prev: address(0), next: address(0), value: value});
-                list.head = id;
-                list.tail = id;
-            }
-            // Account is not the new head.
-            else {
-                address tail = list.tail;
-                list.accounts[id] = Account({prev: tail, next: address(0), value: value});
-                list.accounts[tail].next = id;
-                list.tail = id;
-            }
-        }
+        if (numberOfIterations == maxIterations) next = address(0);
+
+        address prev = getPrev(list, next);
+        list.accounts[id] = Account(prev, next, value);
+        list.accounts[prev].next = id;
+        list.accounts[next].prev = id;
     }
 }
