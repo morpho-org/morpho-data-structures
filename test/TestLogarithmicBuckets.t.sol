@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import {Test} from "forge-std/Test.sol";
+import {SymTest} from "halmos-cheatcodes/SymTest.sol";
 import {
     LogarithmicBucketsMock, BucketDLLMock, BucketDLL, LogarithmicBuckets
 } from "./mocks/LogarithmicBucketsMock.sol";
@@ -118,7 +119,11 @@ contract TestLogarithmicBuckets is LogarithmicBucketsMock, Test {
     }
 }
 
-contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test {
+contract TestProveLogarithmicBuckets is LogarithmicBucketsMock, Test, SymTest {
+    function setUpSymbolic() public {
+        svm.enableSymbolicStorage(address(this));
+    }
+
     function isPowerOfTwo(uint256 x) public pure returns (bool) {
         unchecked {
             return x != 0 && (x & (x - 1)) == 0;
