@@ -1,6 +1,6 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2024-08-14 10:10:08.974975205 +0200
-+++ DoubleLinkedList.sol	2024-08-14 10:14:10.970436843 +0200
+--- DoubleLinkedList.sol
++++ DoubleLinkedList.sol
 @@ -16,6 +16,8 @@
  
      struct List {
