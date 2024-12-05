@@ -12,13 +12,6 @@ contract MockDllFifo {
 
     uint256 public maxIterations;
 
-    uint256 internal dummy_state_variable;
-
-    function dummy_state_modifying_function() public {
-        // to fix a CVL error when only one function is accessible
-        dummy_state_variable = 1;
-    }
-
     function getValueOf(address _id) public view returns (uint256) {
         return dll.getValueOf(_id);
     }
