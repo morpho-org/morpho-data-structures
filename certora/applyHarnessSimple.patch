@@ -1,16 +1,16 @@
 diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
---- DoubleLinkedList.sol	2023-05-23 16:01:50.888803463 +0200
-+++ DoubleLinkedList.sol	2023-05-23 16:34:10.324900474 +0200
-@@ -18,6 +18,8 @@
+--- DoubleLinkedList.sol
++++ DoubleLinkedList.sol
+@@ -16,6 +16,8 @@
+ 
+     struct List {
          mapping(address => Account) accounts;
-         address head;
-         address tail;
 +        address insertedBefore; // HARNESS: address of the account before which the account was inserted at last insertion.
 +        address insertedAfter; // HARNESS: address of the account after which the account was inserted at last insertion.
      }
  
      /* ERRORS */
-@@ -93,24 +95,23 @@
+@@ -90,21 +92,20 @@
      /// @param list The list to search in.
      /// @param id The address of the account.
      /// @param value The value of the account.
@@ -21,120 +21,18 @@ diff -ruN DoubleLinkedList.sol DoubleLinkedList.sol
          if (id == address(0)) revert AddressIsZero();
          if (list.accounts[id].value != 0) revert AccountAlreadyInserted();
  
--        uint256 numberOfIterations;
--        address next = list.head; // If not added at the end of the list `id` will be inserted before `next`.
-+        list.insertedAfter = address(0);
-+        address next = list.head; // `id` will be inserted before `next`.
+         address next = getHead(list); // `id` will be inserted before `next`.
  
--        while (numberOfIterations < maxIterations && next != address(0) && list.accounts[next].value >= value) {
-+        while (next != address(0) && list.accounts[next].value >= value) {
-+            list.insertedAfter = next;
-             next = list.accounts[next].next;
--            unchecked {
--                ++numberOfIterations;
--            }
+-        uint256 numberOfIterations;
+-        for (; numberOfIterations < maxIterations; numberOfIterations++) {
++        for (;;) {
+             if (next == address(0) || list.accounts[next].value < value) break;
++            list.insertedAfter = next; // HARNESS
+             next = getNext(list, next);
          }
  
-+        list.insertedBefore = next;
-+
-         // Account is not the new tail.
--        if (numberOfIterations < maxIterations && next != address(0)) {
-+        if (next != address(0)) {
-             // Account is the new head.
-             if (next == list.head) {
-                 list.accounts[id] = Account({prev: address(0), next: next, value: value});
-diff -ruN MockDLL.sol MockDLL.sol
---- MockDLL.sol	1970-01-01 01:00:00.000000000 +0100
-+++ MockDLL.sol	2023-05-23 16:16:00.233326262 +0200
-@@ -0,0 +1,91 @@
-+// SPDX-License-Identifier: AGPL-3.0-only
-+pragma solidity ^0.8.0;
-+
-+import "./DoubleLinkedList.sol";
-+
-+contract MockDLL {
-+    using DoubleLinkedList for DoubleLinkedList.List;
-+
-+    // VERIFICATION INTERFACE
-+
-+    DoubleLinkedList.List public dll;
-+
-+    uint256 internal dummy_state_variable;
-+
-+    function dummy_state_modifying_function() public {
-+        // to fix a CVL error when only one function is accessible
-+        dummy_state_variable = 1;
-+    }
-+
-+    function getValueOf(address _id) public view returns (uint256) {
-+        return dll.getValueOf(_id);
-+    }
-+
-+    function getHead() public view returns (address) {
-+        return dll.getHead();
-+    }
-+
-+    function getTail() public view returns (address) {
-+        return dll.getTail();
-+    }
-+
-+    function getNext(address _id) public view returns (address) {
-+        return dll.getNext(_id);
-+    }
-+
-+    function getPrev(address _id) public view returns (address) {
-+        return dll.getPrev(_id);
-+    }
-+
-+    function remove(address _id) public {
-+        dll.remove(_id);
-+    }
-+
-+    function insertSorted(address _id, uint256 _value) public {
-+        dll.insertSorted(_id, _value);
-+    }
-+
-+    // SPECIFICATION HELPERS
-+
-+    function getInsertedAfter() public view returns (address) {
-+        return dll.insertedAfter;
-+    }
-+
-+    function getInsertedBefore() public view returns (address) {
-+        return dll.insertedBefore;
-+    }
-+
-+    function getLength() internal view returns (uint256) {
-+        uint256 len;
-+        for (address current = getHead(); current != address(0); current = getNext(current)) len++;
-+        return len;
-+    }
-+
-+    function linkBetween(address _start, address _end) internal view returns (bool, address) {
-+        if (_start == _end) return (true, address(0));
-+        for (uint256 maxIter = getLength(); maxIter > 0; maxIter--) {
-+            address next = getNext(_start);
-+            if (next == _end) return (true, _start);
-+            _start = next;
-+        }
-+        return (false, address(0));
-+    }
-+
-+    function isForwardLinkedBetween(address _start, address _end) public view returns (bool ret) {
-+        (ret, ) = linkBetween(_start, _end);
-+    }
-+
-+    function getPreceding(address _end) public view returns (address last) {
-+        (, last) = linkBetween(getHead(), _end);
-+    }
-+
-+    function isDecrSortedFrom(address _start) public view returns (bool) {
-+        for (uint256 maxIter = getLength(); maxIter > 0; maxIter--) {
-+            address next = getNext(_start);
-+            if (next == address(0)) return true;
-+            if (getValueOf(_start) < getValueOf(next)) return false;
-+            _start = getNext(_start);
-+        }
-+        return true;
-+    }
-+}
+-        if (numberOfIterations == maxIterations) next = address(0);
++        list.insertedBefore = next; // HARNESS
+ 
+         address prev = getPrev(list, next);
+         list.accounts[id] = Account(prev, next, value);
