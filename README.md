@@ -1,6 +1,6 @@
 # Morpho Data Structures 🦋
 
-This repository contains the data structures that are used in Morpho's matching engine.
+This repository contains the data structures that are used in Morpho Optimizer's matching engine.
 The data structures are built to be secure and gas efficient.
 
 ## Double Linked List
@@ -34,51 +34,10 @@ The main entry point is the `update` function, calling internally either `insert
 
 Other data structures may be explored in the future and we are open to any suggestions or optimization of current implementations ⚡️
 
-# Contributing
-
-In this section, you will find some guidelines to read before contributing to the project.
-
-## Setup
-
-Update git submodules:
-
-```
-git submodule update --init --recursive
-```
-
-Run yarn:
-
-```
-yarn
-```
-
-## Testing
-
-The tests can be run with [Foundry](https://github.com/foundry-rs/foundry).
-
-For the `RedBlackBinaryTree`, you can run the tests with hardhat with `yarn test`.
-
-## Creating issues and PRs
-
-For issues and PR, please use conventional naming and add Morpho's contributors to review your code or tackle your issue.
-
-## Before merging a PR
-
-Before merging a PR:
-
-- PR must have been reviewed by reviewers. They must deliver a complete report on the smart contracts (see the section below).
-- Comments and requested changes must have been resolved.
-- PR must have been approved by every reviewer.
-- CI must pass.
-
-## Code Formatting
-
-We use Husky hook to format code before being pushed to any remote branch to enforce coding style among all developers.
-
 # Audits
 
 The code concerning the [heap based ordering data-structure](./contracts/HeapOrdering.sol) has been audited by [Omniscia](https://omniscia.io) and the report can be found [online](https://omniscia.io/reports/morpho-heap-ordering-structure/) or in the file [Morpho_Omniscia](./audits/Morpho_Omniscia.pdf).
 
-# Questions
+# Licenses 
 
-For any questions, you can send an email to [merlin@mopho.best](mailto:merlin@morpho.best) 😊
+The data structures are licensed under `AGPL-3.0-only`, see [LICENSE](./LICENSE).
